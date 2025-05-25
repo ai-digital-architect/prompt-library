@@ -1,0 +1,602 @@
+pipeline:
+  name: React-TypeScript-Vite-Pipeline
+  identifier: React_TypeScript_Vite_Pipeline
+  projectIdentifier: default
+  orgIdentifier: default
+  tags: {}
+  
+  # Pipeline-level variables available to all stages
+  variables:
+    - name: NODE_VERSION
+      type: String
+      value: "20" # Using the latest LTS version of Node
+      description: "Node.js version to use in the pipeline"
+    - name: PNPM_VERSION
+      type: String
+      value: "8" # Using PNPM for faster, more efficient dependency management
+      description: "PNPM version to use for dependency management"
+
+  # Controls when the pipeline will run
+  trigger:
+    # Trigger the pipeline on push events but only for the main branch
+    webhook:
+      enabled: true
+      payloadConditions:
+        - key: eventType
+          operator: equals
+          value: push
+        - key: targetBranch
+          operator: equals
+          value: main
+    # Trigger the pipeline on any pull request
+    pull_request:
+      enabled: true
+    # Allow manual triggering of the pipeline
+    manual:
+      enabled: true
+
+  # Stages define the sequential phases of your CI/CD process
+  stages:
+    # First stage: code quality checks
+    - stage:
+        name: Code Quality
+        identifier: Code_Quality
+        description: "Run code quality checks like linting and type checking"
+        type: CI
+        # Specify where the stage should run
+        infrastructure:
+          type: KubernetesDirect # Harness equivalent of GitHub's ubuntu-latest
+          spec:
+            connectorRef: account.harnessImage
+            os: Linux # Similar to ubuntu-latest
+            resources:
+              limits:
+                cpu: 1
+                memory: 2Gi
+              requests:
+                cpu: 0.5
+                memory: 1Gi
+        
+        # Steps are the individual tasks within this stage
+        execution:
+          steps:
+            # Clone the repository code
+            - step:
+                type: GitClone
+                name: Clone Repository
+                identifier: Clone_Repository
+                spec:
+                  connectorRef: account.githubConnector # Reference to your GitHub connector
+                  repoName: <+trigger.payload.repository.name>
+                  branch: <+trigger.payload.branch>
+                  depth: 0 # Fetch all history for proper linting and type checking
+
+            # Setup Node.js environment
+            - step:
+                type: Run
+                name: Setup Node.js
+                identifier: Setup_Node_js
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION> # Use Node image based on variable
+                  shell: Sh
+                  command: |
+                    # Verify Node installation
+                    node --version
+                    npm --version
+
+            # Setup PNPM (faster alternative to NPM)
+            - step:
+                type: Run
+                name: Setup PNPM
+                identifier: Setup_PNPM
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Install PNPM globally
+                    npm install -g pnpm@<+pipeline.variables.PNPM_VERSION>
+                    # Verify PNPM installation
+                    pnpm --version
+                    # Store PNPM cache path for later use
+                    echo "STORE_PATH=$(pnpm store path)" >> CACHE_VARS
+                    cat CACHE_VARS
+
+            # Install dependencies
+            - step:
+                type: Run
+                name: Install Dependencies
+                identifier: Install_Dependencies
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Install dependencies with frozen lockfile for consistency
+                    pnpm install --frozen-lockfile
+
+            # Lint the code
+            - step:
+                type: Run
+                name: Lint
+                identifier: Lint
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Run ESLint to ensure code quality standards
+                    pnpm lint
+
+            # Type check the code
+            - step:
+                type: Run
+                name: Type Check
+                identifier: Type_Check
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Run TypeScript compiler to check types without emitting files
+                    pnpm type-check
+
+            # Format check the code
+            - step:
+                type: Run
+                name: Format Check
+                identifier: Format_Check
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Run Prettier to ensure code formatting standards
+                    pnpm format:check
+
+    # Second stage: run tests
+    - stage:
+        name: Tests
+        identifier: Tests
+        description: "Run various test suites to ensure code quality"
+        type: CI
+        # This stage depends on the Code Quality stage
+        precondition:
+          type: StageStatus
+          spec:
+            stageName: Code_Quality
+            status: Success
+        
+        infrastructure:
+          type: KubernetesDirect
+          spec:
+            connectorRef: account.harnessImage
+            os: Linux
+            resources:
+              limits:
+                cpu: 1
+                memory: 2Gi
+              requests:
+                cpu: 0.5
+                memory: 1Gi
+        
+        execution:
+          steps:
+            # Clone the repository code
+            - step:
+                type: GitClone
+                name: Clone Repository
+                identifier: Clone_Repository
+                spec:
+                  connectorRef: account.githubConnector
+                  repoName: <+trigger.payload.repository.name>
+                  branch: <+trigger.payload.branch>
+
+            # Setup Node.js and PNPM
+            - step:
+                type: Run
+                name: Setup Environment
+                identifier: Setup_Environment
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Install PNPM
+                    npm install -g pnpm@<+pipeline.variables.PNPM_VERSION>
+                    # Install dependencies
+                    pnpm install --frozen-lockfile
+
+            # Run unit tests
+            - step:
+                type: Run
+                name: Run Unit Tests
+                identifier: Run_Unit_Tests
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Run unit tests with Vitest
+                    pnpm test:unit
+
+            # Run component tests
+            - step:
+                type: Run
+                name: Run Component Tests
+                identifier: Run_Component_Tests
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Run component tests with Testing Library
+                    pnpm test:component
+
+            # Run E2E tests
+            - step:
+                type: Run
+                name: Run E2E Tests
+                identifier: Run_E2E_Tests
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Run end-to-end tests with Cypress
+                    pnpm test:e2e
+
+            # Upload test coverage
+            - step:
+                type: Run
+                name: Upload Coverage Reports
+                identifier: Upload_Coverage_Reports
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Install Codecov uploader
+                    npm install -g codecov
+                    # Upload coverage to Codecov
+                    # Using environment variable for token
+                    codecov -t ${CODECOV_TOKEN}
+                  envVariables:
+                    CODECOV_TOKEN: <+secrets.getValue("codecov_token")>
+
+    # Third stage: build the application
+    - stage:
+        name: Build
+        identifier: Build
+        description: "Build the React application for production"
+        type: CI
+        # This stage depends on the Tests stage
+        precondition:
+          type: StageStatus
+          spec:
+            stageName: Tests
+            status: Success
+        
+        infrastructure:
+          type: KubernetesDirect
+          spec:
+            connectorRef: account.harnessImage
+            os: Linux
+            resources:
+              limits:
+                cpu: 1
+                memory: 2Gi
+              requests:
+                cpu: 0.5
+                memory: 1Gi
+        
+        execution:
+          steps:
+            # Clone the repository code
+            - step:
+                type: GitClone
+                name: Clone Repository
+                identifier: Clone_Repository
+                spec:
+                  connectorRef: account.githubConnector
+                  repoName: <+trigger.payload.repository.name>
+                  branch: <+trigger.payload.branch>
+
+            # Setup Node.js and PNPM
+            - step:
+                type: Run
+                name: Setup Environment
+                identifier: Setup_Environment
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Install PNPM
+                    npm install -g pnpm@<+pipeline.variables.PNPM_VERSION>
+                    # Install dependencies
+                    pnpm install --frozen-lockfile
+
+            # Build the application
+            - step:
+                type: Run
+                name: Build
+                identifier: Build_Application
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Run vite build to create production build
+                    pnpm build
+                  # Set environment variables needed for the build
+                  envVariables:
+                    VITE_API_URL: <+secrets.getValue("api_url")>
+
+            # Upload build artifacts
+            - step:
+                type: UploadArtifacts
+                name: Upload Build Artifacts
+                identifier: Upload_Build_Artifacts
+                spec:
+                  connectorRef: account.artifactoryConnector # Reference to your Artifactory connector
+                  host: <+secrets.getValue("artifactory_host")>
+                  path: dist # Path to the build output directory
+                  artifactPath: react-ts-vite-build/<+pipeline.sequenceId> # Path in Artifactory
+                  metadata:
+                    build: <+pipeline.sequenceId>
+                    branch: <+trigger.payload.branch>
+    
+    # Fourth stage: deploy to preview (only for PRs)
+    - stage:
+        name: Deploy Preview
+        identifier: Deploy_Preview
+        description: "Deploy a preview environment for pull requests"
+        type: Deployment
+        # This stage depends on the Build stage
+        precondition:
+          type: StageStatus
+          spec:
+            stageName: Build
+            status: Success
+        # Only run for PRs
+        when:
+          condition: <+trigger.type == "pull_request">
+        
+        infrastructure:
+          type: KubernetesDirect
+          spec:
+            connectorRef: account.harnessImage
+            os: Linux
+            resources:
+              limits:
+                cpu: 0.5
+                memory: 1Gi
+              requests:
+                cpu: 0.2
+                memory: 512Mi
+        
+        execution:
+          steps:
+            # Download build artifacts
+            - step:
+                type: DownloadArtifacts
+                name: Download Build Artifacts
+                identifier: Download_Build_Artifacts
+                spec:
+                  connectorRef: account.artifactoryConnector
+                  host: <+secrets.getValue("artifactory_host")>
+                  artifactPath: react-ts-vite-build/<+pipeline.sequenceId>
+                  outputPath: ./dist # Path where artifacts will be downloaded
+            
+            # Deploy to Netlify
+            - step:
+                type: Run
+                name: Deploy to Netlify
+                identifier: Deploy_to_Netlify
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Install Netlify CLI
+                    npm install -g netlify-cli
+                    
+                    # Deploy to Netlify
+                    netlify deploy --dir=./dist \
+                      --auth=${NETLIFY_AUTH_TOKEN} \
+                      --site=${NETLIFY_SITE_ID} \
+                      --message="Deploy preview for PR #<+trigger.payload.number>"
+                  envVariables:
+                    NETLIFY_AUTH_TOKEN: <+secrets.getValue("netlify_auth_token")>
+                    NETLIFY_SITE_ID: <+secrets.getValue("netlify_site_id")>
+            
+            # Comment on the PR with the deploy URL
+            - step:
+                type: Run
+                name: Comment on PR
+                identifier: Comment_on_PR
+                spec:
+                  connectorRef: account.harnessImage
+                  image: alpine/git:latest
+                  shell: Sh
+                  command: |
+                    # Add deploy URL as a comment to the PR
+                    # Using GitHub CLI
+                    apk add --no-cache github-cli
+                    echo ${GITHUB_TOKEN} | gh auth login --with-token
+                    gh pr comment <+trigger.payload.number> -R <+trigger.payload.repository.full_name> -b "Preview deployment is live at: ${DEPLOY_URL}"
+                  envVariables:
+                    GITHUB_TOKEN: <+secrets.getValue("github_token")>
+                    DEPLOY_URL: <+pipeline.stages.Deploy_Preview.runtime.netlifyUrl>
+    
+    # Fifth stage: deploy to production (only for main/master branch)
+    - stage:
+        name: Deploy Production
+        identifier: Deploy_Production
+        description: "Deploy to production for main branch changes"
+        type: Deployment
+        # This stage depends on the Build stage
+        precondition:
+          type: StageStatus
+          spec:
+            stageName: Build
+            status: Success
+        # Only run for main/master branch pushes
+        when:
+          condition: <+trigger.payload.branch == "main" || trigger.payload.branch == "master">
+        
+        # Using a Harness approval for production deployments
+        approval:
+          type: HarnessApproval
+          spec:
+            approvalMessage: "Please review and approve this deployment to production"
+            includeAllInputs: true
+            approvers:
+              userGroups:
+                - account.DevOpsTeam
+              minimumCount: 1
+            approverInputs: []
+        
+        infrastructure:
+          type: KubernetesDirect
+          spec:
+            connectorRef: account.harnessImage
+            os: Linux
+            resources:
+              limits:
+                cpu: 0.5
+                memory: 1Gi
+              requests:
+                cpu: 0.2
+                memory: 512Mi
+        
+        execution:
+          steps:
+            # Download build artifacts
+            - step:
+                type: DownloadArtifacts
+                name: Download Build Artifacts
+                identifier: Download_Build_Artifacts
+                spec:
+                  connectorRef: account.artifactoryConnector
+                  host: <+secrets.getValue("artifactory_host")>
+                  artifactPath: react-ts-vite-build/<+pipeline.sequenceId>
+                  outputPath: ./dist # Path where artifacts will be downloaded
+            
+            # Deploy to Firebase (adjust as needed for your production environment)
+            - step:
+                type: Run
+                name: Deploy to Firebase
+                identifier: Deploy_to_Firebase
+                spec:
+                  connectorRef: account.harnessImage
+                  image: node:<+pipeline.variables.NODE_VERSION>
+                  shell: Sh
+                  command: |
+                    # Install Firebase CLI
+                    npm install -g firebase-tools
+                    
+                    # Deploy to Firebase
+                    firebase deploy --only hosting \
+                      --token=${FIREBASE_TOKEN} \
+                      --project=${FIREBASE_PROJECT_ID} \
+                      --message="Production deployment from Harness CI/CD"
+                  envVariables:
+                    FIREBASE_TOKEN: <+secrets.getValue("firebase_token")>
+                    FIREBASE_PROJECT_ID: <+secrets.getValue("firebase_project_id")>
+    
+    # Sixth stage: security scan
+    - stage:
+        name: Security Scan
+        identifier: Security_Scan
+        description: "Run security scans on code and dependencies"
+        type: CI
+        # This stage depends on the Code Quality stage
+        precondition:
+          type: StageStatus
+          spec:
+            stageName: Code_Quality
+            status: Success
+        
+        infrastructure:
+          type: KubernetesDirect
+          spec:
+            connectorRef: account.harnessImage
+            os: Linux
+            resources:
+              limits:
+                cpu: 1
+                memory: 2Gi
+              requests:
+                cpu: 0.5
+                memory: 1Gi
+        
+        execution:
+          steps:
+            # Clone the repository code
+            - step:
+                type: GitClone
+                name: Clone Repository
+                identifier: Clone_Repository
+                spec:
+                  connectorRef: account.githubConnector
+                  repoName: <+trigger.payload.repository.name>
+                  branch: <+trigger.payload.branch>
+            
+            # Run Snyk security scan
+            - step:
+                type: Run
+                name: Snyk Security Scan
+                identifier: Snyk_Security_Scan
+                spec:
+                  connectorRef: account.harnessImage
+                  image: snyk/snyk:node
+                  shell: Sh
+                  command: |
+                    # Scan for vulnerable dependencies
+                    snyk test --severity-threshold=high || true
+                  envVariables:
+                    SNYK_TOKEN: <+secrets.getValue("snyk_token")>
+            
+            # Run SonarQube analysis
+            - step:
+                type: Run
+                name: SonarQube Analysis
+                identifier: SonarQube_Analysis
+                spec:
+                  connectorRef: account.harnessImage
+                  image: sonarsource/sonar-scanner-cli:latest
+                  shell: Sh
+                  command: |
+                    # Run SonarQube analysis
+                    sonar-scanner \
+                      -Dsonar.projectKey=react-ts-vite \
+                      -Dsonar.sources=. \
+                      -Dsonar.host.url=${SONAR_HOST_URL} \
+                      -Dsonar.login=${SONAR_TOKEN}
+                  envVariables:
+                    SONAR_TOKEN: <+secrets.getValue("sonar_token")>
+                    SONAR_HOST_URL: <+secrets.getValue("sonar_host_url")>
+
+# Note: You'll need to create the following Harness secrets:
+# - codecov_token: For uploading test coverage
+# - api_url: For the Vite build
+# - artifactory_host: For artifact storage
+# - netlify_auth_token: For Netlify deployments
+# - netlify_site_id: For Netlify deployments
+# - github_token: For PR comments
+# - firebase_token: For Firebase deployments
+# - firebase_project_id: For Firebase deployments
+# - snyk_token: For Snyk security scanning
+# - sonar_token: For SonarQube analysis
+# - sonar_host_url: For SonarQube analysis
+
+# You'll also need to set up the following Harness connectors:
+# - githubConnector: To connect to your GitHub repository
+# - harnessImage: For running steps in containers
+# - artifactoryConnector: For storing and retrieving build artifacts
+
+# And create the following user group:
+# - DevOpsTeam: Users who can approve production deployments

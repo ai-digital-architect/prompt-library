@@ -1,0 +1,137 @@
+# AWS Well-Architected Framework Reference for Copilot
+
+This document provides a summary of the AWS Well-Architected Framework.  Copilot should use this information to:
+
+*   **Suggest improvements to cloud architectures and code based on Well-Architected principles.**
+*   **Identify potential risks and trade-offs related to architectural decisions.**
+*   **Offer best practices for designing, deploying, and operating workloads on AWS.**
+*   **Prioritize recommendations based on the severity of potential impacts.**
+*   **When possible, include links to official AWS documentation for further information.**
+
+**IMPORTANT: Always cite the specific pillar(s) being addressed when making a recommendation.**
+**IMPORTANT: The best pillar depends on the specific context and requirements**
+
+---
+
+## Core Principles
+
+*   **Stop guessing capacity:** Use auto scaling and on-demand resources.
+*   **Test systems at production scale:** Use automation to simulate real-world load.
+*   **Automate to make architectural experimentation easier:** Implement changes in small, reversible increments.
+*   **Allow for evolutionary architectures:** Design for change, not perfection.
+*   **Drive architectures using data:** Monitor key metrics and adjust based on insights.
+*   **Improve through GameDays** : Test and validate your architecture.
+
+---
+
+## Pillars of the AWS Well-Architected Framework
+
+### 1. Operational Excellence
+
+**Goal:** Run and monitor systems to deliver business value and continually improve supporting processes and procedures.
+
+**Key Principles:**
+
+*   **Perform Operations as Code:** Automate infrastructure and deployments. (Infrastructure as Code - IaC)
+*   **Annotate Everything:** Document and track changes.  Use tagging and metadata.
+*   **Frequently Make Small, Reversible Changes:** Reduce risk and facilitate rollback.
+*   **Refine Operations Procedures Frequently:** Continuously improve processes.
+*   **Anticipate Failure:** Design for resilience and failure recovery.
+*   **Learn from All Operational Failures:** Conduct post-incident analysis.
+
+**Checklist Keywords:**  Automation, Monitoring, Alerting, Incident Management, Change Management, Deployment Pipelines, Infrastructure as Code (IaC), Logging, Auditing, Rollback, Documentation, Post-Incident Analysis.
+
+**Copilot Instruction**: Suggest automation opportunities. Recommend robust monitoring and alerting strategies. Emphasize the importance of IaC.
+
+### 2. Security
+
+**Goal:** Protect information, systems, and assets while delivering business value through risk assessments and mitigation strategies.
+
+**Key Principles:**
+
+*   **Implement a Strong Identity Foundation:** Enforce principle of least privilege.
+*   **Enable Traceability:** Monitor, audit, and log actions.
+*   **Apply Security at All Layers:** Implement defense in depth.
+*   **Automate Security Best Practices:** Reduce human error.
+*   **Protect Data in Transit and at Rest:** Use encryption and access controls.
+*   **Keep People Away From Data:** Reduce the risk of manual error or misuse.
+*   **Prepare for Security Events:** Establish incident response plans.
+
+**Checklist Keywords:**  IAM, Least Privilege, Encryption (at rest & in transit), Network Security (VPC, Security Groups, NACLs), Vulnerability Scanning, Penetration Testing, Logging, Auditing, Compliance, Secrets Management, Incident Response, Data Protection, WAF.
+
+**Copilot Instruction**: Prioritize security recommendations. Suggest appropriate IAM roles and policies.  Advise on encryption and network security configurations. Remind of principle of least privilege.
+
+### 3. Reliability
+
+**Goal:**  Prevent and quickly recover from failures to meet business and customer demand.
+
+**Key Principles:**
+
+*   **Test Recovery Procedures:** Ensure that recovery mechanisms are effective.
+*   **Automatically Recover from Failure:** Use automation to minimize downtime.
+*   **Scale Horizontally to Increase Aggregate System Availability:** Avoid single points of failure.
+*   **Stop Guessing Capacity:** Use dynamic scaling based on demand.
+*   **Manage Change in Automation:** Use automated deployments to minimize errors.
+
+**Checklist Keywords:**  High Availability, Fault Tolerance, Disaster Recovery, Backup & Restore, Monitoring, Alerting, Auto Scaling, Load Balancing, Redundancy, Replication, Chaos Engineering.
+
+**Copilot Instruction**: Suggest strategies for high availability and fault tolerance. Recommend appropriate scaling and load balancing techniques. Emphasize importance of backup and recovery.
+
+### 4. Performance Efficiency
+
+**Goal:** Use computing resources efficiently to meet requirements, and to maintain that efficiency as demand changes and technologies evolve.
+
+**Key Principles:**
+
+*   **Democratize Advanced Technologies:** Use managed services to reduce operational burden.
+*   **Go Global in Minutes:** Deploy applications in multiple regions.
+*   **Use Serverless Architectures:** Reduce operational overhead.
+*   **Experiment More Often:** Make informed decisions based on data.
+*   **Consider Different Tradeoffs:** Optimize for cost, performance, or security.
+
+**Checklist Keywords:**  Compute Selection, Storage Selection, Database Selection, Networking, Content Delivery (CDN), Caching, Serverless, Containerization, Auto Scaling, Monitoring, Optimization.
+
+**Copilot Instruction**: Suggest optimal resource selection (compute, storage, database) based on workload requirements. Explore opportunities for serverless and containerization. Recommend caching strategies.
+
+### 5. Cost Optimization
+
+**Goal:** Run systems to deliver business value at the lowest price point.
+
+**Key Principles:**
+
+*   **Implement Cloud Financial Management:** Understand and control cloud spending.
+*   **Adopt a Consumption Model:** Pay only for what you use.
+*   **Measure Overall Efficiency:**  Track cost per transaction or other key metrics.
+*   **Stop Spending Money on Undifferentiated Heavy Lifting:** Use managed services.
+*   **Analyze and Attribute Expenditure:**  Understand where costs are coming from.
+
+**Checklist Keywords:**  Right Sizing, Reserved Instances, Spot Instances, Savings Plans, Auto Scaling, Data Lifecycle Management, Storage Tiering, Cost Monitoring, Tagging, Waste Identification, Serverless.
+
+**Copilot Instruction**: Suggest cost-effective resource options (e.g., Reserved Instances, Spot Instances). Identify opportunities for right-sizing and waste reduction.  Recommend tagging strategies for cost allocation.
+
+### 6. Sustainability
+
+**Goal:** Minimize the environmental impacts of running cloud workloads.
+
+**Key Principles:**
+
+*   **Understand Your Impact:** Measure and monitor your energy consumption.
+*   **Establish Sustainability Goals:** Define specific targets for reducing your environmental footprint.
+*   **Maximize Utilization:** Optimize resource utilization to reduce waste.
+*   **Anticipate and Adopt New, More Efficient Hardware and Software Offerings:** Take advantage of AWS's ongoing efforts to improve energy efficiency.
+*   **Reduce the Amount of Resources Required to Run Your Workloads:** Optimize your code and architecture to minimize resource consumption.
+
+**Checklist Keywords:**  Region Selection, Compute Optimization, Storage Optimization, Data Transfer Optimization, Workload Scheduling, Monitoring & Reporting, Right Sizing, Serverless, Containerization.
+
+**Copilot Instruction**: Suggest energy-efficient region selection. Explore opportunities for reducing compute and storage footprint. Recommend optimizing data transfer and workload scheduling. Suggest right-sizing and serverless solutions.
+
+---
+
+**Copilot Usage Notes:**
+
+*   This document is a *reference*, not a replacement for thorough analysis of specific use cases.
+*   Always consider the *trade-offs* between different Well-Architected pillars.  Improving one area might impact others.
+*   When making recommendations, clearly state which pillar(s) are being addressed.
+*   If you are unsure which pillar is most relevant, ask the user for more context.
+
+---

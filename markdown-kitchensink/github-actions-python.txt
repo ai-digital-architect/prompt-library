@@ -1,0 +1,210 @@
+name: Python CI/CD Pipeline
+
+# Run this workflow on pushes to main branch and on pull requests
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Enable manual trigger via GitHub UI
+  workflow_dispatch:
+
+jobs:
+  # Code quality checks
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        # We need to checkout the repository first to access its contents
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          # Using Python 3.10 as a stable, modern version
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black isort mypy
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # Installing linting tools and project dependencies
+
+      - name: Check formatting with Black
+        run: black --check .
+        # Black ensures consistent code formatting
+
+      - name: Check import sorting with isort
+        run: isort --check --profile black .
+        # isort organizes imports properly (profile=black makes it compatible with Black)
+
+      - name: Lint with flake8
+        run: flake8 .
+        # Flake8 checks for PEP8 compliance and coding errors
+
+      - name: Type check with mypy
+        run: mypy .
+        # Mypy performs static type checking for better code quality
+
+  # Test across multiple Python versions and operating systems
+  test:
+    name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: lint
+    # Run tests only if linting passes to save CI minutes
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        # Testing on multiple Python versions and operating systems
+        # ensures maximum compatibility
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          # Caching pip dependencies speeds up workflow runs
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+          if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # Installing testing tools and project dependencies
+
+      - name: Test with pytest
+        run: pytest --cov=./ --cov-report=xml
+        # Run tests with coverage reporting
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+        # Upload coverage reports to Codecov for tracking over time
+
+  # Build and publish package to PyPI
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    needs: test
+    # Deploy only if tests pass
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Only deploy on pushes to main, not PRs
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          # Fetching all history for proper versioning
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine wheel setuptools
+        # Installing tools needed for building and publishing packages
+
+      - name: Build package
+        run: python -m build
+        # Build source and wheel distributions
+
+      - name: Check package
+        run: twine check dist/*
+        # Verify the built package meets PyPI standards
+
+      - name: Publish to PyPI
+        if: startsWith(github.ref, 'refs/tags')
+        # Only publish if commit is tagged (for version releases)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          # Using PyPI token stored in GitHub secrets for security
+
+  # Security scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint
+    # Run security scanning in parallel with tests
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit safety
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # Installing security scanning tools
+
+      - name: Run Bandit
+        run: bandit -r . -x ./tests,./venv
+        # Bandit scans for common security issues in Python code
+        # Excluding tests and virtual environment directories
+
+      - name: Check dependencies with Safety
+        run: safety check
+        # Safety checks for known vulnerabilities in dependencies
+
+  # Document generation
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    needs: test
+    # Build docs after tests pass
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Only build docs on pushes to main, not PRs
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install sphinx sphinx-rtd-theme
+          if [ -f requirements-docs.txt ]; then pip install -r requirements-docs.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # Installing documentation tools
+
+      - name: Build documentation
+        run: |
+          cd docs
+          make html
+        # Building HTML documentation with Sphinx
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build/html
+        # Deploying documentation to GitHub Pages
