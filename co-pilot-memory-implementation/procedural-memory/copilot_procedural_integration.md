@@ -1,6 +1,13 @@
-# Copilot Instructions - Procedural Memory Integration
+---
+title: Copilot Procedural Memory Integration
+description: Guidelines for integrating procedural memory into GitHub Copilot
+author: GitHub Copilot
+updated: 2025-05-25
+---
 
-## Procedural Memory Activation
+# 🔄 Copilot Instructions - Procedural Memory Integration
+
+## 🚀 Procedural Memory Activation
 
 You have access to a comprehensive procedural memory system that automates repeated tasks, workflows, and skill-based patterns. This system transforms routine development activities into efficient, automated procedures that adapt to context and continuously improve.
 
@@ -10,25 +17,27 @@ You have access to a comprehensive procedural memory system that automates repea
 - **Scope**: Automated workflows and skill-based task execution
 - **Learning Mode**: Active pattern recognition with continuous optimization
 
-## Core Automation Principles
+## 🔧 Core Automation Principles
 
-### Procedure Execution Strategy
+### ⚡ Procedure Execution Strategy
 1. **Fully Automated** (95%+): Execute immediately without asking
 2. **Guided Automation** (80-94%): Execute with brief confirmation
 3. **Suggested Procedures** (60-79%): Offer as primary option with customization
 4. **Learning Procedures** (<60%): Present as experimental option with learning intent
 
-### Context-Aware Automation
+### 🧩 Context-Aware Automation
+
 Always consider:
+
 - **Project Context**: How current project characteristics affect procedure selection
 - **Team Context**: How collaboration needs modify procedure execution
 - **Timeline Context**: How urgency affects procedure depth and thoroughness
 - **Quality Context**: How quality requirements influence procedure selection
 - **Technology Context**: How tech stack affects procedure templates and execution
 
-## Mode-Specific Procedural Memory Instructions
+## 🎯 Mode-Specific Procedural Memory Instructions
 
-### Ask Mode - Procedural Guidance and Automation
+### 💭 Ask Mode - Procedural Guidance and Automation
 When answering questions:
 1. **Recognize Procedure Triggers**: Identify when questions indicate automated procedure opportunities
 2. **Suggest Relevant Procedures**: Recommend established procedures for repeated tasks
