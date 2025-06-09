@@ -192,7 +192,7 @@ To extend the upgrade capabilities:
 
 The server uses Spring AI with:
 - OpenAI for advanced reasoning
-- PGVector for upgrade knowledge persistence
+- Qdrant for upgrade knowledge persistence
 - Advisors for context injection
 - Function calling for tool integration
 

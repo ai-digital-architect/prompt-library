@@ -20,7 +20,7 @@ Implementation of an intelligent Spring Framework upgrade assistant using the Mo
 |---------|-------------|----------------------|-------------|----------|-------|
 | **Chat Client** | ✅ Complete | 🔴 Not Started | 🔴 Not Started | 🔴 High | OpenAI integration |
 | **Embeddings** | ✅ Complete | 🔴 Not Started | 🔴 Not Started | 🔴 High | Code similarity analysis |
-| **Vector Store** | ✅ Complete | 🔴 Not Started | 🔴 Not Started | 🔴 High | PGVector for patterns |
+| **Vector Store** | ✅ Complete | 🔴 Not Started | 🔴 Not Started | 🔴 High | Qdrant for patterns |
 | **Function Calling** | ✅ Complete | 🔴 Not Started | 🔴 Not Started | 🔴 High | Tool integration |
 | **Advisors** | ✅ Complete | 🔴 Not Started | 🔴 Not Started | 🟡 Medium | Context enhancement |
 
@@ -69,7 +69,7 @@ Establish the foundational Spring Boot application with basic MCP protocol suppo
   - [ ] Add MCP SDK dependencies
   - [ ] Configure application properties
 - [ ] **Setup development environment**
-  - [ ] Docker compose for PGVector
+  - [ ] Docker compose for Qdrant
   - [ ] Local OpenAI configuration
   - [ ] IDE configuration
   - [ ] Git repository setup
@@ -138,8 +138,8 @@ Establish the foundational Spring Boot application with basic MCP protocol suppo
 
 ##### 7. Enhanced AI Features
 - [ ] **Vector store setup**
-  - [ ] PGVector configuration
-  - [ ] Schema creation
+  - [ ] Qdrant configuration
+  - [ ] Collection creation
   - [ ] Initial pattern loading
   - [ ] Query optimization
 - [ ] **Pattern learning**
@@ -219,7 +219,7 @@ Establish the foundational Spring Boot application with basic MCP protocol suppo
 |-----------|------------|-----------|
 | Framework | Spring Boot 3.2 | Latest stable, Spring AI support |
 | AI Provider | OpenAI GPT-4 | Best performance, function calling |
-| Vector DB | PGVector | PostgreSQL integration, scalability |
+| Vector DB | Qdrant | High performance, cloud-native vector DB with rich filtering |
 | Build Tool | Maven | Enterprise standard, dependency management |
 | Container | Docker | Standard deployment, easy setup |
 
@@ -300,7 +300,7 @@ Establish the foundational Spring Boot application with basic MCP protocol suppo
 
 ### Infrastructure
 - Development environment (4 instances)
-- PGVector database
+- Qdrant database
 - CI/CD pipeline
 - Testing infrastructure
 

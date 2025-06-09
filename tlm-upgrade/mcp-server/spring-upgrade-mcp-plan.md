@@ -22,7 +22,7 @@
 - **Spring AI** - LLM integration and AI capabilities
 - **OpenRewrite** - Automated code transformation
 - **MCP SDK** - Model Context Protocol implementation
-- **PGVector** - Vector database for AI context
+- **Qdrant** - Vector database for AI context
 - **Mermaid** - Architecture diagram generation
 
 ### Key Components
@@ -126,10 +126,9 @@ spring:
       options:
         model: text-embedding-3-small
     vectorstore:
-      pgvector:
-        host: localhost
-        port: 5432
-        database: upgrade_patterns
+      qdrant:
+        url: http://localhost:6333
+        collection-name: upgrade_patterns
 ```
 
 ### Core Services
@@ -292,7 +291,7 @@ public class UpgradePattern {
 1. **Environment Setup**
    - Initialize Spring Boot project
    - Configure Spring AI
-   - Set up PGVector database
+   - Set up Qdrant database
    - Configure development tools
 
 2. **Core Implementation**
@@ -322,4 +321,4 @@ public class UpgradePattern {
 - [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/)
 - [MCP Specification](https://modelcontextprotocol.io/specification)
 - [OpenRewrite Recipes](https://docs.openrewrite.org/)
-- [PGVector Documentation](https://github.com/pgvector/pgvector)
+- [Qdrant Documentation](https://qdrant.tech/documentation/)
