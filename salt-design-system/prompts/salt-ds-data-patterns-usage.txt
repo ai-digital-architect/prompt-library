@@ -1,0 +1,4 @@
+How to use this
+For Enterprise Tables: Copy the "Ag-Grid Standard Setup" prompt into your chat when you need sorting, filtering, and column pinning.
+
+For Simple Lists: Use the "Salt Native Data Grid" prompt when you just need to display data cleanly without the overhead of Ag-Grid.
