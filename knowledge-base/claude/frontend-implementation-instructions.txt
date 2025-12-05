@@ -1,0 +1,789 @@
+interface FormBuilderProps<T extends z.ZodType> {
+     schema: T;
+     defaultValues: z.infer<T>;
+     onSubmit: (values: z.infer<T>) => void;
+     children: (form: ReturnType<typeof useForm>) => ReactNode;
+     submitButtonText?: string;
+   }
+   
+   export function FormBuilder<T extends z.ZodType>({
+     schema,
+     defaultValues,
+     onSubmit,
+     children,
+     submitButtonText = 'Submit',
+   }: FormBuilderProps<T>) {
+     const form = useForm<z.infer<typeof schema>>({
+       resolver: zodResolver(schema),
+       defaultValues,
+     });
+     
+     return (
+       <Form {...form}>
+         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+           {children(form)}
+           <Button type="submit" disabled={form.formState.isSubmitting}>
+             {form.formState.isSubmitting && (
+               <span className="mr-2">
+                 <Spinner />
+               </span>
+             )}
+             {submitButtonText}
+           </Button>
+         </form>
+       </Form>
+     );
+   }
+   ```
+
+3. **Build modal and dialog components**
+   ```tsx
+   // components/common/ConfirmDialog.tsx
+   import {
+     AlertDialog,
+     AlertDialogAction,
+     AlertDialogCancel,
+     AlertDialogContent,
+     AlertDialogDescription,
+     AlertDialogFooter,
+     AlertDialogHeader,
+     AlertDialogTitle,
+   } from '@/components/ui/alert-dialog';
+   
+   interface ConfirmDialogProps {
+     open: boolean;
+     onOpenChange: (open: boolean) => void;
+     title: string;
+     description: string;
+     confirmText?: string;
+     cancelText?: string;
+     onConfirm: () => void;
+     variant?: 'default' | 'destructive';
+   }
+   
+   export function ConfirmDialog({
+     open,
+     onOpenChange,
+     title,
+     description,
+     confirmText = 'Confirm',
+     cancelText = 'Cancel',
+     onConfirm,
+     variant = 'default',
+   }: ConfirmDialogProps) {
+     return (
+       <AlertDialog open={open} onOpenChange={onOpenChange}>
+         <AlertDialogContent>
+           <AlertDialogHeader>
+             <AlertDialogTitle>{title}</AlertDialogTitle>
+             <AlertDialogDescription>{description}</AlertDialogDescription>
+           </AlertDialogHeader>
+           <AlertDialogFooter>
+             <AlertDialogCancel>{cancelText}</AlertDialogCancel>
+             <AlertDialogAction
+               onClick={onConfirm}
+               className={variant === 'destructive' ? 'bg-red-600 hover:bg-red-700' : ''}
+             >
+               {confirmText}
+             </AlertDialogAction>
+           </AlertDialogFooter>
+         </AlertDialogContent>
+       </AlertDialog>
+     );
+   }
+   ```
+
+### Phase 5: State Management
+
+1. **Implement context-based state management for simple cases**
+   ```tsx
+   // contexts/AppContext.tsx
+   import { createContext, useContext, useReducer, ReactNode } from 'react';
+   
+   // Define state types
+   interface AppState {
+     // Define your state properties
+     notifications: Notification[];
+     settings: Settings;
+     // ...other state
+   }
+   
+   // Define action types
+   type AppAction =
+     | { type: 'ADD_NOTIFICATION'; payload: Notification }
+     | { type: 'REMOVE_NOTIFICATION'; payload: string }
+     | { type: 'UPDATE_SETTINGS'; payload: Partial<Settings> };
+   
+   // Create initial state
+   const initialState: AppState = {
+     notifications: [],
+     settings: {
+       // Default settings
+     },
+   };
+   
+   // Create reducer
+   function appReducer(state: AppState, action: AppAction): AppState {
+     switch (action.type) {
+       case 'ADD_NOTIFICATION':
+         return {
+           ...state,
+           notifications: [...state.notifications, action.payload],
+         };
+       case 'REMOVE_NOTIFICATION':
+         return {
+           ...state,
+           notifications: state.notifications.filter(n => n.id !== action.payload),
+         };
+       case 'UPDATE_SETTINGS':
+         return {
+           ...state,
+           settings: { ...state.settings, ...action.payload },
+         };
+       default:
+         return state;
+     }
+   }
+   
+   // Create context
+   const AppContext = createContext<{
+     state: AppState;
+     dispatch: React.Dispatch<AppAction>;
+   } | undefined>(undefined);
+   
+   // Create provider
+   export function AppProvider({ children }: { children: ReactNode }) {
+     const [state, dispatch] = useReducer(appReducer, initialState);
+     
+     return (
+       <AppContext.Provider value={{ state, dispatch }}>
+         {children}
+       </AppContext.Provider>
+     );
+   }
+   
+   // Create hook for using the context
+   export function useApp() {
+     const context = useContext(AppContext);
+     if (context === undefined) {
+       throw new Error('useApp must be used within an AppProvider');
+     }
+     return context;
+   }
+   ```
+
+2. **For complex applications, set up Redux Toolkit**
+   ```tsx
+   // store/index.ts
+   import { configureStore } from '@reduxjs/toolkit';
+   import authReducer from './authSlice';
+   import usersReducer from './usersSlice';
+   // Import other slices
+   
+   export const store = configureStore({
+     reducer: {
+       auth: authReducer,
+       users: usersReducer,
+       // Add other reducers
+     },
+     // Middleware configuration
+   });
+   
+   export type RootState = ReturnType<typeof store.getState>;
+   export type AppDispatch = typeof store.dispatch;
+   ```
+
+3. **Create typed hooks for Redux**
+   ```tsx
+   // store/hooks.ts
+   import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+   import type { RootState, AppDispatch } from './index';
+   
+   export const useAppDispatch = () => useDispatch<AppDispatch>();
+   export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+   ```
+
+### Phase 6: Data Fetching and Caching
+
+1. **Implement custom data fetching hooks**
+   ```tsx
+   // hooks/useFetch.ts
+   import { useState, useEffect } from 'react';
+   import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+   
+   interface UseFetchOptions<T> extends AxiosRequestConfig {
+     initialData?: T;
+     onSuccess?: (data: T) => void;
+     onError?: (error: Error | AxiosError) => void;
+     dependencies?: any[];
+   }
+   
+   export function useFetch<T = any>(
+     url: string,
+     options: UseFetchOptions<T> = {}
+   ) {
+     const {
+       initialData,
+       onSuccess,
+       onError,
+       dependencies = [],
+       ...axiosOptions
+     } = options;
+     
+     const [data, setData] = useState<T | undefined>(initialData);
+     const [error, setError] = useState<Error | AxiosError | null>(null);
+     const [loading, setLoading] = useState(true);
+     
+     useEffect(() => {
+       const source = axios.CancelToken.source();
+       
+       const fetchData = async () => {
+         setLoading(true);
+         try {
+           const response = await axios({
+             url,
+             cancelToken: source.token,
+             ...axiosOptions,
+           });
+           
+           const responseData = response.data as T;
+           setData(responseData);
+           setError(null);
+           
+           if (onSuccess) {
+             onSuccess(responseData);
+           }
+         } catch (err) {
+           if (!axios.isCancel(err)) {
+             const axiosError = err as AxiosError | Error;
+             setError(axiosError);
+             
+             if (onError) {
+               onError(axiosError);
+             }
+           }
+         } finally {
+           setLoading(false);
+         }
+       };
+       
+       fetchData();
+       
+       return () => {
+         source.cancel('Request cancelled by cleanup');
+       };
+     }, [url, ...dependencies]);
+     
+     return { data, error, loading };
+   }
+   ```
+
+2. **Implement data mutation hooks**
+   ```tsx
+   // hooks/useMutation.ts
+   import { useState } from 'react';
+   import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+   
+   interface UseMutationOptions<T, D> {
+     onSuccess?: (data: T) => void;
+     onError?: (error: Error | AxiosError) => void;
+     axiosOptions?: AxiosRequestConfig;
+   }
+   
+   export function useMutation<T = any, D = any>(
+     url: string,
+     method: 'post' | 'put' | 'patch' | 'delete' = 'post',
+     options: UseMutationOptions<T, D> = {}
+   ) {
+     const { onSuccess, onError, axiosOptions } = options;
+     
+     const [data, setData] = useState<T | null>(null);
+     const [error, setError] = useState<Error | AxiosError | null>(null);
+     const [loading, setLoading] = useState(false);
+     
+     const mutate = async (mutationData?: D) => {
+       setLoading(true);
+       try {
+         const response = await axios({
+           url,
+           method,
+           data: mutationData,
+           ...axiosOptions,
+         });
+         
+         const responseData = response.data as T;
+         setData(responseData);
+         setError(null);
+         
+         if (onSuccess) {
+           onSuccess(responseData);
+         }
+         
+         return responseData;
+       } catch (err) {
+         const axiosError = err as AxiosError | Error;
+         setError(axiosError);
+         
+         if (onError) {
+           onError(axiosError);
+         }
+         
+         throw axiosError;
+       } finally {
+         setLoading(false);
+       }
+     };
+     
+     return { mutate, data, error, loading };
+   }
+   ```
+
+### Phase 7: Advanced Features
+
+1. **Implement infinite scroll**
+   ```tsx
+   // hooks/useInfiniteScroll.ts
+   import { useState, useEffect, useCallback, useRef } from 'react';
+   
+   interface UseInfiniteScrollOptions<T> {
+     fetchData: (page: number) => Promise<T[]>;
+     initialPage?: number;
+     perPage?: number;
+   }
+   
+   export function useInfiniteScroll<T>({
+     fetchData,
+     initialPage = 1,
+     perPage = 10,
+   }: UseInfiniteScrollOptions<T>) {
+     const [items, setItems] = useState<T[]>([]);
+     const [page, setPage] = useState(initialPage);
+     const [loading, setLoading] = useState(false);
+     const [error, setError] = useState<Error | null>(null);
+     const [hasMore, setHasMore] = useState(true);
+     
+     const observer = useRef<IntersectionObserver | null>(null);
+     const lastItemRef = useCallback(
+       (node: HTMLElement | null) => {
+         if (loading) return;
+         
+         if (observer.current) {
+           observer.current.disconnect();
+         }
+         
+         observer.current = new IntersectionObserver(entries => {
+           if (entries[0].isIntersecting && hasMore) {
+             setPage(prevPage => prevPage + 1);
+           }
+         });
+         
+         if (node) {
+           observer.current.observe(node);
+         }
+       },
+       [loading, hasMore]
+     );
+     
+     const loadInitialData = useCallback(async () => {
+       setLoading(true);
+       setError(null);
+       
+       try {
+         const newItems = await fetchData(initialPage);
+         setItems(newItems);
+         setHasMore(newItems.length >= perPage);
+       } catch (err) {
+         setError(err as Error);
+       } finally {
+         setLoading(false);
+       }
+     }, [fetchData, initialPage, perPage]);
+     
+     const loadMoreData = useCallback(async () => {
+       setLoading(true);
+       setError(null);
+       
+       try {
+         const newItems = await fetchData(page);
+         setItems(prevItems => [...prevItems, ...newItems]);
+         setHasMore(newItems.length >= perPage);
+       } catch (err) {
+         setError(err as Error);
+       } finally {
+         setLoading(false);
+       }
+     }, [fetchData, page, perPage]);
+     
+     useEffect(() => {
+       if (page === initialPage) {
+         loadInitialData();
+       } else {
+         loadMoreData();
+       }
+     }, [page, loadInitialData, loadMoreData]);
+     
+     return { items, loading, error, hasMore, lastItemRef, refresh: loadInitialData };
+   }
+   ```
+
+2. **Implement local storage persistence**
+   ```tsx
+   // hooks/useLocalStorage.ts
+   import { useState, useEffect } from 'react';
+   
+   export function useLocalStorage<T>(key: string, initialValue: T) {
+     const [storedValue, setStoredValue] = useState<T>(() => {
+       if (typeof window === 'undefined') {
+         return initialValue;
+       }
+       
+       try {
+         const item = window.localStorage.getItem(key);
+         return item ? JSON.parse(item) : initialValue;
+       } catch (error) {
+         console.error('Error reading from localStorage:', error);
+         return initialValue;
+       }
+     });
+     
+     useEffect(() => {
+       if (typeof window !== 'undefined') {
+         try {
+           window.localStorage.setItem(key, JSON.stringify(storedValue));
+         } catch (error) {
+           console.error('Error writing to localStorage:', error);
+         }
+       }
+     }, [key, storedValue]);
+     
+     return [storedValue, setStoredValue] as const;
+   }
+   ```
+
+3. **Create a custom notification system**
+   ```tsx
+   // hooks/useNotifications.ts
+   import { useState, useCallback } from 'react';
+   import { v4 as uuidv4 } from 'uuid';
+   
+   export type NotificationType = 'info' | 'success' | 'warning' | 'error';
+   
+   export interface Notification {
+     id: string;
+     type: NotificationType;
+     title: string;
+     message: string;
+     autoClose?: boolean;
+     duration?: number;
+   }
+   
+   export function useNotifications() {
+     const [notifications, setNotifications] = useState<Notification[]>([]);
+     
+     const addNotification = useCallback(
+       ({
+         type = 'info',
+         title,
+         message,
+         autoClose = true,
+         duration = 5000,
+       }: Omit<Notification, 'id'>) => {
+         const id = uuidv4();
+         const notification = {
+           id,
+           type,
+           title,
+           message,
+           autoClose,
+           duration,
+         };
+         
+         setNotifications(prevNotifications => [...prevNotifications, notification]);
+         
+         if (autoClose) {
+           setTimeout(() => {
+             removeNotification(id);
+           }, duration);
+         }
+         
+         return id;
+       },
+       []
+     );
+     
+     const removeNotification = useCallback((id: string) => {
+       setNotifications(prevNotifications =>
+         prevNotifications.filter(notification => notification.id !== id)
+       );
+     }, []);
+     
+     const clearAll = useCallback(() => {
+       setNotifications([]);
+     }, []);
+     
+     return {
+       notifications,
+       addNotification,
+       removeNotification,
+       clearAll,
+     };
+   }
+   ```
+
+## Testing Frontend Components
+
+1. **Set up testing environment**
+   ```bash
+   npm install -D vitest jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event
+   ```
+
+2. **Configure Vitest**
+   ```ts
+   // vitest.config.ts
+   import { defineConfig } from 'vitest/config';
+   import react from '@vitejs/plugin-react';
+   import path from 'path';
+   
+   export default defineConfig({
+     plugins: [react()],
+     test: {
+       environment: 'jsdom',
+       globals: true,
+       setupFiles: ['./src/test/setup.ts'],
+       coverage: {
+         provider: 'c8',
+         reporter: ['text', 'json', 'html'],
+       },
+     },
+     resolve: {
+       alias: {
+         '@': path.resolve(__dirname, './src'),
+       },
+     },
+   });
+   ```
+
+3. **Create test setup file**
+   ```ts
+   // src/test/setup.ts
+   import '@testing-library/jest-dom';
+   
+   // Mock for IntersectionObserver
+   global.IntersectionObserver = class IntersectionObserver {
+     constructor(callback: IntersectionObserverCallback) {}
+     observe() { return null; }
+     unobserve() { return null; }
+     disconnect() { return null; }
+   };
+   
+   // Other global mocks
+   ```
+
+4. **Write component tests**
+   ```tsx
+   // components/common/Button.test.tsx
+   import { describe, it, expect } from 'vitest';
+   import { render, screen, fireEvent } from '@testing-library/react';
+   import { Button } from '@/components/ui/button';
+   
+   describe('Button', () => {
+     it('renders correctly', () => {
+       render(<Button>Click me</Button>);
+       expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+     });
+     
+     it('calls onClick handler when clicked', () => {
+       const handleClick = vi.fn();
+       render(<Button onClick={handleClick}>Click me</Button>);
+       
+       fireEvent.click(screen.getByRole('button', { name: /click me/i }));
+       expect(handleClick).toHaveBeenCalledTimes(1);
+     });
+     
+     it('is disabled when disabled prop is true', () => {
+       render(<Button disabled>Click me</Button>);
+       expect(screen.getByRole('button', { name: /click me/i })).toBeDisabled();
+     });
+   });
+   ```
+
+## Performance Optimization
+
+1. **Use React.memo for expensive renders**
+   ```tsx
+   const MemoizedComponent = React.memo(function MyComponent(props) {
+     // Component logic
+   });
+   ```
+
+2. **Implement code splitting with React.lazy**
+   ```tsx
+   const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+   const Profile = React.lazy(() => import('./pages/Profile'));
+   
+   function App() {
+     return (
+       <React.Suspense fallback={<LoadingSpinner />}>
+         <Routes>
+           <Route path="/dashboard" element={<Dashboard />} />
+           <Route path="/profile" element={<Profile />} />
+         </Routes>
+       </React.Suspense>
+     );
+   }
+   ```
+
+3. **Optimize list rendering with virtualization**
+   ```tsx
+   import { useVirtualizer } from '@tanstack/react-virtual';
+   
+   function VirtualizedList({ items }) {
+     const parentRef = useRef<HTMLDivElement>(null);
+     
+     const rowVirtualizer = useVirtualizer({
+       count: items.length,
+       getScrollElement: () => parentRef.current,
+       estimateSize: () => 35,
+     });
+     
+     return (
+       <div
+         ref={parentRef}
+         style={{ height: '500px', overflow: 'auto' }}
+       >
+         <div
+           style={{
+             height: `${rowVirtualizer.getTotalSize()}px`,
+             width: '100%',
+             position: 'relative',
+           }}
+         >
+           {rowVirtualizer.getVirtualItems().map(virtualRow => (
+             <div
+               key={virtualRow.index}
+               style={{
+                 position: 'absolute',
+                 top: 0,
+                 left: 0,
+                 width: '100%',
+                 height: `${virtualRow.size}px`,
+                 transform: `translateY(${virtualRow.start}px)`,
+               }}
+             >
+               {items[virtualRow.index].name}
+             </div>
+           ))}
+         </div>
+       </div>
+     );
+   }
+   ```
+
+## Deployment Preparation
+
+1. **Configure production build**
+   ```bash
+   npm run build
+   ```
+
+2. **Implement bundle analysis**
+   ```bash
+   npm install -D rollup-plugin-visualizer
+   ```
+   
+   ```ts
+   // vite.config.ts
+   import { visualizer } from 'rollup-plugin-visualizer';
+   
+   export default defineConfig({
+     plugins: [
+       // Other plugins
+       process.env.ANALYZE && visualizer({
+         open: true,
+         gzipSize: true,
+         brotliSize: true,
+       }),
+     ],
+   });
+   ```
+
+3. **Set up CI/CD configurations**
+   ```yaml
+   # .github/workflows/ci.yml
+   name: CI
+   
+   on:
+     push:
+       branches: [main]
+     pull_request:
+       branches: [main]
+   
+   jobs:
+     build:
+       runs-on: ubuntu-latest
+       
+       steps:
+       - uses: actions/checkout@v3
+       
+       - name: Set up Node.js
+         uses: actions/setup-node@v3
+         with:
+           node-version: '18'
+           cache: 'npm'
+           
+       - name: Install dependencies
+         run: npm ci
+         
+       - name: Run linter
+         run: npm run lint
+         
+       - name: Run tests
+         run: npm test
+         
+       - name: Build
+         run: npm run build
+   ```
+
+## Accessibility Considerations
+
+1. **Implement keyboard navigation support**
+   ```tsx
+   function KeyboardNavigation({ children }) {
+     const [focusIndex, setFocusIndex] = useState(0);
+     const elements = useRef<HTMLElement[]>([]);
+     
+     useEffect(() => {
+       const handleKeyDown = (e: KeyboardEvent) => {
+         if (e.key === 'ArrowDown') {
+           e.preventDefault();
+           setFocusIndex(prev => Math.min(prev + 1, elements.current.length - 1));
+         } else if (e.key === 'ArrowUp') {
+           e.preventDefault();
+           setFocusIndex(prev => Math.max(prev - 1, 0));
+         }
+       };
+       
+       document.addEventListener('keydown', handleKeyDown);
+       return () => document.removeEventListener('keydown', handleKeyDown);
+     }, []);
+     
+     useEffect(() => {
+       if (elements.current[focusIndex]) {
+         elements.current[focusIndex].focus();
+       }
+     }, [focusIndex]);
+     
+     return children(elements);
+   }
+   ```
+
+2. **Use semantic HTML and ARIA attributes**
+   ```tsx
+   <div role="dialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
+     <h2 id="dialog-title">Dialog Title</h2>
+     <p id="dialog-description">Dialog description</p>
+     <button aria-label="Close dialog">×</button>
+   </div>
+   ```
+
+3. **Test with screen readers and keyboard navigation**
