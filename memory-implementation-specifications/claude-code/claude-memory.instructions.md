@@ -160,13 +160,8 @@ When the user corrects you on something:
 
 ## Vector Store Integration (Track B Only)
 
-If an MCP memory server is configured (see `.claude/mcp.json`):
-
-- **`memory_recall(query, memory_type?, limit?)`**: Use before architectural decisions to search for relevant past context across all memory entries. Supplements file-based search with semantic similarity.
-- **`memory_store(content, memory_type, title, ...)`**: Use after storing a file-based entry to also index it in the vector store. The file remains the source of truth.
-- **`memory_stats()`**: Check memory health and entry counts.
-
-The vector store is a search index, not a primary store. Always write to files first, then optionally index into the vector store.
+> Track B (vector store) agent instructions and MCP tool protocols have been moved to
+> [mem-impl-vector/claude-code/trade-offs.md](../../mem-impl-vector/claude-code/trade-offs.md).
 
 ## Memory Health Indicators
 

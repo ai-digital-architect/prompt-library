@@ -98,12 +98,8 @@ Both GitHub Copilot and Claude Code can implement a six-type memory architecture
 
 ## Track B (Vector Store) Comparison
 
-| Aspect | GitHub Copilot | Claude Code |
-|---|---|---|
-| **Integration path** | Pre-fetch scripts, MCP (limited), VS Code tasks | MCP server (native tool integration) |
-| **Tool visibility** | Indirect — context injection, not native tools | Direct — `memory_recall`/`memory_store` appear as tools |
-| **Query initiation** | Manual or scripted pre-session | Agent can invoke during reasoning |
-| **Maturity** | Emerging (Copilot MCP support is early) | Mature (MCP is core to Claude Code's extensibility) |
+> The Track B cross-platform comparison table has been moved to
+> [mem-impl-vector/README.md](../mem-impl-vector/README.md).
 
 ## Recommended Adoption Sequence for New Teams
 
@@ -126,11 +122,11 @@ Both GitHub Copilot and Claude Code can implement a six-type memory architecture
 ### Phase 3: Scale (Month 2+)
 
 **If memory entries exceed ~100**:
-1. Evaluate Track B based on team size and search needs
+1. Evaluate Track B based on team size and search needs — see [mem-impl-vector/](../mem-impl-vector/)
 2. Set up vector store infrastructure (start with Qdrant Docker)
 3. Build and run the sync pipeline
-4. For Claude Code: configure MCP server
-5. For Copilot: configure pre-fetch scripts or MCP integration
+4. For Claude Code: configure MCP server — see [mem-impl-vector/claude-code/track-b-vector-store-guide.md](../mem-impl-vector/claude-code/track-b-vector-store-guide.md)
+5. For Copilot: configure pre-fetch scripts or MCP integration — see [mem-impl-vector/github-copilot/track-b-vector-store-guide.md](../mem-impl-vector/github-copilot/track-b-vector-store-guide.md)
 
 ### Phase 4: Optimization (Month 3+)
 

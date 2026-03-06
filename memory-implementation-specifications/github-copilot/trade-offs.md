@@ -33,18 +33,8 @@
 | Regulated environment (SOC2, HIPAA) | Track A primary, self-hosted Track B only | Data residency requirements rule out cloud vector stores |
 | Open-source project | Track A only | Contributors need zero setup to participate |
 
-## Migration Path: Track A → Track B
-
-Track B builds on Track A. The migration is additive, not replacement:
-
-1. Start with Track A (file-based memory in `.github/memory/`)
-2. When search becomes painful (~100+ entries), add the sync pipeline
-3. Deploy a vector store (start with Qdrant Docker locally)
-4. Run the sync script to index existing files
-5. Add the GitHub Action to auto-sync on push
-6. Query the vector store alongside file-based reads
-
-**Important**: Track A files remain the source of truth. The vector store is a derived index. If the vector store is lost, rebuild from files. Never write to the vector store without a corresponding file in Track A.
+> **Track B (Vector Store) migration path** has been moved to
+> [mem-impl-vector/github-copilot/trade-offs.md](../../mem-impl-vector/github-copilot/trade-offs.md).
 
 ## Markdown vs JSON for Track A
 

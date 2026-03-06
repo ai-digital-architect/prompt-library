@@ -43,14 +43,5 @@ Claude Code has several features that make Track A particularly effective:
 | Privacy-sensitive environment | Track A primary, self-hosted Track B only | No data leaves the network |
 | Open-source project | Track A only | Zero infrastructure barrier for contributors |
 
-## Migration Path: Track A → Track B
-
-1. Start with Track A — it's the foundation regardless
-2. When file-based search becomes insufficient (~100+ entries), set up infrastructure:
-   - `docker compose up qdrant`
-   - `ollama pull nomic-embed-text`
-3. Install the MCP server: copy `.claude/scripts/memory-mcp-server.py` and configure `.claude/mcp.json`
-4. Run the sync script to index existing files
-5. Claude Code now has both file access AND vector search
-
-**Critical rule**: Track A files remain the source of truth. The vector store is a derived index. Never write to the vector store without a corresponding file.
+> **Track B (Vector Store) migration path** has been moved to
+> [mem-impl-vector/claude-code/trade-offs.md](../../mem-impl-vector/claude-code/trade-offs.md).

@@ -18,7 +18,7 @@ tags:
 ai_note: "Content created with AI assistance."
 summary: >
   A comprehensive guide to using the model prompt templates in this library.
-  Covers all 10 templates across Anthropic Claude, Google Gemini, and OpenAI GPT-5
+  Covers all 11 templates across Anthropic Claude, Google Gemini, and OpenAI GPT-5
   model families, with selection guidance, template anatomy, and best practices
   for writing effective prompts.
 post_date: "2026-03-03"
@@ -26,7 +26,7 @@ post_date: "2026-03-03"
 
 ## Overview
 
-This folder contains 10 general-purpose prompt templates, one per major model
+This folder contains 11 general-purpose prompt templates, one per major model
 in the Anthropic Claude, Google Gemini 3, and OpenAI GPT-5 model families.
 Each template provides:
 
@@ -54,6 +54,7 @@ quality requirements.
 | 08 | [08-openai-gpt-5-3.md](08-openai-gpt-5-3.md) | GPT-5.3 | OpenAI | Next-gen frontier |
 | 09 | [09-openai-gpt-5-2-codex.md](09-openai-gpt-5-2-codex.md) | GPT-5.2 Codex | OpenAI | Agentic coding |
 | 10 | [10-openai-gpt-5-3-codex.md](10-openai-gpt-5-3-codex.md) | GPT-5.3 Codex | OpenAI | Agentic coding |
+| 11 | [11-openai-gpt-5-4.md](11-openai-gpt-5-4.md) | GPT-5.4 | OpenAI | Current frontier |
 
 ---
 
@@ -120,7 +121,7 @@ processing — the primary differentiators from other families.
 
 ### OpenAI GPT-5
 
-Five models span general-purpose chat through specialized autonomous coding.
+Six models span general-purpose chat through specialized autonomous coding.
 
 #### GPT-5.1 — Adaptive Reasoning for General Use
 
@@ -148,6 +149,15 @@ Five models span general-purpose chat through specialized autonomous coding.
   matters; long-horizon agentic tasks; multi-modal analysis.
 - **Key technique:** Interactive steering mid-task; context compaction for
   large reference material; frame prompts as ongoing collaborations.
+
+#### GPT-5.4 — Current Frontier General Purpose
+
+- **Context window:** Deployment-dependent — use your environment's published limits.
+- **Use when:** high-stakes technical work, long-context professional analysis,
+  complex coding tasks, and multi-step workflows where success criteria matter.
+- **Key technique:** Define the end state, operating rules, and deliverables
+  explicitly; separate goals from constraints; ask for verifiable outputs such
+  as test plans, risk tables, and acceptance criteria.
 
 #### GPT-5.2 Codex — Long-Horizon Agentic Coding :robot:
 
@@ -185,7 +195,7 @@ Is the task code-focused and multi-file / long-horizon?
     │   └── Moderate volume, balanced tasks → Claude Sonnet 4.5 or GPT-5.1
     └── Is this professional / high-stakes work?
         ├── Deep nuance required → Claude Opus 4.5 / 4.6
-        └── Expert-level professional → GPT-5.2 or GPT-5.3
+        └── Expert-level professional → GPT-5.4 or GPT-5.2
 ```
 
 ### Quick Reference: Model vs. Use Case
@@ -198,6 +208,7 @@ Is the task code-focused and multi-file / long-horizon?
 | Multi-modal document analysis | Gemini 3 Pro |
 | Real-time interactive assistant | Gemini 3 Flash or GPT-5.1 |
 | Financial modeling / legal analysis | GPT-5.2 |
+| Cross-functional technical strategy with clear deliverables | GPT-5.4 |
 | Full-stack app from scratch | GPT-5.3 Codex |
 | Large codebase migration | GPT-5.2 Codex |
 | Consumer chat / personality-driven | GPT-5.1 |

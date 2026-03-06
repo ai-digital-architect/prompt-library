@@ -20,7 +20,7 @@ Claude Code's architecture is fundamentally different from GitHub Copilot's. It 
 ## Implementation Tracks
 
 - **Track A (File-based)**: Zero infrastructure. Markdown files + CLAUDE.md + Claude's auto-memory. Uses Read/Write tools for memory operations.
-- **Track B (Vector store)**: MCP server connecting Claude Code to a vector embedding store (Qdrant/Pinecone/pgvector) for semantic retrieval at scale.
+- **Track B (Vector store)**: MCP server connecting Claude Code to a vector embedding store (Qdrant/Pinecone/pgvector) for semantic retrieval at scale. See [mem-impl-vector/claude-code/](../../mem-impl-vector/claude-code/) for the full Track B implementation guide.
 
 ## File Index
 
@@ -28,7 +28,7 @@ Claude Code's architecture is fundamentally different from GitHub Copilot's. It 
 |---|---|
 | [memory-type-mapping.md](memory-type-mapping.md) | Detailed mapping of each memory type to Claude Code primitives |
 | [track-a-file-based-guide.md](track-a-file-based-guide.md) | Step-by-step file-based implementation |
-| [track-b-vector-store-guide.md](track-b-vector-store-guide.md) | Step-by-step vector store implementation via MCP |
+| [track-b-vector-store-guide.md](../../mem-impl-vector/claude-code/track-b-vector-store-guide.md) | Step-by-step vector store implementation via MCP (moved to mem-impl-vector/) |
 | [CLAUDE.md](CLAUDE.md) | Drop-in CLAUDE.md snippet for any repository |
 | [claude-memory.instructions.md](claude-memory.instructions.md) | Reusable agent instructions block |
 | [trade-offs.md](trade-offs.md) | Track A vs Track B comparison |

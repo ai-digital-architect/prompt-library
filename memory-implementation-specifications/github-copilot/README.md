@@ -18,7 +18,7 @@ This guide provides a complete memory architecture for GitHub Copilot that integ
 ## Implementation Tracks
 
 - **Track A (File-based)**: Zero infrastructure. Markdown files in the repository + native `/memories/` scopes. Version-controllable, works offline.
-- **Track B (Vector store)**: External embedding store (Qdrant/Pinecone/pgvector) for semantic retrieval at scale. Requires infrastructure but enables similarity search across thousands of memory entries.
+- **Track B (Vector store)**: External embedding store (Qdrant/Pinecone/pgvector) for semantic retrieval at scale. See [mem-impl-vector/github-copilot/](../../mem-impl-vector/github-copilot/) for the full Track B implementation guide.
 
 ## File Index
 
@@ -26,7 +26,7 @@ This guide provides a complete memory architecture for GitHub Copilot that integ
 |---|---|
 | [memory-type-mapping.md](memory-type-mapping.md) | Detailed mapping of each memory type to Copilot primitives |
 | [track-a-file-based-guide.md](track-a-file-based-guide.md) | Step-by-step file-based implementation |
-| [track-b-vector-store-guide.md](track-b-vector-store-guide.md) | Step-by-step vector store implementation |
+| [track-b-vector-store-guide.md](../../mem-impl-vector/github-copilot/track-b-vector-store-guide.md) | Step-by-step vector store implementation (moved to mem-impl-vector/) |
 | [copilot-memory.instructions.md](copilot-memory.instructions.md) | Drop-in `.instructions.md` for any repository |
 | [copilot-memory.skill.md](copilot-memory.skill.md) | SKILL.md file for memory operations |
 | [trade-offs.md](trade-offs.md) | Track A vs Track B comparison |

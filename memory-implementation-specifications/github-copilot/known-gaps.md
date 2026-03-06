@@ -70,8 +70,8 @@ The `co-pilot-memory-implementation/` templates were designed for a pre-native-m
 
 | Gap | Workaround |
 |---|---|
-| No programmatic API | Use file-based Track A as primary store; sync to vector store for search |
-| No memory search | Use vector store (Track B) for similarity search; use grep on `.github/memory/` files |
+| No programmatic API | Use file-based Track A as primary store; sync to [Track B vector store](../../mem-impl-vector/github-copilot/track-b-vector-store-guide.md) for search |
+| No memory search | Use [Track B vector store](../../mem-impl-vector/github-copilot/track-b-vector-store-guide.md) for similarity search; use grep on `.github/memory/` files |
 | Session memory loss | Instruct Copilot to summarize session at end; manually promote key findings |
 | No memory versioning | Track A files in git provide full version history |
 | No team-shared scope | Use `.github/memory/` files in shared repository; PR-based updates |
