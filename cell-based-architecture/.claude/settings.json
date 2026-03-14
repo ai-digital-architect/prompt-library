@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'file=$(echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get(\\\"file_path\\\",\\\"\\\"))\" 2>/dev/null || echo \"\"); if [[ \"$file\" =~ Domain\\.(ts|java|py)$ ]] || [[ \"$file\" =~ /domain/ ]]; then if grep -qE \"import.*(aws-sdk|@aws-sdk|dynamodb|express|fastify|axios|pg|mysql|redis|mongoose|typeorm|hibernate|spring|django|flask)\" \"$file\" 2>/dev/null; then echo \"DOMAIN PURITY VIOLATION: Infrastructure import detected in domain file: $file\"; echo \"Move infrastructure concerns to an adapter in adapter/outbound/.\"; exit 2; fi; fi; exit 0'",
+            "description": "enforce-domain-purity: Block infrastructure imports in domain files. Rejects writes to *Domain.{ts,java,py} files containing framework or infrastructure library imports."
+          },
+          {
+            "type": "command",
+            "command": "bash -c 'file=$(echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get(\\\"file_path\\\",\\\"\\\"))\" 2>/dev/null || echo \"\"); if [[ \"$file\" =~ Adapter\\.(ts|java|py)$ ]]; then count=$(grep -cE \"implements\\s+\\w+\" \"$file\" 2>/dev/null || echo 0); if [ \"$count\" -gt 1 ]; then echo \"PORT CONTRACT WARNING: Adapter $file implements $count port(s). Each adapter should implement exactly one port interface.\"; exit 1; fi; fi; exit 0'",
+            "description": "validate-port-contracts: Warn if an adapter file implements more than one port interface. Matched files: **/*Adapter.{ts,java,py}."
+          },
+          {
+            "type": "command",
+            "command": "bash -c 'file=$(echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get(\\\"file_path\\\",\\\"\\\"))\" 2>/dev/null || echo \"\"); if [[ \"$file\" =~ \\.(ts|java|py)$ ]] && [[ ! \"$file\" =~ /routing/ ]]; then if grep -qE \"cell-[0-9]+\\.(invoke|send|get|put|query)|CELL_[A-Z0-9_]+_ENDPOINT\" \"$file\" 2>/dev/null; then echo \"CROSS-CELL VIOLATION: Direct cross-cell call detected in $file.\"; echo \"Use the routing layer or publish a domain event on the cell EventBridge bus.\"; exit 2; fi; fi; exit 0'",
+            "description": "block-cross-cell-calls: Reject direct cross-cell method calls not going through the routing layer. Matched files: **/cells/**/*.{ts,java,py} (excluding routing/)."
+          },
+          {
+            "type": "command",
+            "command": "bash -c 'file=$(echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get(\\\"file_path\\\",\\\"\\\"))\" 2>/dev/null || echo \"\"); if [[ \"$file\" =~ Adapter\\.(ts|java|py)$ ]]; then if grep -qE \"(password|secret|api_key|apiKey|token)\\s*=\\s*['\\\"][^'\\\"]+['\\\"]\" \"$file\" 2>/dev/null; then echo \"SECURITY HIGH: Hardcoded credential in outbound adapter $file. Use environment variables or AWS Secrets Manager.\"; echo \"Flagging for @security-agent review.\"; exit 1; fi; if grep -qE \"eval\\(|exec\\(|execSync\\(|child_process\" \"$file\" 2>/dev/null; then echo \"SECURITY CRITICAL: Dynamic code execution in $file. Injection risk. Flag for @security-agent review.\"; exit 2; fi; fi; exit 0'",
+            "description": "adapter-security-scan: Grep for injection patterns and hardcoded credentials in adapter files. Flags SecurityAgent for review on HIGH/CRITICAL findings."
+          },
+          {
+            "type": "command",
+            "command": "bash -c 'file=$(echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get(\\\"file_path\\\",\\\"\\\"))\" 2>/dev/null || echo \"\"); if [[ \"$file\" =~ /ports/ ]] && [[ \"$file\" =~ \\.(ts|java|py)$ ]]; then echo \"PORT CONTRACT CHANGE DETECTED in $file.\"; echo \"Run /project:generate-adr to document this change and migration path before the change is reviewed.\"; echo \"ADR is mandatory for any port interface modification.\"; fi; exit 0'",
+            "description": "adr-on-boundary-change: Print reminder to invoke /generate-adr when a port interface file is modified. Matched files: **/ports/**/*.{ts,java,py}."
+          }
+        ]
+      }
+    ]
+  }
+}
