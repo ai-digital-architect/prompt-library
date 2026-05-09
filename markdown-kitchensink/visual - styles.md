@@ -113,3 +113,8 @@ Do you want the diagram to feel like a physical model, such as blocks or
 Lego, or like a transparent digital overlay, such as holographic glass?
 
 
+## 4
+
+```
+Use  an excalidraw style where Important element should use thicker outlines (bold strokes) or emphasis , while connections or annotations use thinner lines, use a muted color palette and simplified geometry where complex systems are reduced to basic boxes , clouds or cylinders to keep the focus on relationships and flow rather than their granular details
+```
