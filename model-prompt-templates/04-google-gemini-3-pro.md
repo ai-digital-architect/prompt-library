@@ -1,5 +1,7 @@
 # General-Purpose Prompt Template — Google Gemini 3 Pro
 
+> **Status update (June 2026):** Gemini 3 Pro is no longer the newest Pro-tier model. **Gemini 3.1 Pro (Preview, `gemini-3.1-pro-preview`)** is now Google's latest flagship and no longer appears alongside Gemini 3 Pro on the current Gemini API model page. For new work, see [Gemini 3.1 Pro template](./18-google-gemini-3-1-pro.md). The guidance below remains valid for existing Gemini 3 Pro deployments.
+
 ## Model Profile
 
 | Attribute | Detail |
@@ -203,9 +205,9 @@ recommended visual, and presenter notes.
 
 | Scenario | Use Gemini 3 Pro? |
 |---|---|
-| Processing documents, images, audio, and video together | ✅ Best-in-class multimodal |
+| Processing documents, images, audio, and video together | ✅ Native multimodal (Gemini 3.1 Pro now leads this tier) |
 | Analyzing a full codebase (500K+ tokens) in one pass | ✅ 1M context window |
-| Advanced math and scientific reasoning | ✅ Top-tier benchmarks |
+| Advanced math and scientific reasoning | ✅ Strong, though surpassed by Gemini 3.1 Pro |
 | Real-time chat requiring sub-second latency | ❌ Use Gemini 3 Flash |
 | High-volume batch processing on a budget | ❌ Use Gemini 3 Flash |
 | Complex agentic coding with long-horizon tasks | ✅ Strong, especially with thinking enabled |

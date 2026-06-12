@@ -7,6 +7,7 @@
 | **Model** | Claude Haiku 4.5 |
 | **Provider** | Anthropic |
 | **Tier** | Fast frontier — speed and cost efficiency at near-frontier quality |
+| **API Model ID** | `claude-haiku-4-5` (or pinned: `claude-haiku-4-5-20251001`) |
 | **Context Window** | 200K tokens |
 | **Max Output** | 64K tokens |
 | **Strengths** | Low latency, high throughput, cost efficiency, classification, extraction, lightweight RAG, real-time chat, agentic subtasks |
@@ -43,7 +44,7 @@ Output: {{sample output}}
 3. **Few-shot examples are critical** — One or two examples improve consistency dramatically, especially for classification and extraction.
 4. **Enable extended thinking selectively** — Haiku 4.5 supports extended thinking (a first for Haiku models), but use it only for genuinely hard reasoning tasks to preserve speed advantage.
 5. **Design for pipelines** — Haiku is ideal as a worker in multi-model architectures. Sonnet plans, Haiku executes.
-6. **Batch aggressively** — Haiku's low cost makes it viable for high-volume processing. Design prompts that handle one unit of work cleanly.
+6. **Batch aggressively** — Haiku's low cost makes it viable for high-volume processing. Design prompts that handle one unit of work cleanly. (Note: Haiku 4.5 does not accept the `effort` parameter — that is an Opus/Sonnet 4.6+ feature.)
 
 ---
 

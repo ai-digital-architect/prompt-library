@@ -1,5 +1,11 @@
 # General-Purpose Prompt Template — OpenAI GPT-5.1
 
+> **Status (June 2026):** GPT-5.1 is no longer listed in OpenAI's current model
+> documentation and is presumed legacy. OpenAI's deprecation page schedules
+> `gpt-5.1-chat-latest` and `gpt-5.1-codex` for retirement on July 23, 2026, with
+> `gpt-5.5` as the recommended replacement. For new work, prefer
+> [GPT-5.5](./15-openai-gpt-5-5.md) or [GPT-5.4](./11-openai-gpt-5-4.md).
+
 ## Model Profile
 
 | Attribute | Detail |

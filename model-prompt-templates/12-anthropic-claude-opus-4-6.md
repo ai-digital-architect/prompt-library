@@ -1,5 +1,11 @@
 # General-Purpose Prompt Template — Anthropic Claude Opus 4.6
 
+> **Status (June 2026):** Opus 4.6 remains active but has been superseded by
+> **Claude Opus 4.8** ([template 14](./14-anthropic-claude-opus-4-8.md)) as the
+> current Opus-tier model, with **Claude Fable 5**
+> ([template 13](./13-anthropic-claude-fable-5.md)) above it. Prefer Opus 4.8 for
+> new work.
+
 ## Model Profile
 
 | Attribute | Detail |
@@ -7,8 +13,8 @@
 | **Model** | Claude Opus 4.6 |
 | **Provider** | Anthropic |
 | **Tier** | Flagship — maximum intelligence, extended reasoning, and agentic depth |
-| **Context Window** | 200K tokens |
-| **Max Output** | 64K tokens (128K with beta header) |
+| **Context Window** | 1M tokens |
+| **Max Output** | 128K tokens (streaming required for large outputs) |
 | **Strengths** | Extended thinking, deep multi-step reasoning, agentic workflows, complex bug detection, long-document synthesis, nuanced judgment |
 | **New in 4.6** | Enhanced extended thinking with deeper reasoning chains, improved tool-use reliability, stronger performance on STEM and legal reasoning benchmarks, refined computer-use capabilities |
 | **Best For** | Tasks requiring the highest correctness bar — production code auditing, advanced research synthesis, strategic documents, agent orchestration, and long-horizon problem solving |
@@ -38,7 +44,7 @@ You are {{ROLE}}, an expert in {{DOMAIN}}.
 <context>
 {{Background information, constraints, organizational context, or situational
 framing. Be generous with detail — Opus 4.6 maintains coherence across the full
-200K-token window.}}
+1M-token window.}}
 </context>
 
 <objectives>
@@ -77,7 +83,8 @@ sub-tags — <doc1>, <doc2>, <code> — to keep reference items distinct.}}
 
 ### Key Prompting Principles for Opus 4.6
 
-1. **Activate extended thinking explicitly** — In the API set `"thinking": {"type": "enabled", "budget_tokens": 10000}`.
+1. **Use adaptive thinking** — In the API set `"thinking": {"type": "adaptive"}` and the model decides
+   when and how deeply to think (fixed `budget_tokens` is deprecated on 4.6).
    Conversationally use: *"Reason carefully before answering"* or *"Think step by step."*
 2. **Provide motivational framing** — Opus 4.6 calibrates rigor to stakes.
    Example: *"This will be reviewed by the lead security engineer before production deploy."*
@@ -85,8 +92,9 @@ sub-tags — <doc1>, <doc2>, <code> — to keep reference items distinct.}}
    wrap each in a named tag (`<spec>`, `<code>`, `<logs>`) so the model can cite them precisely.
 4. **Request explicit uncertainty disclosure** — Add *"Flag any areas where your
    confidence is lower"* to get calibrated, trustworthy output.
-5. **Use the `effort` parameter for cost control** — Equivalent to Opus 4.5; pass
-   `"effort": "high"` for maximum thoroughness, `"effort": "medium"` for balanced output.
+5. **Use the `effort` parameter for cost control** — Pass
+   `"output_config": {"effort": "high"}` for thoroughness (also `"max"` on Opus 4.6),
+   or `"medium"` for balanced output. Effort lives inside `output_config`, not top-level.
 6. **Chain objectives, not prompts** — Opus 4.6's tool-use and reasoning hold context
    well across long turns. Prefer one rich prompt over multiple short follow-ups.
 
@@ -312,10 +320,10 @@ fully transparent — do not skip inferential steps.
 | Long-document synthesis with cross-source reconciliation | ✅ Opus 4.6 |
 | Multi-step agentic workflows with tool chaining | ✅ Opus 4.6 |
 | Non-deterministic production bug with insufficient evidence | ✅ Opus 4.6 |
-| Standard code completion or refactoring | ❌ Sonnet 4.5 |
+| Standard code completion or refactoring | ❌ Sonnet 4.6 |
 | High-volume classification, extraction, or summarization | ❌ Haiku 4.5 |
-| Conversational assistant or FAQ bot | ❌ Haiku 4.5 or Sonnet 4.5 |
-| Balanced quality and cost (most production tasks) | ❌ Sonnet 4.5 |
+| Conversational assistant or FAQ bot | ❌ Haiku 4.5 or Sonnet 4.6 |
+| Balanced quality and cost (most production tasks) | ❌ Sonnet 4.6 |
 
 ---
 
@@ -323,13 +331,10 @@ fully transparent — do not skip inferential steps.
 
 ```json
 {
-  "model": "claude-opus-4-6-20260301",
+  "model": "claude-opus-4-6",
   "max_tokens": 16000,
-  "thinking": {
-    "type": "enabled",
-    "budget_tokens": 10000
-  },
-  "effort": "high",
+  "thinking": { "type": "adaptive" },
+  "output_config": { "effort": "high" },
   "system": "...",
   "messages": [
     { "role": "user", "content": "..." }
@@ -337,7 +342,9 @@ fully transparent — do not skip inferential steps.
 }
 ```
 
-> **Cost note**: Opus 4.6 with extended thinking enabled at `budget_tokens: 10000`
-> consumes significantly more tokens than Sonnet 4.5. Use `effort: "medium"` or
-> reduce `budget_tokens` for cost-sensitive workloads where Opus 4.6's judgment
-> is still needed but exhaustive reasoning is not.
+> **API notes**: Use the bare alias `claude-opus-4-6` (no date suffix). Adaptive
+> thinking is the recommended mode on 4.6 — `budget_tokens` is deprecated.
+> Assistant-turn prefills return a 400 on Opus 4.6; use `output_config.format`
+> (structured outputs) instead. Use `"effort": "medium"` for cost-sensitive
+> workloads where Opus 4.6's judgment is still needed but exhaustive reasoning
+> is not.

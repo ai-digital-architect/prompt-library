@@ -1,5 +1,12 @@
 # General-Purpose Prompt Template — Anthropic Claude Opus 4.5 / 4.6
 
+> **Status (June 2026):** The current Opus-tier model is **Claude Opus 4.8** — see
+> [14-anthropic-claude-opus-4-8.md](./14-anthropic-claude-opus-4-8.md). Anthropic's
+> most powerful model overall is **Claude Fable 5** — see
+> [13-anthropic-claude-fable-5.md](./13-anthropic-claude-fable-5.md). Opus 4.5 and
+> 4.6 remain active and this template still applies to them, but prefer Opus 4.8
+> for new work.
+
 ## Model Profile
 
 | Attribute | Detail |
@@ -7,8 +14,8 @@
 | **Model** | Claude Opus 4.5 / Opus 4.6 |
 | **Provider** | Anthropic |
 | **Tier** | Flagship — maximum intelligence and reasoning depth |
-| **Context Window** | 200K tokens |
-| **Max Output** | 64K tokens (128K with beta header) |
+| **Context Window** | 1M tokens (Opus 4.6; Opus 4.5 is 200K) |
+| **Max Output** | 128K tokens (streaming required for large outputs) |
 | **Strengths** | Deep reasoning, nuanced analysis, complex multi-step tasks, creative writing, subtle bug detection, research synthesis |
 | **Best For** | Tasks where correctness, depth, and nuance outweigh speed — final code reviews, architecture design, executive strategy, advanced research |
 
@@ -55,10 +62,10 @@ You are {{ROLE}}, an expert in {{DOMAIN}}.
 
 1. **Give motivational context** — Opus performs better when you explain *why* the task matters. Example: "This architecture review will be presented to the CTO and must surface risks that less careful analysis would miss."
 2. **Use XML tags liberally** — Opus is highly responsive to well-structured XML for separating context, instructions, and reference material.
-3. **Request extended thinking** — Via API, enable extended thinking for complex tasks. Conversationally, phrases like "think step by step" or "reason carefully before answering" activate deeper reasoning.
+3. **Enable thinking** — On Opus 4.6 use adaptive thinking (`"thinking": {"type": "adaptive"}` — `budget_tokens` is deprecated); on Opus 4.5 use extended thinking. Conversationally, phrases like "think step by step" or "reason carefully before answering" activate deeper reasoning.
 4. **Leverage the full context window** — Opus maintains coherence across very long contexts. Include full documents, codebases, or lengthy reference material.
 5. **Be explicit about quality bars** — Opus calibrates depth to your expectations. Say "production-ready" or "flag subtle issues that faster models might miss."
-6. **Use the effort parameter** — Opus 4.5 uniquely supports the `effort` parameter to control token usage vs. thoroughness with a single model.
+6. **Use the effort parameter** — Opus 4.5+ supports `effort` (passed as `"output_config": {"effort": "low" | "medium" | "high" | "max"}`) to control token usage vs. thoroughness with a single model.
 
 ---
 
@@ -246,7 +253,7 @@ compelling but honest about risks and timeline uncertainty.
 | Final code review before production merge | ✅ Yes — catches subtle bugs others miss |
 | Quick classification or extraction task | ❌ Use Haiku 4.5 |
 | Architecture or strategy document requiring deep reasoning | ✅ Yes |
-| High-volume batch processing | ❌ Use Haiku 4.5 or Sonnet 4.5 |
+| High-volume batch processing | ❌ Use Haiku 4.5 or Sonnet 4.6 |
 | Creative writing requiring nuance and literary quality | ✅ Yes |
-| Agentic coding with many tool calls | ⚠️ Consider Sonnet 4.5 for better speed |
+| Agentic coding with many tool calls | ⚠️ Consider Sonnet 4.6 for better speed |
 | Board-level communications where precision matters | ✅ Yes |

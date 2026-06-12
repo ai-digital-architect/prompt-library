@@ -18,16 +18,19 @@ tags:
 ai_note: "Content created with AI assistance."
 summary: >
   A comprehensive guide to using the model prompt templates in this library.
-  Covers all 11 templates across Anthropic Claude, Google Gemini, and OpenAI GPT-5
+  Covers all 20 templates across Anthropic Claude, Google Gemini, and OpenAI GPT-5
   model families, with selection guidance, template anatomy, and best practices
-  for writing effective prompts.
+  for writing effective prompts. Refreshed June 2026 against the current model
+  lineups of all three providers.
 post_date: "2026-03-03"
+last_updated: "2026-06-12"
 ---
 
 ## Overview
 
-This folder contains 11 general-purpose prompt templates, one per major model
-in the Anthropic Claude, Google Gemini 3, and OpenAI GPT-5 model families.
+This folder contains 20 general-purpose prompt templates, one per major model
+in the Anthropic Claude, Google Gemini, and OpenAI GPT-5 model families —
+refreshed June 2026 against [current-model-list.md](current-model-list.md).
 Each template provides:
 
 - A **model profile** with key attributes, context window, and best-fit scenarios.
@@ -42,19 +45,34 @@ quality requirements.
 
 ## Template Index
 
-| # | File | Model | Provider | Tier |
-|---|------|-------|----------|------|
-| 01 | [01-anthropic-claude-opus.md](01-anthropic-claude-opus.md) | Claude Opus 4.5 / 4.6 | Anthropic | Flagship |
-| 02 | [02-anthropic-claude-sonnet.md](02-anthropic-claude-sonnet.md) | Claude Sonnet 4.5 | Anthropic | Balanced frontier |
-| 03 | [03-anthropic-claude-haiku.md](03-anthropic-claude-haiku.md) | Claude Haiku 4.5 | Anthropic | Fast frontier |
-| 04 | [04-google-gemini-3-pro.md](04-google-gemini-3-pro.md) | Gemini 3 Pro | Google DeepMind | Flagship |
-| 05 | [05-google-gemini-3-flash.md](05-google-gemini-3-flash.md) | Gemini 3 Flash | Google DeepMind | Fast frontier |
-| 06 | [06-openai-gpt-5-1.md](06-openai-gpt-5-1.md) | GPT-5.1 | OpenAI | Balanced frontier |
-| 07 | [07-openai-gpt-5-2.md](07-openai-gpt-5-2.md) | GPT-5.2 | OpenAI | Flagship |
-| 08 | [08-openai-gpt-5-3.md](08-openai-gpt-5-3.md) | GPT-5.3 | OpenAI | Next-gen frontier |
-| 09 | [09-openai-gpt-5-2-codex.md](09-openai-gpt-5-2-codex.md) | GPT-5.2 Codex | OpenAI | Agentic coding |
-| 10 | [10-openai-gpt-5-3-codex.md](10-openai-gpt-5-3-codex.md) | GPT-5.3 Codex | OpenAI | Agentic coding |
-| 11 | [11-openai-gpt-5-4.md](11-openai-gpt-5-4.md) | GPT-5.4 | OpenAI | Current frontier |
+| # | File | Model | Provider | Tier | Status (June 2026) |
+|---|------|-------|----------|------|--------|
+| 01 | [01-anthropic-claude-opus.md](01-anthropic-claude-opus.md) | Claude Opus 4.5 / 4.6 | Anthropic | Flagship (prior gen) | Legacy — see 14 |
+| 02 | [02-anthropic-claude-sonnet.md](02-anthropic-claude-sonnet.md) | Claude Sonnet 4.6 (4.5 legacy) | Anthropic | Balanced frontier | **Current** |
+| 03 | [03-anthropic-claude-haiku.md](03-anthropic-claude-haiku.md) | Claude Haiku 4.5 | Anthropic | Fast frontier | **Current** |
+| 04 | [04-google-gemini-3-pro.md](04-google-gemini-3-pro.md) | Gemini 3 Pro | Google DeepMind | Flagship (prior gen) | Legacy — see 18 |
+| 05 | [05-google-gemini-3-flash.md](05-google-gemini-3-flash.md) | Gemini 3 Flash | Google DeepMind | Fast frontier | Preview — see 19 |
+| 06 | [06-openai-gpt-5-1.md](06-openai-gpt-5-1.md) | GPT-5.1 | OpenAI | Balanced frontier | Deprecated — see 15 |
+| 07 | [07-openai-gpt-5-2.md](07-openai-gpt-5-2.md) | GPT-5.2 | OpenAI | Flagship (prior gen) | Deprecated — see 15 |
+| 08 | [08-openai-gpt-5-3.md](08-openai-gpt-5-3.md) | GPT-5.3 | OpenAI | Frontier (prior gen) | Deprecated — see 15 |
+| 09 | [09-openai-gpt-5-2-codex.md](09-openai-gpt-5-2-codex.md) | GPT-5.2 Codex | OpenAI | Agentic coding | Deprecated — see 15 |
+| 10 | [10-openai-gpt-5-3-codex.md](10-openai-gpt-5-3-codex.md) | GPT-5.3 Codex | OpenAI | Agentic coding | Deprecated — see 15 |
+| 11 | [11-openai-gpt-5-4.md](11-openai-gpt-5-4.md) | GPT-5.4 | OpenAI | Affordable frontier | **Current** |
+| 12 | [12-anthropic-claude-opus-4-6.md](12-anthropic-claude-opus-4-6.md) | Claude Opus 4.6 | Anthropic | Flagship (prior gen) | Legacy — see 14 |
+| 13 | [13-anthropic-claude-fable-5.md](13-anthropic-claude-fable-5.md) | Claude Fable 5 | Anthropic | Frontier (above Opus) | **Current** |
+| 14 | [14-anthropic-claude-opus-4-8.md](14-anthropic-claude-opus-4-8.md) | Claude Opus 4.8 | Anthropic | Flagship | **Current** |
+| 15 | [15-openai-gpt-5-5.md](15-openai-gpt-5-5.md) | GPT-5.5 | OpenAI | Flagship | **Current** |
+| 16 | [16-openai-gpt-5-4-mini.md](16-openai-gpt-5-4-mini.md) | GPT-5.4 mini | OpenAI | Balanced / low latency | **Current** |
+| 17 | [17-openai-gpt-5-4-nano.md](17-openai-gpt-5-4-nano.md) | GPT-5.4 nano | OpenAI | Fast / lowest cost | **Current** |
+| 18 | [18-google-gemini-3-1-pro.md](18-google-gemini-3-1-pro.md) | Gemini 3.1 Pro | Google DeepMind | Flagship | **Current** (Preview) |
+| 19 | [19-google-gemini-3-5-flash.md](19-google-gemini-3-5-flash.md) | Gemini 3.5 Flash | Google DeepMind | Fast frontier | **Current** (Stable) |
+| 20 | [20-google-gemini-3-1-flash-lite.md](20-google-gemini-3-1-flash-lite.md) | Gemini 3.1 Flash-Lite | Google DeepMind | Fast / lowest cost | **Current** (Stable) |
+
+> **Intentionally excluded:** Anthropic's Claude Mythos 5 / Mythos Preview
+> (limited-availability research models — skipped by design), the Gemini 2.5
+> family (previous generation), and all media, realtime-voice, TTS,
+> transcription, embedding, and robotics models — this library covers
+> general-purpose text/reasoning prompting only.
 
 ---
 
@@ -62,25 +80,41 @@ quality requirements.
 
 ### Anthropic Claude
 
-Three tiers cover the full range of latency and depth requirements.
+Four tiers cover the full range of latency and depth requirements. (Claude
+Mythos 5 / Mythos Preview are limited-availability research models and have no
+template by design.)
 
-#### Claude Opus 4.5 / 4.6 — Maximum Depth
+#### Claude Fable 5 — Frontier Ceiling :sparkles:
 
-- **Context window:** 200K tokens | **Max output:** 64K tokens (128K with beta)
-- **Use when:** correctness and nuance outweigh speed — architecture reviews,
-  executive strategy, advanced research, subtle bug detection.
-- **Key technique:** Enable extended thinking; use XML-tagged system prompts;
-  provide motivational context explaining why quality matters.
-- **Unique feature:** `effort` parameter controls token usage vs. thoroughness.
+- **Context window:** 1M tokens | **Max output:** 128K tokens
+- **Pricing:** $10 / $50 per million input/output tokens
+- **Use when:** the hardest novel problems, multi-day autonomous agent runs,
+  near-1M-token research synthesis, work where a subtle error is very costly.
+- **Key technique:** One rich, fully specified prompt with the complete end
+  state; adaptive thinking is the only mode — steer depth with
+  `output_config.effort` (`high` default, `xhigh` for coding/agentic). No
+  sampling parameters, no prefills.
 
-#### Claude Sonnet 4.5 — Best Intelligence-to-Cost Ratio
+#### Claude Opus 4.8 — Flagship Daily Driver for Hard Tasks
 
-- **Context window:** 200K tokens (1M in beta) | **Max output:** 64K tokens
+- **Context window:** 1M tokens (no long-context premium) | **Max output:** 128K tokens
+- **Pricing:** $5 / $25 per million input/output tokens
+- **Use when:** long-horizon agentic work, production code review, deep
+  document/knowledge work, high-stakes writing.
+- **Key technique:** Full task spec up front at high effort; explicit "call
+  this when…" trigger conditions for tools, search, memory, and subagents;
+  grant autonomy on minor decisions to reduce ask-rate.
+- **Prior generations:** Opus 4.5/4.6 remain active — see templates 01 and 12.
+
+#### Claude Sonnet 4.6 — Best Speed-to-Intelligence Ratio
+
+- **Context window:** 1M tokens | **Max output:** 64K tokens
 - **Pricing:** $3 / $15 per million input/output tokens
 - **Use when:** production coding agents, multi-tool workflows, architecture
   planning, content creation, subagent orchestration.
 - **Key technique:** Direct, action-oriented instructions; multishot examples;
-  encourage parallel tool calls explicitly.
+  encourage parallel tool calls explicitly; set `effort` deliberately (4.6
+  defaults to `high` — drop to `low`/`medium` on latency-sensitive paths).
 
 #### Claude Haiku 4.5 — Speed and Cost Efficiency
 
@@ -93,89 +127,97 @@ Three tiers cover the full range of latency and depth requirements.
 
 ---
 
-### Google Gemini 3
+### Google Gemini
 
-Both Gemini 3 models share a **1M token context window** and native multimodal
-processing — the primary differentiators from other families.
+All current Gemini models share a **1M token context window** and native
+multimodal processing — the primary differentiators from other families.
+(Gemini 2.5 and media/TTS/Live models are out of scope for this library.)
 
-#### Gemini 3 Pro — Advanced Reasoning + Multimodal
+#### Gemini 3.1 Pro — Flagship Reasoning + Multimodal (Preview)
 
-- **Context window:** 1M tokens
-- **Use when:** multi-modal analysis (images, audio, video, PDFs), scientific
-  reasoning, long-document processing, complex coding, agentic workflows.
-- **Key technique:** Feed entire codebases or document collections; configure
-  thinking level (minimal → high) via API; use system instructions for role
-  and constraints; connect to Google Search for real-time grounding.
+- **Context window:** 1M tokens | **Max output:** 64K tokens
+- **Pricing:** $2 / $12 per million tokens (≤200K prompt); $4 / $18 above 200K
+- **Use when:** the deepest reasoning in the Gemini lineup — multi-modal
+  analysis, scientific reasoning, agentic coding, long-document processing.
+- **Key technique:** Context first, instruction last; thinking is always on
+  (defaults to `thinking_level: "high"`, cannot be disabled); keep sampling
+  parameters at defaults; ground with Google Search for current facts.
 
-#### Gemini 3 Flash — Frontier Reasoning at Flash Speed
+#### Gemini 3.5 Flash — Newest Stable Fast Frontier
 
-- **Context window:** 1M tokens
-- **Pricing:** $0.50 / $3.00 per million input/output tokens
-- **Use when:** interactive agents, real-time assistants, rapid prototyping,
-  batch data extraction, production pipelines at scale.
-- **Key technique:** Keep prompts focused for low latency; batch 100+
-  simultaneous function calls; pair with Pro for hybrid workflows (Flash
-  for the fast inner loop, Pro for the reasoning-heavy outer loop).
+- **Context window:** 1M tokens | **Max output:** 64K tokens
+- **Pricing:** $1.50 / $9.00 per million input/output tokens
+- **Use when:** interactive agents, production pipelines, agentic tool use at
+  speed — Google reports large agentic-benchmark gains and ~68% better token
+  efficiency vs. prior Flash.
+- **Key technique:** Defaults to `thinking_level: "medium"` — raise to `high`
+  for harder reasoning; keep prompts focused; pair with 3.1 Pro for hybrid
+  workflows (Flash inner loop, Pro outer loop).
+
+#### Gemini 3.1 Flash-Lite — Lowest Cost / Highest Throughput (Stable)
+
+- **Context window:** 1M tokens | **Max output:** 64K tokens
+- **Pricing:** $0.25 / $1.50 per million input/output tokens
+- **Use when:** high-volume classification, extraction, routing, and templated
+  generation where throughput and cost dominate.
+- **Key technique:** Defaults to `thinking_level: "minimal"` for speed —
+  escalate selectively; strict output schemas and few-shot examples.
+
+#### Gemini 3 Pro / 3 Flash — Prior Generation
+
+Gemini 3 Pro is superseded by 3.1 Pro; Gemini 3 Flash ($0.50 / $3.00) remains
+in Preview alongside the stable 3.5 Flash. Templates 04 and 05 remain valid
+for existing deployments.
 
 ---
 
 ### OpenAI GPT-5
 
-Six models span general-purpose chat through specialized autonomous coding.
+The current lineup is GPT-5.5 (flagship) plus the GPT-5.4 family (standard /
+mini / nano). GPT-5.1–5.3 and the Codex variants are deprecated, with
+retirements announced for July–August 2026 — their templates (06–10) remain
+for existing deployments.
 
-#### GPT-5.1 — Adaptive Reasoning for General Use
+#### GPT-5.5 — Current Flagship for Reasoning and Coding
 
-- **Context window:** 200K tokens
-- **Use when:** general-purpose chat, fast coding iteration, conversational
-  agents, consumer-facing applications, mixed-difficulty pipelines.
-- **Key technique:** Trust adaptive reasoning; use `reasoning_effort: none`
-  for speed-sensitive paths; leverage 8 customizable personality presets.
+- **Context window:** 1,050,000 tokens | **Max output:** 128K tokens
+- **Pricing:** $5.00 / $30.00 per million input/output tokens
+- **Use when:** complex reasoning and coding (OpenAI's recommendation),
+  agentic workflows with large tool surfaces, high-stakes professional work.
+- **Key technique:** Outcome-first prompts (goal, success criteria, output
+  shape — not step-by-step process); `reasoning_effort` `none` → `xhigh`
+  (default `medium`); its reasoning efficiency means fewer reasoning tokens
+  for equal results, so the flagship can be cheaper end-to-end.
 
-#### GPT-5.2 — Professional Knowledge Work
+#### GPT-5.4 — Affordable Frontier General Purpose
 
-- **Context window:** 400K tokens | **Max output:** 128K tokens
-- **Use when:** complex professional tasks (financial modeling, legal analysis,
-  research synthesis), long-document processing, high-stakes reasoning.
-- **Key technique:** Set explicit professional quality bars ("investment-grade",
-  "Big 4 audit standard"); use `reasoning_effort: xhigh` for maximum depth;
-  feed entire contracts or codebases at once.
-
-#### GPT-5.3 — Next-Generation Efficiency
-
-- **Context window:** 400K tokens (expected)
-- **Status:** General-purpose variant not yet officially released as of March 2026.
-  Based on observed patterns from GPT-5.3-Codex.
-- **Use when:** tasks that previously required GPT-5.2 Pro but where speed
-  matters; long-horizon agentic tasks; multi-modal analysis.
-- **Key technique:** Interactive steering mid-task; context compaction for
-  large reference material; frame prompts as ongoing collaborations.
-
-#### GPT-5.4 — Current Frontier General Purpose
-
-- **Context window:** Deployment-dependent — use your environment's published limits.
+- **Context window:** 1,050,000 tokens | **Max output:** 128K tokens
+- **Pricing:** $2.50 / $15.00 per million input/output tokens
 - **Use when:** high-stakes technical work, long-context professional analysis,
   complex coding tasks, and multi-step workflows where success criteria matter.
 - **Key technique:** Define the end state, operating rules, and deliverables
   explicitly; separate goals from constraints; ask for verifiable outputs such
   as test plans, risk tables, and acceptance criteria.
 
-#### GPT-5.2 Codex — Long-Horizon Agentic Coding :robot:
+#### GPT-5.4 mini — Balanced Cost / Latency
 
-- **Context window:** 400K tokens | **Max output:** 128K tokens
-- **SWE-Bench Pro:** 56.4% | **Terminal-Bench 2.0:** 64.0%
-- **Use when:** multi-file codebase changes, code migrations, large refactors,
-  security audits, complex debugging across large repositories.
-- **Key technique:** Define end state, not steps; specify what must NOT change;
-  set clear success criteria with tests; context compaction sustains long sessions.
+- **Use when:** production pipelines, summarization, mid-complexity coding,
+  components of larger systems where GPT-5.4 quality isn't required.
+- **Key technique:** More literal than the flagship — provide explicit
+  scaffolding, concrete examples, and tight output formats.
 
-#### GPT-5.3 Codex — Full Software Lifecycle :rocket:
+#### GPT-5.4 nano — High-Volume / Lowest Cost
 
-- **Context window:** 400K tokens
-- **Use when:** full-lifecycle tasks (code + docs + tests + deploy + monitor),
-  long-running autonomous sessions, building complete applications from scratch.
-- **Key technique:** Describe outcomes not procedures; steer interactively
-  mid-task; assign lifecycle deliverables (PRDs, runbooks, metrics reports)
-  alongside code; set multi-day milestones.
+- **Use when:** classification, extraction, routing, and other single-step
+  tasks at very high volume.
+- **Key technique:** One unit of work per call; avoid multi-step orchestration
+  (per OpenAI's guidance); strict schemas and few-shot examples.
+
+#### GPT-5.1 / 5.2 / 5.3 and Codex Variants — Deprecated
+
+No longer listed in OpenAI's model docs; announced retirements July 23 –
+August 10, 2026, with GPT-5.5 as the designated replacement (including for
+coding/Codex workloads). See templates 06–10 for migration banners.
 
 ---
 
@@ -185,34 +227,37 @@ Use this decision tree as a starting point.
 
 ```
 Is the task code-focused and multi-file / long-horizon?
-├── Yes → GPT-5.3 Codex (full lifecycle) or GPT-5.2 Codex (security/migration)
+├── Yes → Claude Opus 4.8 (long-horizon agentic) or GPT-5.5 (complex coding)
+│         └── Hardest / multi-day autonomous runs → Claude Fable 5
 └── No
     ├── Does it involve images, audio, video, or PDFs?
-    │   ├── Need speed → Gemini 3 Flash
-    │   └── Need depth → Gemini 3 Pro
+    │   ├── Need speed → Gemini 3.5 Flash
+    │   └── Need depth → Gemini 3.1 Pro
     ├── Is cost or latency the primary constraint?
-    │   ├── Very high volume, simple tasks → Claude Haiku 4.5 or Gemini 3 Flash
-    │   └── Moderate volume, balanced tasks → Claude Sonnet 4.5 or GPT-5.1
+    │   ├── Very high volume, simple tasks → Claude Haiku 4.5,
+    │   │   Gemini 3.1 Flash-Lite, or GPT-5.4 nano
+    │   └── Moderate volume, balanced tasks → Claude Sonnet 4.6,
+    │       Gemini 3.5 Flash, or GPT-5.4 mini
     └── Is this professional / high-stakes work?
-        ├── Deep nuance required → Claude Opus 4.5 / 4.6
-        └── Expert-level professional → GPT-5.4 or GPT-5.2
+        ├── Deep nuance / judgment required → Claude Opus 4.8 (or Fable 5)
+        └── Expert-level professional → GPT-5.5 or GPT-5.4
 ```
 
 ### Quick Reference: Model vs. Use Case
 
 | Use Case | Recommended Model |
 |----------|------------------|
-| Production coding agent (multi-tool) | Claude Sonnet 4.5 |
-| Code review — production release | Claude Opus 4.5 / 4.6 |
-| High-volume extraction / classification | Claude Haiku 4.5 |
-| Multi-modal document analysis | Gemini 3 Pro |
-| Real-time interactive assistant | Gemini 3 Flash or GPT-5.1 |
-| Financial modeling / legal analysis | GPT-5.2 |
+| Production coding agent (multi-tool) | Claude Sonnet 4.6 |
+| Code review — production release | Claude Opus 4.8 |
+| Hardest novel problems / multi-day autonomous runs | Claude Fable 5 |
+| High-volume extraction / classification | Claude Haiku 4.5, Gemini 3.1 Flash-Lite, or GPT-5.4 nano |
+| Multi-modal document analysis | Gemini 3.1 Pro |
+| Real-time interactive assistant | Gemini 3.5 Flash or Claude Haiku 4.5 |
+| Financial modeling / legal analysis | GPT-5.5 |
 | Cross-functional technical strategy with clear deliverables | GPT-5.4 |
-| Full-stack app from scratch | GPT-5.3 Codex |
-| Large codebase migration | GPT-5.2 Codex |
-| Consumer chat / personality-driven | GPT-5.1 |
-| Architecture strategy — board level | Claude Opus or GPT-5.2 |
+| Production summarization pipelines | GPT-5.4 mini or Gemini 3.5 Flash |
+| Full-stack app from scratch / large codebase migration | GPT-5.5 or Claude Opus 4.8 |
+| Architecture strategy — board level | Claude Opus 4.8 or GPT-5.5 |
 
 ---
 
@@ -309,10 +354,12 @@ Use XML tags (Anthropic), system vs. user roles (OpenAI), or section headers
 
 | Model | How to enable deeper reasoning |
 |-------|-------------------------------|
-| Claude (all) | "Think step by step" / API extended thinking |
-| Claude Opus | `effort` parameter; "reason carefully before answering" |
-| GPT-5.x | `reasoning_effort: low / medium / high / xhigh` |
-| Gemini 3 Pro/Flash | Thinking level: minimal / low / medium / high |
+| Claude Fable 5 / Opus 4.8 | Adaptive thinking (`thinking: {"type": "adaptive"}`) is the only mode; depth via `output_config.effort` (`low` → `max`, `xhigh` for coding/agentic) |
+| Claude Sonnet 4.6 / Opus 4.6 | Adaptive thinking recommended (`budget_tokens` deprecated); `output_config.effort` supported |
+| Claude Haiku 4.5 / Sonnet 4.5 | Extended thinking with `budget_tokens`; "think step by step" |
+| GPT-5.5 / 5.4 family | `reasoning_effort: none / low / medium / high / xhigh` |
+| Gemini 3.1 Pro | Thinking always on; `thinking_level` defaults to `high` (no `minimal`) |
+| Gemini 3.5 Flash / 3.1 Flash-Lite | `thinking_level: minimal / low / medium / high` (defaults: medium / minimal) |
 
 ---
 

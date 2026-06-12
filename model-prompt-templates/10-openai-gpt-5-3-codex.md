@@ -1,12 +1,17 @@
 # General-Purpose Prompt Template — OpenAI GPT-5.3 Codex
 
+> **Status (June 2026):** GPT-5.3-Codex is no longer listed in OpenAI's current
+> model documentation and is presumed deprecated/legacy; OpenAI's deprecation
+> guidance points Codex-era models to `gpt-5.5`. For new agentic coding work,
+> prefer [GPT-5.5](./15-openai-gpt-5-5.md).
+
 ## Model Profile
 
 | Attribute | Detail |
 |---|---|
 | **Model** | GPT-5.3-Codex |
 | **Provider** | OpenAI |
-| **Tier** | Most capable agentic coding model (as of February 2026) |
+| **Tier** | Most capable agentic coding model at release (February 2026); superseded by GPT-5.5 as of June 2026 |
 | **Strengths** | State-of-the-art SWE-Bench Pro and Terminal-Bench 2.0, combines frontier coding with GPT-5.2-level professional knowledge, 25% faster than 5.2-Codex, mid-task interactive steering, fewer tokens for equivalent output, multi-day task support |
 | **Best For** | Full software lifecycle (code, docs, tests, deploy, monitor), long-running autonomous sessions, building complete applications, security research |
 | **Key Differentiator** | First model instrumental in creating itself. Combines frontier coding with professional knowledge work (GDPval-level). Supports interactive mid-task steering without context loss. |

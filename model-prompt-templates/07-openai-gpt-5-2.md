@@ -1,12 +1,18 @@
 # General-Purpose Prompt Template — OpenAI GPT-5.2
 
+> **Status (June 2026):** GPT-5.2 is no longer listed in OpenAI's current model
+> documentation and is presumed deprecated/legacy. OpenAI's deprecation page
+> schedules `gpt-5.2-chat-latest` for retirement on August 10, 2026, with
+> `gpt-5.5` as the recommended replacement. For new work, prefer
+> [GPT-5.5](./15-openai-gpt-5-5.md) or [GPT-5.4](./11-openai-gpt-5-4.md).
+
 ## Model Profile
 
 | Attribute | Detail |
 |---|---|
 | **Model** | GPT-5.2 (Instant, Thinking, Pro modes) |
 | **Provider** | OpenAI |
-| **Tier** | Flagship — most capable model for professional knowledge work |
+| **Tier** | Former flagship (superseded by GPT-5.5) — was the most capable model for professional knowledge work at release |
 | **Context Window** | 400K tokens |
 | **Max Output** | 128K tokens |
 | **Strengths** | Professional knowledge work across 44 occupations, spreadsheet/presentation generation, long-context understanding, agentic tool calling, advanced reasoning, reduced hallucination |

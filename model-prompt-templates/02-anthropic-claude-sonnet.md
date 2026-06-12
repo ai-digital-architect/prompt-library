@@ -1,13 +1,18 @@
-# General-Purpose Prompt Template — Anthropic Claude Sonnet 4.5
+# General-Purpose Prompt Template — Anthropic Claude Sonnet 4.5 / 4.6
+
+> **Status (June 2026):** The current Sonnet model is **Claude Sonnet 4.6**
+> (`claude-sonnet-4-6`). Sonnet 4.5 remains active as a legacy model. This template
+> covers both; 4.6-specific notes are called out inline.
 
 ## Model Profile
 
 | Attribute | Detail |
 |---|---|
-| **Model** | Claude Sonnet 4.5 |
+| **Model** | Claude Sonnet 4.6 (current) / Sonnet 4.5 (legacy) |
 | **Provider** | Anthropic |
-| **Tier** | Balanced frontier — best intelligence-to-cost ratio |
-| **Context Window** | 200K tokens (1M in beta) |
+| **Tier** | Balanced frontier — best speed-to-intelligence ratio |
+| **API Model ID** | `claude-sonnet-4-6` |
+| **Context Window** | 1M tokens (Sonnet 4.6; Sonnet 4.5 is 200K) |
 | **Max Output** | 64K tokens |
 | **Strengths** | Agentic coding, parallel tool use, multi-step planning, creative content, frontend UI generation, subagent orchestration |
 | **Best For** | Production coding agents, complex multi-tool workflows, architecture planning with delegation, presentation and content creation |
@@ -17,7 +22,7 @@
 
 ## Template Structure
 
-Sonnet 4.5 is Anthropic's recommended default model. It is concise and direct — it favors action over explanation. It excels at parallel tool execution and agentic patterns. Prompts should be clear, structured, and action-oriented. Unlike Opus, Sonnet does not need motivational preamble — it performs best with direct instructions and concrete examples.
+Sonnet is Anthropic's recommended default model for production workloads. It is concise and direct — it favors action over explanation. It excels at parallel tool execution and agentic patterns. Prompts should be clear, structured, and action-oriented. Unlike Opus, Sonnet does not need motivational preamble — it performs best with direct instructions and concrete examples.
 
 ```xml
 <system>
@@ -44,18 +49,20 @@ You are {{ROLE}} with expertise in {{DOMAIN}}.
 {{User message — direct and specific}}
 
 <attached_context>
-{{Code, documents, or data — Sonnet handles long context well and supports 1M beta}}
+{{Code, documents, or data — Sonnet 4.6 handles a full 1M-token context window}}
 </attached_context>
 ```
 
-### Key Prompting Principles for Sonnet 4.5
+### Key Prompting Principles for Sonnet 4.5 / 4.6
 
-1. **Be direct and specific** — Sonnet 4.5 has refined communication that is concise. It may skip verbose summaries after tool calls. Give it direct instructions.
+1. **Be direct and specific** — Sonnet has refined communication that is concise. It may skip verbose summaries after tool calls. Give it direct instructions.
 2. **Use examples (multishot)** — Sonnet excels when you show it what good output looks like. One or two examples dramatically improve consistency.
 3. **Enable parallel tool calling** — Sonnet is aggressive about firing off multiple tool calls simultaneously. Encourage this: "Make all independent tool calls in parallel."
-4. **Leverage subagent orchestration** — Sonnet 4.5 can break tasks into subtasks and delegate to sub-agents (like Haiku 4.5) without explicit instruction.
-5. **Extended thinking for hard problems** — Enable explicitly via API for complex coding or reasoning. Conversationally, say "think through this carefully."
-6. **Provide positive and negative examples** — Sonnet responds well to "Do X" and "Do not do Y" patterns.
+4. **Leverage subagent orchestration** — Sonnet can break tasks into subtasks and delegate to sub-agents (like Haiku 4.5) without explicit instruction.
+5. **Use adaptive thinking on 4.6** — Enable `"thinking": {"type": "adaptive"}` and the model decides when and how deeply to think (`budget_tokens` is deprecated on 4.6). On Sonnet 4.5, use extended thinking with a budget. Conversationally, say "think through this carefully."
+6. **Set `effort` explicitly on 4.6** — Sonnet 4.6 supports `"output_config": {"effort": "low" | "medium" | "high" | "max"}` and defaults to `high`. Set `low`/`medium` for latency- or cost-sensitive paths; Sonnet 4.5 does not accept this parameter.
+7. **Provide positive and negative examples** — Sonnet responds well to "Do X" and "Do not do Y" patterns.
+8. **Prefer structured outputs over prefills** — Assistant-turn prefills return a 400 on Sonnet 4.6; use `output_config.format` (JSON schema) to force machine-readable output.
 
 ---
 
@@ -187,14 +194,14 @@ Provide the slide-by-slide narrative with headlines and talking points.
 
 ---
 
-## When to Choose Sonnet 4.5
+## When to Choose Sonnet
 
 | Scenario | Use Sonnet? |
 |---|---|
 | Agentic coding workflows with many tool calls | ✅ Best-in-class |
 | Complex multi-step task planning and delegation | ✅ Yes — native subagent support |
 | Frontend UI / React component generation | ✅ Exceptional first-try quality |
-| Deep philosophical or nuanced creative writing | ⚠️ Consider Opus for maximum depth |
+| Deep philosophical or nuanced creative writing | ⚠️ Consider Opus 4.8 or Fable 5 for maximum depth |
 | High-volume batch classification | ❌ Use Haiku 4.5 |
 | General-purpose "default model" choice | ✅ Anthropic's recommended default |
 | Presentation and slide content creation | ✅ Matches or exceeds Opus for this |

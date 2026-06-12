@@ -1,17 +1,30 @@
 # General-Purpose Prompt Template — OpenAI GPT-5.4
 
+> **Status (June 2026):** GPT-5.4 is current and listed in OpenAI's model docs as
+> "a more affordable model for coding and professional work." Note that
+> [GPT-5.5](./15-openai-gpt-5-5.md) now sits above it as the flagship for complex
+> reasoning and coding. Smaller siblings:
+> [GPT-5.4 mini](./16-openai-gpt-5-4-mini.md) and
+> [GPT-5.4 nano](./17-openai-gpt-5-4-nano.md).
+
 ## Model Profile
 
 | Attribute | Detail |
 | --- | --- |
 | **Model** | GPT-5.4 |
 | **Provider** | OpenAI |
-| **Tier** | Current frontier general-purpose model |
-| **Context Window** | Deployment-dependent — use the limit published by your environment |
-| **Max Output** | Deployment-dependent — use the limit published by your environment |
+| **Tier** | Current general-purpose model — affordable frontier option below GPT-5.5 |
+| **Context Window** | 1,050,000 tokens (long-prompt pricing applies above 272K input tokens) |
+| **Max Output** | 128K tokens |
 | **Strengths** | Strong instruction following, precise tool use, high-quality coding, long-context synthesis, rigorous analysis, iterative collaboration |
 | **Best For** | High-stakes technical work, professional analysis, complex coding tasks, multi-step workflows, long-context document synthesis |
 | **Key Differentiator** | Balances deep reasoning, controllable verbosity, and reliable execution. Responds best to explicit success criteria, concrete constraints, and clearly defined deliverables. |
+
+> **Spec notes (sourced June 2026):** knowledge cutoff Aug 31, 2025;
+> `reasoning_effort` supports `none` (default), `low`, `medium`, `high`, `xhigh`;
+> pricing $2.50/M input, $0.25/M cached input, $15.00/M output; current snapshot
+> `gpt-5.4-2026-03-05`; tools include web search, file search, image generation,
+> code interpreter, computer use, MCP, and tool search. Source: OpenAI model docs.
 
 ---
 
@@ -235,7 +248,7 @@ Deliverables:
 | High-stakes technical reasoning with long context | ✅ Strong fit |
 | Complex coding plus documentation and planning | ✅ Strong fit |
 | Multi-step professional analysis with explicit deliverables | ✅ Strong fit |
-| Fast, lightweight consumer chat | ⚠️ May be more than you need |
-| Specialized autonomous coding in Codex-style environments | ⚠️ Consider Codex variants if available |
+| Fast, lightweight consumer chat | ⚠️ May be more than you need — consider [GPT-5.4 mini](./16-openai-gpt-5-4-mini.md) or [nano](./17-openai-gpt-5-4-nano.md) |
+| Frontier-level complex reasoning and agentic coding | ⚠️ Consider [GPT-5.5](./15-openai-gpt-5-5.md) (the Codex variants are deprecated) |
 | Ambiguous tasks with unclear success criteria | ❌ Clarify requirements first |
 | Work that requires strict artifact structure and reviewability | ✅ Excellent fit |

@@ -1,10 +1,12 @@
 # General-Purpose Prompt Template — Google Gemini 3 Flash
 
+> **Status update (June 2026):** Gemini 3 Flash remains in **Preview** (`gemini-3-flash-preview`), while **Gemini 3.5 Flash (Stable, `gemini-3.5-flash`)** is now the newest Flash-tier model and Google's recommended stable choice for agentic and coding tasks. For new work, see [Gemini 3.5 Flash template](./19-google-gemini-3-5-flash.md).
+
 ## Model Profile
 
 | Attribute | Detail |
 |---|---|
-| **Model** | Gemini 3 Flash (gemini-3-flash) |
+| **Model** | Gemini 3 Flash (gemini-3-flash-preview) |
 | **Provider** | Google DeepMind |
 | **Tier** | Fast frontier — Pro-grade reasoning at Flash-level speed and cost |
 | **Context Window** | 1M tokens |

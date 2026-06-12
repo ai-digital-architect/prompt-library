@@ -1,5 +1,11 @@
 # General-Purpose Prompt Template — OpenAI GPT-5.3
 
+> **Status (June 2026):** GPT-5.3 is no longer listed in OpenAI's current model
+> documentation and is presumed deprecated/legacy. OpenAI's deprecation page
+> schedules `gpt-5.3-chat-latest` for retirement on August 10, 2026, with
+> `gpt-5.5` as the recommended replacement. For new work, prefer
+> [GPT-5.5](./15-openai-gpt-5-5.md) or [GPT-5.4](./11-openai-gpt-5-4.md).
+
 ## Model Profile
 
 | Attribute | Detail |
@@ -10,7 +16,7 @@
 | **Context Window** | 400K tokens (expected, based on 5.2 baseline) |
 | **Strengths** | Expected: high-density reasoning, improved efficiency (2x speed at lower cost), enhanced agentic capabilities, stronger long-context performance |
 | **Best For** | Complex professional work, long-horizon agentic tasks, multi-modal analysis, scientific reasoning |
-| **Status** | ⚠️ As of March 2026, GPT-5.3 has been referenced in OpenAI's GPT-5.3-Codex release but a general-purpose GPT-5.3 model has not been officially announced. This template is based on observed patterns and the Codex variant. Adjust when official specifications are available. |
+| **Status** | ⚠️ Superseded. As of June 2026, GPT-5.3 does not appear in OpenAI's current model docs, and `gpt-5.3-chat-latest` is scheduled for retirement (August 10, 2026) in favor of `gpt-5.5`. This template was originally drafted from observed patterns and the Codex variant — retain for legacy reference only. |
 
 ---
 
