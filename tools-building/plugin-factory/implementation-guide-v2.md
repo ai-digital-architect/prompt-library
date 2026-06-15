@@ -17,7 +17,7 @@ is the implementer.
 | Claude Code | implementer | `claude --version` |
 | git | VCS / worktrees | `git --version` |
 | Python 3.12+ + uv | engine (`factory_core`) | `python --version` |
-| just | operator surface | `just --version` |
+| make | operator surface | `make --version` |
 | jq | hook/CLI JSON | `jq --version` |
 | harness-cli | CLI substrate (P5+) | `harness-cli --help` |
 | harness-cli **sandbox** profile | dry-run evals never hit prod | `HARNESS_CLI_PROFILE=sandbox` configured |
@@ -78,8 +78,8 @@ acceptance criteria), commit, move on. Never start a phase until its dependencie
 **P5 gates Harness capabilities**, **P8 gates repeatable use**).
 
 ### Phase 0 — Repository Baseline
-**Prompt:** `Begin Phase 0 (Repository Baseline) from docs/design-and-implementation-plan.md. Plan mode first (sub-tasks 1–6), then implement the neutral monorepo skeleton, pyproject (factory_core), justfile stubs, .gitignore, README, AGENTS.md. Report the Phase 0 acceptance table.`
-**Verify:** `python -m factory_core --help` returns a controlled message · `just validate/test/lint` exist · root docs describe a generic factory and name both governing docs · commit `chore: repo baseline`.
+**Prompt:** `Begin Phase 0 (Repository Baseline) from docs/design-and-implementation-plan.md. Plan mode first (sub-tasks 1–6), then implement the neutral monorepo skeleton, pyproject (factory_core), Makefile stubs, .gitignore, README, AGENTS.md. Report the Phase 0 acceptance table.`
+**Verify:** `python -m factory_core --help` returns a controlled message · `make validate/test/lint` exist · root docs describe a generic factory and name both governing docs · commit `chore: repo baseline`.
 
 ### Phase 1 — Generic Coding Harness (gates everything)
 **Prompt:** `Begin Phase 1 (Generic Coding Harness). Governing: claude-code doc. Create coding-harness/.claude/ (the plan's generic Layer-1 harness). Plan mode first (sub-tasks 1–13), then implement: settings, the 6 rules, the 4 generic skills, install + pin the operator-provided official skill-creator from docs/reference/skill-creator/ into skills/skill-creator/ (do not modify it), 7 generic sub-agents (least-privilege; skill-author preloads skill-creator), 4 hooks, the output style, and integration-manifest.schema.json. Finish with the grep guard and report the Phase 1 acceptance table.`
@@ -102,16 +102,16 @@ acceptance criteria), commit, move on. Never start a phase until its dependencie
 **Verify:** integration.yaml validates vs the Phase-1 schema · bash wrappers dry-run by default · MCP adapter lists tools mapping the declared verbs×resources · version-gate + redaction proven by tests · CC `.mcp.json` + Copilot MCP fragments valid, env-auth only · surface ⊆ declared `cli_surface` · commit `feat(integration): Harness CLI first-class (bash + MCP, gated)`.
 
 ### Phase 6 — Walking-Skeleton Capability + Claude Code Target
-**Prompt:** `Begin Phase 6 (Walking-Skeleton Capability + Claude Code target). Governing: claude-code doc. Plan mode first (sub-tasks 1–12), then implement domains/harness/capabilities/harness-pipeline-author/ and the Claude Code build branch only. Scripts must call the CLI ADAPTER, not raw APIs. Emit AGENTS.md into the bundle. End with `just ship`, assert the .factory-manifest.json is hash-clean, and report the Phase 6 acceptance table.`
-**Verify:** `just ship` runs end-to-end · plugin installs + triggers + drives CLI in sandbox → validated pipeline YAML · gates: trigger ≥ 0.85, behavioral ≥ 0.90, security clean, conformance PASS, certification PASS · dist hash-clean · commit `feat(capability): harness-pipeline-author (Claude Code)`.
+**Prompt:** `Begin Phase 6 (Walking-Skeleton Capability + Claude Code target). Governing: claude-code doc. Plan mode first (sub-tasks 1–12), then implement domains/harness/capabilities/harness-pipeline-author/ and the Claude Code build branch only. Scripts must call the CLI ADAPTER, not raw APIs. Emit AGENTS.md into the bundle. End with `make ship NAME=harness-pipeline-author`, assert the .factory-manifest.json is hash-clean, and report the Phase 6 acceptance table.`
+**Verify:** `make ship NAME=harness-pipeline-author` runs end-to-end · plugin installs + triggers + drives CLI in sandbox → validated pipeline YAML · gates: trigger ≥ 0.85, behavioral ≥ 0.90, security clean, conformance PASS, certification PASS · dist hash-clean · commit `feat(capability): harness-pipeline-author (Claude Code)`.
 
 ### Phase 7 — GitHub Copilot Target
 **Prompt:** `Begin Phase 7 (GitHub Copilot target). Governing: ghcopilot doc. Plan mode first (sub-tasks 1–6), then implement the Copilot build branch so the SAME canonical SKILL.md emits a .github bundle (no second skill). Map ordered agent_dispatch to handoffs and parallel to single-level sub-agents. Emit AGENTS.md into the bundle. Add the Copilot trigger smoke. Report the Phase 7 acceptance table.`
 **Verify:** both targets from one SKILL.md · Copilot smoke passes (recorded; CC authoritative) · `conformance-copilot` passes · repo-bundle works across Copilot CLI/VS Code/cloud/code-review · commit `feat(capability): Copilot target`.
 
 ### Phase 8 — Factory Pipeline & CI Gates (gates repeatable use)
-**Prompt:** `Begin Phase 8 (Factory Pipeline & CI Gates). Governing: both. Plan mode first (sub-tasks 1–6), then implement factory_core/cli.py (Typer), the justfile wiring incl. ship, the CI (changed-capability detection → validate → tests → evals → compile → verify dist → upload certs), the merge gate, the release workflow, and the two docs. Report the Phase 8 acceptance table.`
-**Verify:** `just ship <target>` one-command · CI fail-closed on missing/stale evals · changed detection never skips required gates · release artifacts produced · new capability shippable without re-architecting · commit `feat(pipeline): CI gates + release`.
+**Prompt:** `Begin Phase 8 (Factory Pipeline & CI Gates). Governing: both. Plan mode first (sub-tasks 1–6), then implement factory_core/cli.py (Typer), the Makefile wiring incl. ship, the CI (changed-capability detection → validate → tests → evals → compile → verify dist → upload certs), the merge gate, the release workflow, and the two docs. Report the Phase 8 acceptance table.`
+**Verify:** `make ship TARGET=<target>` one-command · CI fail-closed on missing/stale evals · changed detection never skips required gates · release artifacts produced · new capability shippable without re-architecting · commit `feat(pipeline): CI gates + release`.
 
 ### Phase 9 — Distribution, Onboarding & Governance
 **Prompt:** `Begin Phase 9 (Distribution, Onboarding & Governance). Governing: both (managed settings + marketplace/plugin models). Plan mode first (sub-tasks 1–8), then implement the internal marketplace, Copilot install pack, the harness-ai installer (verifies CLI presence + version), managed-settings governance (managed MCP allow-list, enabledPlugins, allowManagedHooksOnly, Copilot enterprise-managed plugins), the version-compatibility matrix, consumer docs incl. rollback, the versioning + deprecation policy, and the release-approval checklist. Report the Phase 9 acceptance table.`
@@ -137,13 +137,15 @@ acceptance criteria), commit, move on. Never start a phase until its dependencie
 
 ## 6. After Phase 10 — operating the factory
 
-Adding capability **N+1** needs no factory changes — only a new `domains/harness/capabilities/<name>/`:
+Adding capability **N+1** needs no factory changes — only a new `domains/harness/capabilities/<name>/`.
+`make` takes the capability/target as variables (`NAME=`, `DOMAIN=`, `TARGET=`, `SANDBOX=1`); all
+command targets are `.PHONY`:
 
 ```
-just new-capability harness <name>   # scaffold against the integration manifest
-just research <name>                 # (optional) seed capability.yaml; you sign off
-just author <name>                   # skill-author writes the canonical SKILL.md
-just ship <name>                     # validate → eval → build → certify → package, fail-closed
+make new-capability DOMAIN=harness NAME=<name>   # scaffold against the integration manifest
+make research NAME=<name>                        # (optional) seed capability.yaml; you sign off
+make author NAME=<name>                          # skill-author writes the canonical SKILL.md
+make ship NAME=<name>                            # validate → eval → build → certify → package, fail-closed
 ```
 
 New domain? Drop `domains/<other>/integration.yaml` — `coding-harness/` is domain-free and reused

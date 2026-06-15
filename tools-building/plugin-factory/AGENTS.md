@@ -1,22 +1,24 @@
 # AGENTS.md — Build & Conventions
 
 This repository is built **phase by phase** per `docs/design-and-implementation-plan.md` (the
-merged v2 plan). Tooling (`justfile`, `pyproject.toml`) is created in **Phase 0/1**; before that
+merged v2 plan). Tooling (`Makefile`, `pyproject.toml`) is created in **Phase 0/1**; before that
 there are no build commands.
 
-## Once Phase 0/1 exists, the operator surface is `just`:
-- Scaffold a capability:   `just new-capability <domain> <name>`
-- Research intent:         `just research <name>`   (human signs off capability.yaml)
-- Author the skill:        `just author <name>`
-- Validate:                `just validate <target>` (hard fail)
-- Conformance check:       `just conform <target>`   (hard fail — blocker, vs governing docs)
-- Evals:                   `just eval <target> --sandbox` (hard fail below threshold)
-- Certify (+ security):    `just certify <target>`   (security scan + cert record; fail-closed)
-- Build targets:           `just build <target>`
-- Package:                 `just package <target>`
-- Full local pipeline:     `just ship <target>`      (validate→eval→build→certify→package)
-- Release (all):           `just release`
-- CLI adapter checks:      `just validate-cli-adapter <name>` · `just test-cli-adapter <name>`
+## Once Phase 0/1 exists, the operator surface is `make`:
+`make` passes the capability/target as variables: `NAME=<capability>`, `DOMAIN=<domain>`,
+`TARGET=<claude-code|copilot>`, `SANDBOX=1`. All command targets are `.PHONY`.
+- Scaffold a capability:   `make new-capability DOMAIN=<domain> NAME=<name>`
+- Research intent:         `make research NAME=<name>`   (human signs off capability.yaml)
+- Author the skill:        `make author NAME=<name>`
+- Validate:                `make validate TARGET=<target>` (hard fail)
+- Conformance check:       `make conform TARGET=<target>`   (hard fail — blocker, vs governing docs)
+- Evals:                   `make eval TARGET=<target> SANDBOX=1` (hard fail below threshold)
+- Certify (+ security):    `make certify TARGET=<target>`   (security scan + cert record; fail-closed)
+- Build targets:           `make build TARGET=<target>`
+- Package:                 `make package TARGET=<target>`
+- Full local pipeline:     `make ship TARGET=<target>`      (validate→eval→build→certify→package)
+- Release (all):           `make release`
+- CLI adapter checks:      `make validate-cli-adapter NAME=<name>` · `make test-cli-adapter NAME=<name>`
 
 ## Conventions
 - Language for factory tooling: **Python** (uv/poetry), package `factory_core`.
@@ -30,8 +32,8 @@ there are no build commands.
 - Never commit secrets. CLI auth is env/keychain only.
 
 ## Before committing
-1. Run `just validate <target>` and `just conform <target>` — both must pass (conformance is
+1. Run `make validate TARGET=<target>` and `make conform TARGET=<target>` — both must pass (conformance is
    checked against the governing architecture docs).
-2. For capabilities, run `just eval <target> --sandbox` then `just certify <target>` — evals must
+2. For capabilities, run `make eval TARGET=<target> SANDBOX=1` then `make certify TARGET=<target>` — evals must
    meet thresholds and the security scan (secret + mutating-command) must be clean.
 3. Confirm `dist/` has no hand-edits (`.factory-manifest.json` hash check).

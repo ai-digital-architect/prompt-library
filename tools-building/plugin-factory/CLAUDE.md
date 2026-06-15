@@ -62,5 +62,5 @@ This layout has no name collision; do not place Harness artifacts anywhere under
 4. Stop and summarize. Do not begin the next phase until told.
 
 ## Build commands
-See `AGENTS.md`. The `justfile` and Python tooling are created in **Phase 0/1**. Until then,
+See `AGENTS.md`. The `Makefile` and Python tooling are created in **Phase 0/1**. Until then,
 there are no build commands to run.

@@ -120,7 +120,7 @@ skill-plugin-factory/                         # monorepo, trunk-based
 │   └── <target>/<name>/.factory-manifest.json # hash manifest + generated-file metadata                            (G2)
 ├── tests/golden/<target>/<name>/              # golden fixtures for deterministic compile                            (G2)
 ├── .claude-plugin/marketplace.json
-├── pyproject.toml • justfile • docs/ • CLAUDE.md • AGENTS.md • README.md
+├── pyproject.toml • Makefile • docs/ • CLAUDE.md • AGENTS.md • README.md
 ```
 
 ---
@@ -183,19 +183,19 @@ any real capability exists. Every generated file carries a generated-file banner
 in `dist/<target>/<name>/.factory-manifest.json`. Re-running the compiler must produce identical
 hashes; a hash mismatch against the manifest = hand-edit detected = build failure.
 
-| Stage | `just` target | Gate |
+| Stage | `make` invocation | Gate |
 |---|---|---|
-| scaffold | `new-capability <domain> <name>` | — |
-| research | `research <name>` | human signs off `capability.yaml` |
-| author | `author <name>` | — |
-| validate | `validate <target>` | **hard fail** (schema + links + budgets) |
-| **conformance** | `conform <target>` | **hard fail — blocker** (vs governing docs, S1) |
-| eval | `eval <target> --sandbox` | **hard fail** (trigger + behavioral) |
+| scaffold | `make new-capability DOMAIN=<domain> NAME=<name>` | — |
+| research | `make research NAME=<name>` | human signs off `capability.yaml` |
+| author | `make author NAME=<name>` | — |
+| validate | `make validate TARGET=<target>` | **hard fail** (schema + links + budgets) |
+| **conformance** | `make conform TARGET=<target>` | **hard fail — blocker** (vs governing docs, S1) |
+| eval | `make eval TARGET=<target> SANDBOX=1` | **hard fail** (trigger + behavioral) |
 | **security** | (part of certify) | **hard fail** (secret + mutating-command scan, G3) |
-| build | `build <target>` | deterministic; manifest written |
-| certify | `certify <target>` | **fail-closed**: writes certification incl. source+target hashes, security, smoke |
-| package | `package <target>` | refuses without current certification |
-| release | `release` | approval checklist (G4) |
+| build | `make build TARGET=<target>` | deterministic; manifest written |
+| certify | `make certify TARGET=<target>` | **fail-closed**: writes certification incl. source+target hashes, security, smoke |
+| package | `make package TARGET=<target>` | refuses without current certification |
+| release | `make release` | approval checklist (G4) |
 
 ---
 
@@ -351,13 +351,13 @@ constraint). Each sub-task is hand-off-ready for Claude Code.
 
 **Goal.** Neutral monorepo skeleton for a generic artifact factory. **Gov.** Both.
 **Deliverables.** Structure, `pyproject.toml` (`factory_core`; deps: pydantic, pyyaml, jsonschema,
-typer, rich, pytest, ruff), `justfile` stubs, baseline CI, `.gitignore`, `README.md`, `AGENTS.md`.
+typer, rich, pytest, ruff), `Makefile` stubs, baseline CI, `.gitignore`, `README.md`, `AGENTS.md`.
 **Sub-tasks.** 1) Create the tree from §2 (empty dirs ok). 2) `.gitignore` (`dist/tmp/`, `.venv/`,
 `__pycache__`, `.env*`, `CLAUDE.local.md`, `.claude/settings.local.json`, `agent-memory-local/`).
-3) `pyproject.toml`. 4) `justfile` placeholder targets (`validate test lint format`). 5) Root
+3) `pyproject.toml`. 4) `Makefile` placeholder targets (`validate test lint format`). 5) Root
 `AGENTS.md` (generic build/test/lint + conventions). 6) `README.md` (generic factory; `factory-core/`
 vs `domains/` separation). **Acceptance.** `python -m factory_core --help` returns a controlled
-message; `just validate/test/lint` exist; root docs describe a generic (not Harness-only) factory
+message; `make validate/test/lint` exist; root docs describe a generic (not Harness-only) factory
 and name the two governing docs.
 
 ## Phase 1 — Generic Coding Harness (Layer 1)  [GATES ALL]
@@ -375,7 +375,7 @@ version/source in `docs/PINS.md`; do not modify its contents. 9) generic sub-age
 least-privilege per §3); give `skill-author` `skills: [skill-creator]` so it preloads it. 10) hooks
 `validate-json-yaml.sh`, `block-secrets.sh`, `enforce-eval-before-build.sh`, `audit-tool-use.sh`.
 11) `output-styles/decision-grade-architect.md`. 12) `integration-manifest.schema.json`. 13) grep
-guard in `just validate`: fail on `harness-cli|cli_surface|HARNESS_|Harness\.io` under
+guard in `make validate`: fail on `harness-cli|cli_surface|HARNESS_|Harness\.io` under
 `coding-harness/.claude/`, **excluding `skills/skill-creator/`** (generic; may use "harness" as a
 common noun).
 **Acceptance.** grep guard clean; skill-creator present + pinned (unmodified); correct placement
@@ -423,7 +423,7 @@ separate clone. 2) `evals/skill_creator_adapter.py` (`run_description_optimizer`
 **Security**/Certification results). 4) runners: trigger, behavioral, platform-smoke, cli-contract,
 **security-scan (secret + mutating-command)**. 5) `evals/certification_writer.py`. 6) **stale-hash
 check** (hash source; fail if source changed after eval). 7) certification output:
-`dist/certifications/<name>/<version>/{certification,benchmark,security-report}.json`. 8) `just`
+`dist/certifications/<name>/<version>/{certification,benchmark,security-report}.json`. 8) `make`
 targets `certify`, `verify-certified`; markdown reviewer report. 9) fail-closed `gate.py`. 10)
 offline unit tests via fake skill-creator fixtures. 11) prove with throwaway `_smoke` capability.
 **Acceptance.** packaging fails without current certification; cert binds source+target hashes;
@@ -447,8 +447,8 @@ rendering, dry-run enforcement, **output redaction**, golden compare. 8) **MCP a
 mapping `harness.<verb>.<resource>` → CLI; defer schemas; forward dry-run/profile; **audited tool
 descriptions** (both-miss). 9) registration fragments: CC `.mcp.json` + Copilot MCP config (env
 auth only). 10) contract tests (missing version fails; unsupported version fails; prod mutation in
-eval fails; command matches golden; output validates). 11) `just validate-cli-adapter`,
-`test-cli-adapter`. **Acceptance.** integration.yaml valid; both surfaces dry-run by default; MCP
+eval fails; command matches golden; output validates). 11) `make validate-cli-adapter`,
+`make test-cli-adapter`. **Acceptance.** integration.yaml valid; both surfaces dry-run by default; MCP
 lists tools mapping the declared surface; version-gate + redaction proven; no secrets/prod
 endpoints; surface ⊆ declared `cli_surface`.
 
@@ -461,10 +461,9 @@ doc. **Deliverables.** `domains/harness/capabilities/harness-pipeline-author/` +
 commands, agents, evals). 2) `capability.yaml` (§6E; targets `[claude-code]` for now). 3) canonical
 SKILL.md (dry-run default; CLI-adapter usage; confirm-before-mutate; refs). 4–8) references,
 scripts (call the CLI **adapter**, not raw APIs), assets, neutral command, neutral agent. 9) evals
-(`trigger-evals.json`, `evals.json`, `platform-smoke.json`). 10) `just build … --target
-claude-code` → plugin (plugin.json+userConfig, SKILL.md, commands, restricted agents, `.mcp.json`,
-hooks). 11) **emit `AGENTS.md` into the bundle** (both-miss — cross-tool memory). 12) `just ship`;
-assert `.factory-manifest.json` hash-clean. **Acceptance.** `just ship` runs end-to-end; plugin
+(`trigger-evals.json`, `evals.json`, `platform-smoke.json`). 10) `make build … TARGET=claude-code` → plugin (plugin.json+userConfig, SKILL.md, commands, restricted agents, `.mcp.json`,
+hooks). 11) **emit `AGENTS.md` into the bundle** (both-miss — cross-tool memory). 12) `make ship`;
+assert `.factory-manifest.json` hash-clean. **Acceptance.** `make ship` runs end-to-end; plugin
 installs + triggers + drives CLI in sandbox → validated YAML; gates (trigger ≥ 0.85, behavioral ≥
 0.90, security clean, conformance PASS, certification PASS); dist hash-clean.
 
@@ -472,7 +471,7 @@ installs + triggers + drives CLI in sandbox → validated YAML; gates (trigger �
 
 **Goal.** Same canonical SKILL.md → `.github` bundle (+ optional plugin); no second skill. **Gov.**
 ghcopilot doc. **Sub-tasks.** 1) add `copilot` to `targets`; `distribution.copilot: repo-bundle`
-(D4). 2) `just build … --target copilot` → `.github/skills|prompts|agents`, hooks,
+(D4). 2) `make build … TARGET=copilot` → `.github/skills|prompts|agents`, hooks,
 house-rules-only instructions. 3) ordered dispatch→handoffs, parallel→single-level sub-agents. 4)
 emit `AGENTS.md` into the bundle. 5) Copilot trigger smoke (recorded; CC authoritative). 6)
 optional Claude-format plugin for marketplace. **Acceptance.** both targets from one SKILL.md;
@@ -481,14 +480,14 @@ Code/cloud/code-review.
 
 ## Phase 8 — Factory Pipeline & CI Gates
 
-**Goal.** Repeatable factory via Typer CLI + `just` + CI. **Gov.** Both. **Sub-tasks.** 1)
+**Goal.** Repeatable factory via Typer CLI + `make` + CI. **Gov.** Both. **Sub-tasks.** 1)
 `factory_core/cli.py` (new capability/cli-adapter, validate, eval, build, certify, package,
-release, ship). 2) `justfile` wiring incl. `ship = validate→eval→build→certify→package`. 3) CI:
+release, ship). 2) `Makefile` wiring incl. `ship = validate→eval→build→certify→package`. 3) CI:
 detect changed capabilities → validate contracts → unit + CLI-adapter tests → evals → compile →
 verify dist → upload certs. 4) merge gate: no stale cert; no generated drift without source
 change; no failing eval; no secrets. 5) release workflow: package certified → update marketplace →
 Copilot pack → tag → notes. 6) `docs/factory-pipeline.md`, `docs/debugging-failed-certification.md`.
-**Acceptance.** `just ship <target>` one-command; CI fail-closed on missing/stale evals; changed
+**Acceptance.** `make ship TARGET=<target>` one-command; CI fail-closed on missing/stale evals; changed
 detection never skips required gates; release artifacts produced; new capability shippable without
 re-architecting.
 
