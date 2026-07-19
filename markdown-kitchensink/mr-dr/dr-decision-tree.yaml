@@ -1,0 +1,303 @@
+# dr-decision-tree.yaml
+# Canonical, versioned spec of the AWS multi-region DR decision tree.
+# Single source of truth. Consumed by:
+#   - Forge wizard (schema-driven UI rendering)
+#   - Copilot skill (conversational gate traversal)
+#   - Decision Service (server-side strategy computation — authoritative)
+# Channels NEVER compute outcomes; they submit gate answers only.
+
+meta:
+  tree_version: "3.1.0"
+  effective_date: "2026-07-19"
+  owner: "platform-architecture"
+  changelog: >
+    3.1.0 — Gate 3 expanded to 3A (AWS data stores) / 3B (AWS service scope
+    and static stability: global vs regional vs zonal, control-plane
+    dependency, KMS/secrets replication, region service parity) / 3C (SaaS
+    data planes: Atlas, Snowflake, Starburst — correlated-failure, edition
+    gates, network/auth paths) with server-computed effective objectives
+    and a central Vendor DR Catalog reference.
+    3.0.0 — RPO moved from duration-based gate questions to a registry-assigned
+    categorical class (POF / SOD / NO_RECOVERY). Tree restructured as a
+    5x3 decision matrix (RTO band x RPO class); 11 of 15 cells deterministic.
+    Added IAC_REBUILD strategy for NO_RECOVERY workloads.
+  mandate: >
+    Firmwide: all applications adopt an AWS multi-region posture regardless
+    of RTO. The floor for every application is its matrix cell outcome;
+    no single-region outcomes exist.
+
+strategies:
+  ACTIVE_ACTIVE:        { label: "Multi-Site Active/Active",            cost_band_pct: "100-200" }
+  WARM_STANDBY_HOT:     { label: "Warm Standby at near-full capacity",  cost_band_pct: "70-100" }
+  WARM_STANDBY:         { label: "Warm Standby",                        cost_band_pct: "40-70" }
+  PILOT_LIGHT:          { label: "Pilot Light",                         cost_band_pct: "20-40" }
+  BACKUP_RESTORE:       { label: "Backup & Restore (cross-region)",     cost_band_pct: "10-20" }
+  BACKUP_RESTORE_ECON:  { label: "Backup & Restore — economy tier",     cost_band_pct: "5-15" }
+  IAC_REBUILD:          { label: "IaC Rebuild (no data recovery)",      cost_band_pct: "3-10" }
+
+# Compute-posture ordering for deviation direction & over-engineering distance
+strategy_order: [IAC_REBUILD, BACKUP_RESTORE_ECON, BACKUP_RESTORE, PILOT_LIGHT, WARM_STANDBY, WARM_STANDBY_HOT, ACTIVE_ACTIVE]
+
+bands:
+  - { id: band-1, rto: { label: "RTO <= 2 hours",        max: "PT2H" } }
+  - { id: band-2, rto: { label: "2h < RTO <= 4 hours",   min: "PT2H",  max: "PT4H" } }
+  - { id: band-3, rto: { label: "4h < RTO <= 24 hours",  min: "PT4H",  max: "PT24H" } }
+  - { id: band-4, rto: { label: "24h < RTO <= 48 hours", min: "PT24H", max: "PT48H" } }
+  - { id: band-5, rto: { label: "48h < RTO <= 72 hours", min: "PT48H", max: "PT72H" } }
+
+rpo_classes:
+  POF:
+    label: "Point-of-Failure"
+    meaning: "Recover to the moment of failure — near-zero data loss"
+    data_posture: continuous_replication
+    allowed_replication: [aurora-global-db, dynamodb-global-tables, rds-cross-region-replica,
+                          elasticache-global-datastore, aws-drs, msk-mirror, s3-crr]
+  SOD:
+    label: "Start-of-Day"
+    meaning: "Recover to start of the business day — intraday loss acceptable"
+    data_posture: daily_sod_backup_cross_region
+    over_engineering_replication: [aurora-global-db, dynamodb-global-tables, elasticache-global-datastore, msk-mirror]
+  NO_RECOVERY:
+    label: "No Recovery"
+    meaning: "No data restoration required — stateless, transient, or rebuilt from upstream feeds"
+    data_posture: none
+    gate3_waived: true
+
+# ---------- THE DECISION MATRIX (band x rpo_class) ----------
+# Cells with `outcome` are deterministic (11 of 15).
+# Cells with `entry_gate` route to residual questions (4 of 15).
+decision_matrix:
+  band-1:
+    POF:         { entry_gate: q1_pof_nearzero }
+    SOD:         { entry_gate: q1_sod_nearzero }
+    NO_RECOVERY: { entry_gate: q1_nr_nearzero }
+  band-2:
+    POF:         { outcome: PILOT_LIGHT }
+    SOD:         { entry_gate: q2_sod_restore }
+    NO_RECOVERY: { outcome: IAC_REBUILD }
+  band-3:
+    POF:         { outcome: PILOT_LIGHT }
+    SOD:         { outcome: BACKUP_RESTORE }
+    NO_RECOVERY: { outcome: IAC_REBUILD }
+  band-4:
+    POF:         { outcome: PILOT_LIGHT }
+    SOD:         { outcome: BACKUP_RESTORE }
+    NO_RECOVERY: { outcome: IAC_REBUILD }
+  band-5:
+    POF:         { outcome: PILOT_LIGHT }
+    SOD:         { outcome: BACKUP_RESTORE_ECON }
+    NO_RECOVERY: { outcome: IAC_REBUILD, annotations: [economy] }
+
+# Defaults per cell for pre-computation & deviation detection
+# (the outcome of the default/most-common path through gated cells)
+matrix_defaults:
+  band-1: { POF: WARM_STANDBY, SOD: WARM_STANDBY, NO_RECOVERY: WARM_STANDBY }
+  band-2: { POF: PILOT_LIGHT,  SOD: BACKUP_RESTORE, NO_RECOVERY: IAC_REBUILD }
+  band-3: { POF: PILOT_LIGHT,  SOD: BACKUP_RESTORE, NO_RECOVERY: IAC_REBUILD }
+  band-4: { POF: PILOT_LIGHT,  SOD: BACKUP_RESTORE, NO_RECOVERY: IAC_REBUILD }
+  band-5: { POF: PILOT_LIGHT,  SOD: BACKUP_RESTORE_ECON, NO_RECOVERY: IAC_REBUILD }
+
+# ---------- RESIDUAL GATES ----------
+gates:
+  # Band 1 x POF
+  q1_pof_nearzero:
+    prompt: "Is the effective requirement near-zero downtime (< 15 minutes)?"
+    type: boolean
+    help: "Answer from the BIA, not aspiration. Near-zero means automated failover with no human in the loop."
+    on_true: q1_pof_mrwrites
+    on_false: q1_pof_automation
+
+  q1_pof_mrwrites:
+    prompt: "Can the data layer support multi-region writes?"
+    type: boolean
+    help: >
+      True only if writes are partitioned by region/user, conflicts are
+      resolved (e.g. DynamoDB Global Tables), or a single-writer design has
+      fast automated promotion (e.g. Aurora Global Database) — AND the team
+      can operate and drill it.
+    evidence_required: [data_store_inventory]
+    on_true:  { outcome: ACTIVE_ACTIVE }
+    on_false: { outcome: WARM_STANDBY_HOT }
+
+  q1_pof_automation:
+    prompt: >
+      Is provisioning fully automated in IaC, with a measured drill showing
+      full stand-up plus traffic shift completes comfortably inside 2 hours?
+    type: boolean
+    evidence_required: [drill_report]
+    on_true:  { outcome: PILOT_LIGHT }     # cost-optimizing downgrade
+    on_false: { outcome: WARM_STANDBY }
+
+  # Band 1 x SOD — A/A intentionally unreachable: live replicated data is
+  # POF-grade spend an SOD classification does not justify.
+  q1_sod_nearzero:
+    prompt: "Is the effective requirement near-zero downtime (< 15 minutes)?"
+    type: boolean
+    on_true:  { outcome: WARM_STANDBY_HOT, annotations: [sod_data_refresh] }
+    on_false: { outcome: WARM_STANDBY,     annotations: [sod_data_refresh] }
+
+  # Band 1 x NO_RECOVERY — stateless makes A/A trivial (no data conflicts)
+  q1_nr_nearzero:
+    prompt: "Is the effective requirement near-zero downtime (< 15 minutes)?"
+    type: boolean
+    on_true:  { outcome: ACTIVE_ACTIVE, annotations: [stateless] }
+    on_false: { outcome: WARM_STANDBY,  annotations: [stateless] }
+
+  # Band 2 x SOD
+  q2_sod_restore:
+    prompt: >
+      Has a full restore of the SOD backup (including the largest dataset)
+      been PROVEN under 4 hours in a drill?
+    type: boolean
+    evidence_required: [restore_test_report]
+    on_true:  { outcome: BACKUP_RESTORE }
+    on_false: { outcome: PILOT_LIGHT, annotations: [sod_data_refresh] }
+
+# ---------- GATE 3: data-layer inventory ----------
+data_layer_inventory:
+  required_unless: "registry.rpo_class == 'NO_RECOVERY'"
+  min_entries: 1
+  entry_schema:
+    store: string                          # e.g. aurora-postgres, dynamodb, kafka-msk
+    replication:
+      enum: [aurora-global-db, dynamodb-global-tables, rds-cross-region-replica,
+             s3-crr, elasticache-global-datastore, aws-drs, msk-mirror,
+             backup-copy-only, none, unknown]
+    achievable_rpo: iso8601_duration
+    achievable_rto: iso8601_duration
+    meets_target: boolean                  # computed server-side vs rpo_class posture
+  rules:
+    - id: pof-feasibility
+      when: "registry.rpo_class == 'POF'"
+      assert: "all(entry.replication in rpo_classes.POF.allowed_replication)"
+      on_fail: flag                        # a POF app with backup-copy-only/none stores cannot meet POF
+    - id: sod-over-engineering
+      when: "registry.rpo_class == 'SOD'"
+      assert: "none(entry.replication in rpo_classes.SOD.over_engineering_replication)"
+      on_fail: flag                        # cost flag for CFO register, not a rejection
+    - id: no-unknowns
+      assert: "none(entry.replication == 'unknown')"
+      on_fail: flag
+    - id: pitr-mandatory
+      when: "registry.rpo_class != 'NO_RECOVERY'"
+      assert: "point_in_time_backup_declared == true"
+      on_fail: reject                      # replication replicates corruption; PITR always required
+
+
+# ---------- GATE 3B: AWS service scope & static stability ----------
+aws_service_inventory:
+  required: true                           # applies to ALL apps incl. NO_RECOVERY (compute still fails over)
+  entry_schema:
+    service: string                        # e.g. lambda, eks, route53, cloudfront, kms
+    scope: { enum: [global, regional, zonal, edge] }
+    management: { enum: [aws-managed, self-managed-on-aws] }
+    dr_region_pairing: { enum: [paired, partial, missing, not-applicable] }
+    control_plane_needed_at_failover: boolean
+    quota_parity_verified: boolean
+    config_replication: { enum: [iac, multi-region-native, manual, none] }
+  rules:
+    - id: static-stability
+      when: "computed_strategy in ['ACTIVE_ACTIVE','WARM_STANDBY_HOT'] OR registry.rto_band == 'band-1'"
+      assert: "none(entry.control_plane_needed_at_failover)"
+      on_fail: flag                        # failover must ride data planes (Route 53 ARC, pre-provisioned capacity)
+    - id: kms-secrets-replication
+      when: "registry.rpo_class != 'NO_RECOVERY'"
+      assert: "kms_multi_region_keys_declared AND secrets_replicated_declared"
+      on_fail: flag                        # replicated data must be decryptable in the DR region
+    - id: region-service-parity
+      assert: "none(entry.dr_region_pairing == 'missing')"
+      on_fail: reject                      # a regional service absent in the DR region invalidates the pair
+    - id: zonal-snapshot-posture
+      assert: "all(entry.scope != 'zonal' OR entry.config_replication != 'none')"
+      on_fail: flag
+
+# ---------- GATE 3C: SaaS dependencies ----------
+saas_dependency_inventory:
+  required: true                           # empty array permitted only with saas_none_attested == true
+  catalog_ref: vendor-dr-catalog           # capability facts maintained centrally by architects
+  entry_schema:
+    vendor: string                         # e.g. mongodb, snowflake, starburst
+    product: string
+    plan_edition: string                   # DR features are edition-gated
+    homed_cloud: { enum: [aws, azure, gcp, vendor-private] }
+    homed_regions: [string]
+    multi_region_capability: { enum: [native-failover, replication-configurable, stateless-redeploy, none] }
+    configured: boolean                    # capability exists vs actually turned on
+    contractual_rpo: iso8601_duration_or_null
+    contractual_rto: iso8601_duration_or_null
+    network_path_dr_ready: boolean         # PrivateLink / regional endpoints pre-provisioned in DR region
+    auth_path_dr_ready: boolean
+    last_vendor_dr_test: date_or_null
+  rules:
+    - id: saas-correlated-failure
+      assert: "none(app.primary_region in entry.homed_regions AND entry.configured == false)"
+      on_fail: flag                        # severity: high — SaaS homed in primary region w/o replication defeats the strategy
+    - id: saas-pof-alignment
+      when: "registry.rpo_class == 'POF'"
+      assert: "all(entry.multi_region_capability in ['native-failover','replication-configurable'] AND entry.configured)"
+      on_fail: flag                        # effective RPO class downgrades to worst SaaS data plane
+    - id: saas-edition-gate
+      assert: "all(vendor_dr_catalog.features_available(entry.vendor, entry.product, entry.plan_edition, entry.multi_region_capability))"
+      on_fail: flag                        # e.g. Snowflake failover groups require Business Critical
+    - id: saas-network-auth-paths
+      assert: "all(entry.network_path_dr_ready AND entry.auth_path_dr_ready)"
+      on_fail: flag
+
+# Effective objectives are computed by the Decision Service, never declared:
+#   effective_rpo = worst across data_layer_inventory + saas data planes
+#   effective_rto = max(own failover, slowest vendor failover)
+effective_objectives:
+  computed: true
+  persisted_in_ddr: true
+
+# ---------- GATE 4: modifiers ----------
+modifiers:
+  compliance_data_residency: { effect: constrains_region_pair }
+  low_ops_maturity:          { effect: downgrade_one_level, requires_justification: true }
+  full_iac_automation:       { effect: enables_pilot_light_downgrade }
+  budget_constrained:        { effect: flag_if_above_matrix_default }
+  third_party_single_region: { effect: document_capped_dr }
+  static_stability_required: { effect: require_preprovisioned_capacity }
+
+# ---------- Deviation policy ----------
+deviation:
+  definition: "declared_strategy != computed_strategy"
+  requires: [justification, cost_delta_estimate, cto_endorsement]
+  routing:
+    upgrade:   ARCHITECT_REVIEW            # cost scrutiny (FinOps lens)
+    downgrade: DEVIATION_PANEL             # risk scrutiny (Co-STORM panel)
+
+# ---------- Automated conformance checks (run at SUBMITTED) ----------
+conformance_checks:
+  - id: mandate-floor
+    assert: "computed_strategy != null"    # every app lands on a multi-region strategy
+    on_fail: reject
+  - id: matrix-conformance
+    assert: "declared_strategy >= matrix_defaults[band][rpo_class] OR deviation.filed"
+    on_fail: flag
+  - id: over-engineering
+    assert: "strategy_distance(declared, matrix_defaults[band][rpo_class]) < 2 OR deviation.filed"
+    on_fail: flag
+  - id: rpo-class-data-mismatch
+    assert: "gate3 rules pof-feasibility and sod-over-engineering pass"
+    on_fail: flag
+  - id: static-stability-and-parity
+    assert: "gate3b rules static-stability, kms-secrets-replication, region-service-parity pass"
+    on_fail: flag
+  - id: saas-feasibility
+    assert: "gate3c rules saas-correlated-failure, saas-pof-alignment, saas-edition-gate pass"
+    on_fail: flag
+  - id: effective-objectives-met
+    assert: "effective_rpo meets rpo_class AND effective_rto <= band.max OR deviation.filed"
+    on_fail: flag
+  - id: evidence-complete
+    assert: "all(gate.evidence_required satisfied)"
+    on_fail: rework
+  - id: attestation
+    assert: "attestation.owner_signed == true"
+    on_fail: reject
+
+fast_track:
+  criteria: "declared == computed AND all checks pass AND no flags"
+  action: auto-approve
+  audit_sample_pct: 10

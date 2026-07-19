@@ -1,0 +1,771 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.internal/dr/ddr/1.2.0",
+  "title": "DR Decision Record (DDR)",
+  "description": "Canonical output of the DR decision tree exercise (tree v3.x, band x RPO-class matrix). Emitted identically by the Forge wizard and the Copilot plugin; validated at the Decision Service API boundary. computed_strategy is server-populated and rejected if supplied by a client.",
+  "type": "object",
+  "required": [
+    "ddr_version",
+    "tree_version",
+    "app",
+    "submission",
+    "gate_answers",
+    "declared_strategy",
+    "attestation",
+    "workflow",
+    "aws_service_inventory"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ddr_version": {
+      "const": "1.2"
+    },
+    "tree_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "app": {
+      "type": "object",
+      "description": "Pre-seeded from the application registry; read-only to clients.",
+      "required": [
+        "app_id",
+        "name",
+        "owner",
+        "cto_tower",
+        "rto_band",
+        "rpo_class",
+        "primary_region",
+        "dr_region"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "app_id": {
+          "type": "string",
+          "pattern": "^APM-\\d{5}$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Application owner identity (corp ID)"
+        },
+        "cto_tower": {
+          "type": "string"
+        },
+        "rto_band": {
+          "enum": [
+            "band-1",
+            "band-2",
+            "band-3",
+            "band-4",
+            "band-5"
+          ]
+        },
+        "rpo_class": {
+          "enum": [
+            "POF",
+            "SOD",
+            "NO_RECOVERY"
+          ],
+          "description": "Registry-assigned RPO class: Point-of-Failure (continuous replication), Start-of-Day (daily SOD backup), or No Recovery (IaC rebuild, Gate 3 waived)."
+        },
+        "primary_region": {
+          "type": "string",
+          "description": "Primary AWS region (e.g. us-east-1); used for SaaS correlated-failure checks."
+        },
+        "dr_region": {
+          "type": "string",
+          "description": "Selected DR region; validated for service parity."
+        }
+      }
+    },
+    "submission": {
+      "type": "object",
+      "required": [
+        "channel",
+        "submitted_by",
+        "submitted_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "channel": {
+          "enum": [
+            "webapp",
+            "copilot-plugin",
+            "claude-code-plugin"
+          ]
+        },
+        "submitted_by": {
+          "type": "string"
+        },
+        "submitted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "session_transcript_ref": {
+          "type": "string",
+          "format": "uri",
+          "description": "S3 URI; plugin channels only"
+        },
+        "repo_introspection_ref": {
+          "type": "string",
+          "format": "uri",
+          "description": "S3 URI of IaC scan findings; plugin channels only"
+        }
+      }
+    },
+    "gate_answers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "gate",
+          "answer"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gate": {
+            "type": "string",
+            "pattern": "^q\\d+_\\d+$"
+          },
+          "answer": {
+            "type": [
+              "boolean",
+              "string"
+            ]
+          },
+          "prefilled": {
+            "type": "boolean",
+            "default": false
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "kind",
+                "ref"
+              ],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "drill_report",
+                    "restore_test_report",
+                    "data_store_inventory",
+                    "iac_scan",
+                    "runbook",
+                    "other"
+                  ]
+                },
+                "ref": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "data_layer_inventory": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "store",
+          "replication",
+          "achievable_rpo",
+          "achievable_rto"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "store": {
+            "type": "string"
+          },
+          "replication": {
+            "enum": [
+              "aurora-global-db",
+              "dynamodb-global-tables",
+              "rds-cross-region-replica",
+              "s3-crr",
+              "elasticache-global-datastore",
+              "aws-drs",
+              "msk-mirror",
+              "backup-copy-only",
+              "none",
+              "unknown"
+            ]
+          },
+          "achievable_rpo": {
+            "type": "string",
+            "format": "duration"
+          },
+          "achievable_rto": {
+            "type": "string",
+            "format": "duration"
+          },
+          "meets_target": {
+            "type": "boolean",
+            "description": "Server-computed vs app.rpo_class data posture: POF requires continuous replication; SOD requires daily cross-region backup coverage."
+          },
+          "detected_from_iac": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "point_in_time_backup_declared": {
+      "type": "boolean"
+    },
+    "modifiers": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "compliance_data_residency",
+          "low_ops_maturity",
+          "full_iac_automation",
+          "budget_constrained",
+          "third_party_single_region",
+          "static_stability_required"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "computed_strategy": {
+      "enum": [
+        "ACTIVE_ACTIVE",
+        "WARM_STANDBY_HOT",
+        "WARM_STANDBY",
+        "PILOT_LIGHT",
+        "BACKUP_RESTORE",
+        "BACKUP_RESTORE_ECON",
+        "IAC_REBUILD"
+      ],
+      "description": "SERVER-POPULATED ONLY. API rejects client-supplied values."
+    },
+    "declared_strategy": {
+      "enum": [
+        "ACTIVE_ACTIVE",
+        "WARM_STANDBY_HOT",
+        "WARM_STANDBY",
+        "PILOT_LIGHT",
+        "BACKUP_RESTORE",
+        "BACKUP_RESTORE_ECON",
+        "IAC_REBUILD"
+      ]
+    },
+    "deviation": {
+      "type": "object",
+      "description": "Required (enforced server-side) when declared_strategy != computed_strategy.",
+      "required": [
+        "is_deviation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "is_deviation": {
+          "type": "boolean"
+        },
+        "direction": {
+          "enum": [
+            "upgrade",
+            "downgrade"
+          ]
+        },
+        "justification": {
+          "type": "string",
+          "minLength": 50
+        },
+        "cost_delta_estimate_monthly_usd": {
+          "type": "number"
+        },
+        "cto_endorsed": {
+          "type": "boolean",
+          "default": false
+        },
+        "cto_endorsed_by": {
+          "type": "string"
+        },
+        "cto_endorsed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "prod_monthly_estimate_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dr_cost_band_pct": {
+          "type": "string",
+          "description": "Derived from strategy, e.g. 20-40"
+        },
+        "dr_monthly_estimate_usd": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "attestation": {
+      "type": "object",
+      "required": [
+        "owner_signed",
+        "signed_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "owner_signed": {
+          "const": true
+        },
+        "signed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "statement_version": {
+          "type": "string",
+          "default": "1.0"
+        }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "required": [
+        "state"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "NOT_STARTED",
+            "IN_PROGRESS",
+            "SUBMITTED",
+            "AUTO_CHECKED",
+            "ARCHITECT_REVIEW",
+            "DEVIATION_PANEL",
+            "REWORK",
+            "APPROVED",
+            "CTO_ENDORSED",
+            "REPORTED"
+          ]
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "state",
+              "at",
+              "by"
+            ],
+            "properties": {
+              "state": {
+                "type": "string"
+              },
+              "at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "by": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "description": "Populated during architect review; absent on initial submission.",
+      "additionalProperties": false,
+      "properties": {
+        "auto_checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "check_id",
+              "result"
+            ],
+            "properties": {
+              "check_id": {
+                "type": "string"
+              },
+              "result": {
+                "enum": [
+                  "pass",
+                  "flag",
+                  "rework",
+                  "reject"
+                ]
+              },
+              "detail": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "fast_tracked": {
+          "type": "boolean"
+        },
+        "rubric_scores": {
+          "type": "object",
+          "description": "1-5 per Well-Architected dimension plus ops/resiliency emphasis",
+          "properties": {
+            "reliability_resiliency": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "operational_excellence": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "cost_optimization": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "security": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            },
+            "performance_efficiency": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            }
+          }
+        },
+        "evidence_quality": {
+          "enum": [
+            "strong",
+            "adequate",
+            "weak"
+          ]
+        },
+        "verdict": {
+          "enum": [
+            "approve",
+            "approve_with_conditions",
+            "rework",
+            "escalate_to_panel"
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reviewed_by": {
+          "type": "string"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "costorm_session_ref": {
+          "type": "string",
+          "format": "uri",
+          "description": "Transcript + mind map + verdict memo for panel cases"
+        }
+      }
+    },
+    "strategy_annotations": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "sod_data_refresh",
+          "stateless",
+          "economy",
+          "tighten_data_path"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Server-populated annotations from the matrix cell / gate outcome (e.g. Warm Standby with SOD-refreshed standby data)."
+    },
+    "aws_service_inventory": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Gate 3B: every AWS dependency classified by scope. Required for ALL apps including NO_RECOVERY (compute still fails over).",
+      "items": {
+        "type": "object",
+        "required": [
+          "service",
+          "scope",
+          "management",
+          "dr_region_pairing",
+          "control_plane_needed_at_failover"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "global",
+              "regional",
+              "zonal",
+              "edge"
+            ]
+          },
+          "management": {
+            "enum": [
+              "aws-managed",
+              "self-managed-on-aws"
+            ]
+          },
+          "dr_region_pairing": {
+            "enum": [
+              "paired",
+              "partial",
+              "missing",
+              "not-applicable"
+            ]
+          },
+          "control_plane_needed_at_failover": {
+            "type": "boolean",
+            "description": "True if failover depends on this service's control plane (e.g. Route 53 API updates, ASG launches, IAM role creation) \u2014 static-stability flag for Band 1 / near-zero."
+          },
+          "quota_parity_verified": {
+            "type": "boolean",
+            "default": false
+          },
+          "config_replication": {
+            "enum": [
+              "iac",
+              "multi-region-native",
+              "manual",
+              "none"
+            ]
+          },
+          "detected_from_iac": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "kms_multi_region_keys_declared": {
+      "type": "boolean",
+      "description": "Multi-region KMS keys in place so replicated data is decryptable in the DR region."
+    },
+    "secrets_replicated_declared": {
+      "type": "boolean",
+      "description": "Secrets Manager replication (or equivalent) to the DR region."
+    },
+    "saas_dependencies": {
+      "type": "array",
+      "description": "Gate 3C: SaaS data planes in the critical path (MongoDB Atlas, Snowflake, Starburst, ...). Capability facts come from the central Vendor DR Catalog; this records the app's configuration. Empty only if saas_none_attested is true.",
+      "items": {
+        "type": "object",
+        "required": [
+          "vendor",
+          "product",
+          "plan_edition",
+          "homed_cloud",
+          "homed_regions",
+          "multi_region_capability",
+          "configured",
+          "network_path_dr_ready",
+          "auth_path_dr_ready"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "vendor": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string"
+          },
+          "plan_edition": {
+            "type": "string",
+            "description": "DR features are edition-gated (e.g. Snowflake failover groups require Business Critical)."
+          },
+          "catalog_entry_id": {
+            "type": "string",
+            "description": "Reference into the Vendor DR Catalog."
+          },
+          "homed_cloud": {
+            "enum": [
+              "aws",
+              "azure",
+              "gcp",
+              "vendor-private"
+            ]
+          },
+          "homed_regions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "multi_region_capability": {
+            "enum": [
+              "native-failover",
+              "replication-configurable",
+              "stateless-redeploy",
+              "none"
+            ]
+          },
+          "configured": {
+            "type": "boolean",
+            "description": "Capability exists vs actually enabled for this app."
+          },
+          "contractual_rpo": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "duration"
+          },
+          "contractual_rto": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "duration"
+          },
+          "replication_refresh_cadence": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "duration",
+            "description": "For scheduled-replication products (e.g. Snowflake) this IS the effective RPO."
+          },
+          "network_path_dr_ready": {
+            "type": "boolean",
+            "description": "PrivateLink / regional endpoints pre-provisioned in the DR region."
+          },
+          "auth_path_dr_ready": {
+            "type": "boolean",
+            "description": "SSO/IdP path validated for failover."
+          },
+          "correlated_with_primary": {
+            "type": "boolean",
+            "description": "SERVER-COMPUTED: homed in app.primary_region without configured replication \u2014 high-severity flag."
+          },
+          "last_vendor_dr_test": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          }
+        }
+      }
+    },
+    "saas_none_attested": {
+      "type": "boolean",
+      "description": "Owner attests no SaaS product sits in the critical path."
+    },
+    "effective_objectives": {
+      "type": "object",
+      "description": "SERVER-COMPUTED, never client-declared. Honest achievable posture across Gate 3A + 3C.",
+      "additionalProperties": false,
+      "properties": {
+        "effective_rpo_achievable": {
+          "type": "string",
+          "format": "duration"
+        },
+        "effective_rto_achievable": {
+          "type": "string",
+          "format": "duration"
+        },
+        "meets_rpo_class": {
+          "type": "boolean"
+        },
+        "meets_rto_band": {
+          "type": "boolean"
+        },
+        "worst_dependency": {
+          "type": "string",
+          "description": "The store or vendor that sets the effective number."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "app": {
+            "properties": {
+              "rpo_class": {
+                "enum": [
+                  "POF",
+                  "SOD"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "data_layer_inventory",
+          "point_in_time_backup_declared"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "app": {
+            "properties": {
+              "rpo_class": {
+                "const": "NO_RECOVERY"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "declared_strategy": {
+            "enum": [
+              "IAC_REBUILD",
+              "WARM_STANDBY",
+              "ACTIVE_ACTIVE"
+            ],
+            "description": "NO_RECOVERY apps: IaC Rebuild (bands 2-5) or stateless Warm Standby / Active-Active (band 1)."
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "not": {
+          "required": [
+            "saas_dependencies"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "saas_none_attested"
+        ],
+        "properties": {
+          "saas_none_attested": {
+            "const": true
+          }
+        }
+      }
+    }
+  ]
+}
