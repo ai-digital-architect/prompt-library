@@ -27,7 +27,7 @@ using the prompt-template library in the model-prompt-templates/ folder.
 
 ## My request
 
-- TARGET_MODEL: {{TARGET_MODEL}}            (a specific model, e.g. "Claude Opus 4.8",
+- TARGET_MODEL: {{TARGET_MODEL}}            (a specific model, e.g. "Claude Opus 5",
                                              "GPT-5.5", "Gemini 3.5 Flash" — or "auto"
                                              to have you select the best fit)
 - INTENT: {{INTENT}}                        (what the generated prompt must accomplish,
@@ -60,6 +60,11 @@ using the prompt-template library in the model-prompt-templates/ folder.
    roles for OpenAI, system_instruction with context-first/instruction-last
    ordering for Gemini). Where my request leaves a placeholder genuinely
    unfillable, keep a clearly marked {{PLACEHOLDER}} for me to complete.
+   If the target is a Claude 5-generation model (Fable 5, Opus 5, Sonnet 5),
+   keep the prompt lean: no verification or double-check instructions, no
+   progress-summary scaffolding, no severity filters, no enumerated style
+   prohibitions. Use judgment framing and add only the Steering Blocks from
+   that template that my request actually calls for.
 5. If anything load-bearing is missing (success criteria, audience, or output
    format), ask me at most one batch of clarifying questions BEFORE writing
    the prompt. Otherwise proceed and list your assumptions.
@@ -97,11 +102,12 @@ Filled-in fields for a real request:
 - DESIRED OUTPUT FORMAT: summary, findings by severity, go/no-go verdict
 ```
 
-Expected behavior: the assistant selects **Claude Opus 4.8**
+Expected behavior: the assistant selects **Claude Opus 5**
 (production code review per the README rules), reads only
-[14-anthropic-claude-opus-4-8.md](./14-anthropic-claude-opus-4-8.md), and
-returns an XML-structured review prompt with
-`{"model": "claude-opus-4-8", "thinking": {"type": "adaptive"}, "output_config": {"effort": "xhigh"}}`
+[21-anthropic-claude-opus-5.md](./21-anthropic-claude-opus-5.md), and
+returns an XML-structured review prompt — coverage-first, with no
+"double-check your work" scaffolding — with
+`{"model": "claude-opus-5", "output_config": {"effort": "xhigh"}}`
 as the run settings.
 
 ---
@@ -109,7 +115,7 @@ as the run settings.
 ## Notes
 
 - This file is the single entry point for prompt generation; the per-model
-  knowledge lives in templates `01`–`20`, and the routing logic lives in
+  knowledge lives in templates `01`–`22`, and the routing logic lives in
   [README.md](./README.md). Update those, not this file, when models change.
 - For background on why prompts differ per model (template anatomy, selection
   trade-offs), see [user-guide.md](./user-guide.md).

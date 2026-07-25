@@ -1,8 +1,9 @@
 # General-Purpose Prompt Template — Anthropic Claude Sonnet 4.5 / 4.6
 
-> **Status (June 2026):** The current Sonnet model is **Claude Sonnet 4.6**
-> (`claude-sonnet-4-6`). Sonnet 4.5 remains active as a legacy model. This template
-> covers both; 4.6-specific notes are called out inline.
+> **Status (July 2026):** The current Sonnet model is **Claude Sonnet 5**
+> ([template 22](./22-anthropic-claude-sonnet-5.md)). Sonnet 4.5 and 4.6 remain
+> active legacy models and this template still applies to them; 4.6-specific notes
+> are called out inline. Prefer Sonnet 5 for new work.
 
 ## Model Profile
 
