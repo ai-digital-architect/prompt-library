@@ -1,6 +1,34 @@
-# General-Purpose Prompt Template — Google Gemini 3 Pro
+---
+post_title: "General-Purpose Prompt Template — Google Gemini 3 Pro"
+author1: "Prompt Library Team"
+post_slug: "04-google-gemini-3-pro"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "google"
+  - "gemini"
+  - "legacy"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Gemini 3 Pro: context-first instruction-last scaffold
+  and multimodal reasoning guidance. Superseded by Gemini 3.1 Pro.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
-> **Status update (June 2026):** Gemini 3 Pro is no longer the newest Pro-tier model. **Gemini 3.1 Pro (Preview, `gemini-3.1-pro-preview`)** is now Google's latest flagship and no longer appears alongside Gemini 3 Pro on the current Gemini API model page. For new work, see [Gemini 3.1 Pro template](./18-google-gemini-3-1-pro.md). The guidance below remains valid for existing Gemini 3 Pro deployments.
+> **Status update (June 2026):** Gemini 3 Pro is no longer the newest Pro-tier
+> model. **Gemini 3.1 Pro (Preview, `gemini-3.1-pro-preview`)** is now
+> Google's latest flagship and no longer appears alongside Gemini 3 Pro on the
+> current Gemini API model page. For new work, see [Gemini 3.1 Pro
+> template](./18-google-gemini-3-1-pro.md). The guidance below remains valid
+> for existing Gemini 3 Pro deployments.
 
 ## Model Profile
 

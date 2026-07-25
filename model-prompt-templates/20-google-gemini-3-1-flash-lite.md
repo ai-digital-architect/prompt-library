@@ -1,4 +1,27 @@
-# General-Purpose Prompt Template — Google Gemini 3.1 Flash-Lite
+---
+post_title: "General-Purpose Prompt Template — Google Gemini 3.1 Flash-Lite"
+author1: "Prompt Library Team"
+post_slug: "20-google-gemini-3-1-flash-lite"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "google"
+  - "gemini"
+  - "legacy"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Gemini 3.1 Flash-Lite: strict schemas and minimal
+  thinking for bulk processing. Superseded by Gemini 3.5 Flash-Lite.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 ## Model Profile
 

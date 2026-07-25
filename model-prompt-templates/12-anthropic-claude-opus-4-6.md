@@ -1,4 +1,27 @@
-# General-Purpose Prompt Template — Anthropic Claude Opus 4.6
+---
+post_title: "General-Purpose Prompt Template — Anthropic Claude Opus 4.6"
+author1: "Prompt Library Team"
+post_slug: "12-anthropic-claude-opus-4-6"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "anthropic"
+  - "claude-opus"
+  - "legacy"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Claude Opus 4.6: extended-thinking scaffold and agentic
+  depth guidance. Legacy tier — prefer Claude Opus 5 for new work.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 > **Status (June 2026):** Opus 4.6 remains active but has been superseded by
 > **Claude Opus 4.8** ([template 14](./14-anthropic-claude-opus-4-8.md)) as the

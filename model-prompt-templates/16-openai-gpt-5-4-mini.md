@@ -1,4 +1,28 @@
-# General-Purpose Prompt Template — OpenAI GPT-5.4 mini
+---
+post_title: "General-Purpose Prompt Template — OpenAI GPT-5.4 mini"
+author1: "Prompt Library Team"
+post_slug: "16-openai-gpt-5-4-mini"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "openai"
+  - "gpt-5"
+  - "legacy"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for GPT-5.4 mini: explicit scaffolding, concrete examples,
+  and tight output formats for production pipelines. No longer listed by
+  OpenAI — prefer GPT-5.6 Terra or Luna.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 > **Provenance note:** Model specs and positioning are sourced from OpenAI's model
 > docs and prompt-guidance pages (June 2026). The exact `reasoning_effort` levels

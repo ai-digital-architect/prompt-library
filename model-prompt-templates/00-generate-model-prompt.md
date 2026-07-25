@@ -1,4 +1,27 @@
-# Meta-Prompt — Generate a Model-Specific Prompt from This Library
+---
+post_title: "Meta-Prompt — Generate a Model-Specific Prompt from This Library"
+author1: "Prompt Library Team"
+post_slug: "00-generate-model-prompt"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "meta-prompt"
+  - "prompt-generation"
+ai_note: "Content created with AI assistance."
+summary: >
+  Reusable meta-prompt that turns a plain-language intent into a finished,
+  model-specific prompt by routing through this library's README and reading
+  exactly one template.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 Use this document to turn a plain-language intent into a polished,
 model-specific prompt built from the templates in this folder.
@@ -60,11 +83,12 @@ using the prompt-template library in the model-prompt-templates/ folder.
    roles for OpenAI, system_instruction with context-first/instruction-last
    ordering for Gemini). Where my request leaves a placeholder genuinely
    unfillable, keep a clearly marked {{PLACEHOLDER}} for me to complete.
-   If the target is a Claude 5-generation model (Fable 5, Opus 5, Sonnet 5),
-   keep the prompt lean: no verification or double-check instructions, no
-   progress-summary scaffolding, no severity filters, no enumerated style
-   prohibitions. Use judgment framing and add only the Steering Blocks from
-   that template that my request actually calls for.
+   If the target is a Claude 5-generation model (Fable 5, Opus 5, Sonnet 5) or
+   a GPT-5.6 model (Sol, Terra, Luna), keep the prompt lean: no verification or
+   double-check instructions, no progress-summary scaffolding, no severity
+   filters, no enumerated style prohibitions, no repeated instructions. Use
+   judgment framing and add only the Steering Blocks from that template that my
+   request actually calls for.
 5. If anything load-bearing is missing (success criteria, audience, or output
    format), ask me at most one batch of clarifying questions BEFORE writing
    the prompt. Otherwise proceed and list your assumptions.
@@ -115,7 +139,7 @@ as the run settings.
 ## Notes
 
 - This file is the single entry point for prompt generation; the per-model
-  knowledge lives in templates `01`–`22`, and the routing logic lives in
+  knowledge lives in templates `01`–`26`, and the routing logic lives in
   [README.md](./README.md). Update those, not this file, when models change.
 - For background on why prompts differ per model (template anatomy, selection
   trade-offs), see [user-guide.md](./user-guide.md).

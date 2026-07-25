@@ -1,6 +1,29 @@
-# Current AI Model Lists: OpenAI, Anthropic, and Google
+---
+post_title: "Current AI Model Lists: OpenAI, Anthropic, and Google"
+author1: "Prompt Library Team"
+post_slug: "current-model-list"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "model-lineup"
+  - "reference"
+ai_note: "Content created with AI assistance."
+summary: >
+  Source-of-truth lineup of currently listed OpenAI, Anthropic, and Google
+  models with API model IDs, context windows, pricing, and migration notes,
+  verified against each provider's official documentation.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
-**Date:** June 12, 2026 — *Anthropic section updated July 25, 2026*
+**Date:** June 12, 2026 — *Anthropic, OpenAI, and Google sections updated July 25, 2026*
 
 This document summarizes the currently listed models from OpenAI, Anthropic, and Google, based on the model information referenced in the prior response.
 
@@ -10,12 +33,13 @@ This document summarizes the currently listed models from OpenAI, Anthropic, and
 
 ### Frontier / General Models
 
-| Model        | API Model ID   |
-| ------------ | -------------- |
-| GPT-5.5      | `gpt-5.5`      |
-| GPT-5.4      | `gpt-5.4`      |
-| GPT-5.4 mini | `gpt-5.4-mini` |
-| GPT-5.4 nano | `gpt-5.4-nano` |
+| Model         | API Model ID     | Context / Max output | Pricing (in/out/cached in per MTok) | Notes                                                                 |
+| ------------- | ---------------- | -------------------- | ----------------------------------- | --------------------------------------------------------------------- |
+| GPT-5.6 Sol   | `gpt-5.6-sol`    | 1,050,000 / 128K     | $5.00 / $30.00 / $0.50              | Flagship; `gpt-5.6` and `gpt-5` alias to it; `reasoning.mode: "pro"` documented; knowledge cutoff Feb 16, 2026 |
+| GPT-5.6 Terra | `gpt-5.6-terra`  | 1,050,000 / 128K     | $2.50 / $15.00 / $0.25              | Mid-tier; exactly half Sol's price; same context, output, and tool surface |
+| GPT-5.6 Luna  | `gpt-5.6-luna`   | 1,050,000 / 128K     | $1.00 / $6.00 / $0.10               | Fast/budget; highest rate-limit ceiling (Tier 5: 30,000 RPM / 180M TPM) |
+| GPT-5.5       | `gpt-5.5`        | 1,050,000 / 128K     | $5.00 / $30.00 / $0.50              | No longer listed on the models page — prior flagship                  |
+| GPT-5.4 family | `gpt-5.4`, `gpt-5.4-mini`, `gpt-5.4-nano` | 1,050,000 / 128K | see prior templates    | No longer listed on the models page                                   |
 
 ### Specialized Models
 
@@ -28,9 +52,20 @@ This document summarizes the currently listed models from OpenAI, Anthropic, and
 
 ### Notes
 
-OpenAI’s documentation currently recommends **GPT-5.5** for complex reasoning and coding, while the smaller GPT-5.4 variants are positioned for lower latency and lower cost use cases.
+OpenAI’s documentation now lists only the three GPT-5.6 variants and tells developers: “If you’re not sure where to start, use GPT-5.6 Sol, our flagship model for complex reasoning and coding.”
 
-**Source:** [OpenAI model documentation](https://platform.openai.com/docs/models)
+All three tiers share a 1,050,000-token context window, a 128K output ceiling,
+a February 16, 2026 knowledge cutoff, and the same built-in tool surface (web
+search, file search, code interpreter, computer use, image generation, hosted
+shell, apply patch, skills, MCP, tool search). None support fine-tuning.
+Requests above 272K input tokens bill at 2× input and 1.5× output for the
+session, and cache writes bill at 1.25× uncached input.
+
+`reasoning.effort` accepts a model-dependent subset of `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`. `reasoning.mode` (`standard` / `pro`) is an independent axis and is documented for `gpt-5.6-sol`; it is not confirmed for Terra or Luna. Programmatic Tool Calling — the model writing JavaScript to orchestrate tool calls — is supported on GPT-5.4 and later.
+
+**Deprecations:** `gpt-5-2025-08-07`, `gpt-5-mini-2025-08-07`, and `gpt-5-nano-2025-08-07` shut down December 11, 2026, with `gpt-5.6-sol`, `gpt-5.6-terra`, and `gpt-5.6-luna` named as their respective replacements. No retirement date has been announced for GPT-5.4 or GPT-5.5, but neither appears on the models page.
+
+**Source:** [OpenAI model documentation](https://developers.openai.com/api/docs/models), [model guidance](https://developers.openai.com/api/docs/guides/latest-model), [reasoning guide](https://developers.openai.com/api/docs/guides/reasoning), and [deprecations](https://developers.openai.com/api/docs/deprecations) — verified July 25, 2026.
 
 ---
 
@@ -68,15 +103,18 @@ The prompt-caching minimum drops from 1,024 to 512 tokens, and the beta headers
 
 ### Gemini 3 / Current Generation
 
-| Model                     | Status  |
-| ------------------------- | ------- |
-| Gemini 3.1 Pro            | Preview |
-| Gemini 3.5 Flash          | Stable  |
-| Gemini 3 Flash            | Preview |
-| Gemini 3.1 Flash-Lite     | Stable  |
-| Gemini 3.5 Live Translate | Preview |
-| Gemini 3.1 Flash Live     | Preview |
-| Gemini 3.1 Flash TTS      | Preview |
+| Model                     | API Model ID             | Status  | Context / Max output    | Pricing (in/out per MTok) |
+| ------------------------- | ------------------------ | ------- | ----------------------- | ------------------------- |
+| Gemini 3.6 Flash          | `gemini-3.6-flash`       | Stable  | 1,048,576 / 65,536      | $1.50 / $7.50             |
+| Gemini 3.1 Pro            | `gemini-3.1-pro-preview` | Preview | 1M / 64K                | $2.00 / $12.00 (≤200K prompt); $4.00 / $18.00 above |
+| Gemini 3.5 Flash          | `gemini-3.5-flash`       | Stable  | 1M / 64K                | $1.50 / $9.00             |
+| Gemini 3.5 Flash-Lite     | `gemini-3.5-flash-lite`  | Stable  | 1,048,576 / 65,536      | $0.30 / $2.50             |
+| Gemini 3.1 Flash-Lite     | `gemini-3.1-flash-lite`  | Stable  | 1M / 64K                | $0.25 / $1.50             |
+| Gemini 3 Flash            | `gemini-3-flash`         | Preview | 1M / 64K                | $0.50 / $3.00             |
+| Gemini 3.5 Flash Cyber    | —                        | Limited-access pilot | —          | —                         |
+| Gemini 3.5 Live Translate | —                        | Preview | —                       | —                         |
+| Gemini 3.1 Flash Live     | —                        | Preview | —                       | —                         |
+| Gemini 3.1 Flash TTS      | —                        | Preview | —                       | —                         |
 
 ### Gemini 2.5
 
@@ -102,9 +140,48 @@ The prompt-caching minimum drops from 1,024 to 512 tokens, and the beta headers
 
 ### Notes
 
-Google’s model page was last updated **June 9, 2026** and identifies some previous Gemini 2.0 models and older previews as deprecated or shut down.
+**Gemini 3.6 Flash (July 2026):** Google's recommended Flash-tier model,
+positioned as the workhorse "designed for the agentic era." Input modalities
+are text, image, video, audio, and PDF; output is text only. It supports code
+execution, computer use (Preview), file search, function calling, grounding
+with Google Search and Google Maps, structured outputs, thinking, URL context,
+the Batch API, context caching, and flex/priority inference. It does not
+support audio generation, image generation, or the Live API. The model page
+does not publish a knowledge cutoff — see the model card.
 
-**Source:** [Google Gemini API model documentation](https://ai.google.dev/gemini-api/docs/models)
+**Migration to 3.6 Flash:** `temperature`, `top_p`, and `top_k` are deprecated
+and ignored, and will return HTTP 400 in future versions. `thinking_budget` is
+superseded by `thinking_level` string values, with the `medium` default
+carried over from 3.5 Flash. Requests may no longer end on a model-role turn
+(prefilled model turns now error) — move that steering into
+`system_instruction` or structured outputs.
+
+**Gemini 3.5 Flash-Lite (July 2026):** Google's recommended Flash-Lite tier,
+superseding Gemini 3.1 Flash-Lite and Gemini 2.5 Flash. Stable, 1,048,576
+input / 65,536 output tokens, ~350 output tokens per second. Input is priced
+uniformly at $0.30/M across text, image, video, and audio; output $2.50/M;
+Batch and Flex $0.15 / $1.25; Priority $0.54 / $4.50; context caching $0.03/M
+plus $1.00 per million tokens per hour of storage. It supports Search and Maps
+grounding, code execution, file search, function calling, structured outputs,
+thinking, URL context, context caching, Batch, and flex/priority inference,
+but **not** computer use, the Live API, audio generation, or image generation.
+`thinking_level` defaults to `"minimal"` — Google advises raising it to
+`"medium"` or `"high"` for autonomous subagents that make tool calls, which
+otherwise terminate early. The same migration changes as 3.6 Flash apply.
+
+**Pro tier:** Gemini 3.1 Pro (Preview) remains the newest Pro-tier model on the model page. Google has stated that Gemini 3.5 Pro is testing with partners with broader availability "as soon as it's ready," and that Gemini 4 pre-training has begun; neither has a published specification.
+
+Google’s model page identifies some previous Gemini 2.0 models and older previews as deprecated or shut down.
+
+**Source:** [Google Gemini API model
+documentation](https://ai.google.dev/gemini-api/docs/models), [Gemini 3.6
+Flash model page](https://ai.google.dev/gemini-
+api/docs/models/gemini-3.6-flash), [pricing](https://ai.google.dev/gemini-
+api/docs/pricing), [using the latest Gemini
+models](https://ai.google.dev/gemini-api/docs/latest-model), and the [launch
+announcement](https://blog.google/innovation-and-ai/models-and-
+research/gemini-models/gemini-3-6-flash-3-5-flash-lite-3-5-flash-cyber/) —
+verified July 25, 2026.
 
 ---
 
@@ -112,7 +189,7 @@ Google’s model page was last updated **June 9, 2026** and identifies some prev
 
 | Provider  | Primary Current Families                                                    |
 | --------- | --------------------------------------------------------------------------- |
-| OpenAI    | GPT-5.5, GPT-5.4, GPT-Realtime, GPT Image                                   |
+| OpenAI    | GPT-5.6 (Sol / Terra / Luna), GPT-Realtime, GPT Image                       |
 | Anthropic | Claude Fable, Claude Mythos, Claude Opus, Claude Sonnet, Claude Haiku       |
 | Google    | Gemini 3, Gemini 2.5, Imagen, Veo, Lyria, Gemini Embedding, Gemini Robotics |
 
@@ -120,6 +197,6 @@ Google’s model page was last updated **June 9, 2026** and identifies some prev
 
 ## Source Links
 
-* OpenAI: https://platform.openai.com/docs/models
+* OpenAI: https://developers.openai.com/api/docs/models
 * Anthropic: https://docs.anthropic.com/en/docs/about-claude/models/overview
 * Google Gemini: https://ai.google.dev/gemini-api/docs/models

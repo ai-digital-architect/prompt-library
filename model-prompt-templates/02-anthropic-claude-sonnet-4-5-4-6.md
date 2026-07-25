@@ -1,4 +1,28 @@
-# General-Purpose Prompt Template — Anthropic Claude Sonnet 4.5 / 4.6
+---
+post_title: "General-Purpose Prompt Template — Anthropic Claude Sonnet 4.5 / 4.6"
+author1: "Prompt Library Team"
+post_slug: "02-anthropic-claude-sonnet-4-5-4-6"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "anthropic"
+  - "claude-sonnet"
+  - "legacy"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Claude Sonnet 4.5 and 4.6: direct action-oriented
+  scaffold, multishot examples, and parallel tool-calling guidance. Legacy
+  tier — prefer Claude Sonnet 5 for new work.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 > **Status (July 2026):** The current Sonnet model is **Claude Sonnet 5**
 > ([template 22](./22-anthropic-claude-sonnet-5.md)). Sonnet 4.5 and 4.6 remain

@@ -1,4 +1,27 @@
-# General-Purpose Prompt Template — Google Gemini 3 Flash
+---
+post_title: "General-Purpose Prompt Template — Google Gemini 3 Flash"
+author1: "Prompt Library Team"
+post_slug: "05-google-gemini-3-flash"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "google"
+  - "gemini"
+  - "legacy"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Gemini 3 Flash: fast multimodal scaffold with thinking-
+  level tuning. Preview generation — prefer Gemini 3.6 Flash.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 > **Status update (June 2026):** Gemini 3 Flash remains in **Preview** (`gemini-3-flash-preview`), while **Gemini 3.5 Flash (Stable, `gemini-3.5-flash`)** is now the newest Flash-tier model and Google's recommended stable choice for agentic and coding tasks. For new work, see [Gemini 3.5 Flash template](./19-google-gemini-3-5-flash.md).
 

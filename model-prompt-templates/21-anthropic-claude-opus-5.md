@@ -1,4 +1,30 @@
-# General-Purpose Prompt Template — Anthropic Claude Opus 5
+---
+post_title: "General-Purpose Prompt Template — Anthropic Claude Opus 5"
+author1: "Prompt Library Team"
+post_slug: "21-anthropic-claude-opus-5"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "anthropic"
+  - "claude-opus"
+  - "agentic"
+  - "context-engineering"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Claude Opus 5, Anthropic's flagship for complex agentic
+  coding and enterprise work: a lean scaffold, a steering block library for
+  length, narration, scope, and delegation, and a migration table of what to
+  delete from Opus 4.8 prompts.
+post_date: "2026-07-25"
+last_updated: "2026-07-25"
+---
 
 ## Model Profile
 

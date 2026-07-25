@@ -1,4 +1,27 @@
-# General-Purpose Prompt Template — OpenAI GPT-5.3
+---
+post_title: "General-Purpose Prompt Template — OpenAI GPT-5.3"
+author1: "Prompt Library Team"
+post_slug: "08-openai-gpt-5-3"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "openai"
+  - "gpt-5"
+  - "legacy"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for GPT-5.3: markdown-sectioned system prompt scaffold and
+  multi-step reasoning guidance. Deprecated — migrate to GPT-5.6 Sol.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 > **Status (June 2026):** GPT-5.3 is no longer listed in OpenAI's current model
 > documentation and is presumed deprecated/legacy. OpenAI's deprecation page

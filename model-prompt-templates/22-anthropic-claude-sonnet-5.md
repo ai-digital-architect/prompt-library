@@ -1,4 +1,30 @@
-# General-Purpose Prompt Template — Anthropic Claude Sonnet 5
+---
+post_title: "General-Purpose Prompt Template — Anthropic Claude Sonnet 5"
+author1: "Prompt Library Team"
+post_slug: "22-anthropic-claude-sonnet-5"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "anthropic"
+  - "claude-sonnet"
+  - "agentic"
+  - "context-engineering"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Claude Sonnet 5, the balanced production default:
+  literal-instruction scaffolding, effort recalibration from Sonnet 4.6,
+  tokenizer and sampling-parameter migration notes, and frontend and code-
+  review steering blocks.
+post_date: "2026-07-25"
+last_updated: "2026-07-25"
+---
 
 ## Model Profile
 

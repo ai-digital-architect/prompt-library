@@ -1,4 +1,27 @@
-# General-Purpose Prompt Template — Anthropic Claude Haiku 4.5
+---
+post_title: "General-Purpose Prompt Template — Anthropic Claude Haiku 4.5"
+author1: "Prompt Library Team"
+post_slug: "03-anthropic-claude-haiku"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "anthropic"
+  - "claude-haiku"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Claude Haiku 4.5: lean prompts, explicit output formats,
+  and one-unit-of-work-per-call design for high-volume classification,
+  extraction, and subagent execution.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 ## Model Profile
 

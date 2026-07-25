@@ -1,4 +1,29 @@
-# General-Purpose Prompt Template — Google Gemini 3.1 Pro
+---
+post_title: "General-Purpose Prompt Template — Google Gemini 3.1 Pro"
+author1: "Prompt Library Team"
+post_slug: "18-google-gemini-3-1-pro"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "google"
+  - "gemini"
+  - "multimodal"
+  - "reasoning"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Gemini 3.1 Pro, the deepest reasoner in the Gemini
+  lineup: always-on thinking, context-first instruction-last ordering, and
+  multimodal research synthesis examples.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 ## Model Profile
 
@@ -28,7 +53,12 @@
 
 ## Template Structure
 
-Gemini 3.1 Pro responds best to direct, concisely stated goals with clear section delimiters (Markdown headings, not XML tags). Per Google's official prompting guidance for Gemini 3.x: place large context first and the specific instruction at the very end, keep generation parameters at their defaults, and explicitly request verbosity if you want a detailed response — by default the model answers efficiently.
+Gemini 3.1 Pro responds best to direct, concisely stated goals with clear
+section delimiters (Markdown headings, not XML tags). Per Google's official
+prompting guidance for Gemini 3.x: place large context first and the specific
+instruction at the very end, keep generation parameters at their defaults, and
+explicitly request verbosity if you want a detailed response — by default the
+model answers efficiently.
 
 ```
 system_instruction:

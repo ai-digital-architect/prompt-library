@@ -1,4 +1,30 @@
-# General-Purpose Prompt Template — Anthropic Claude Fable 5
+---
+post_title: "General-Purpose Prompt Template — Anthropic Claude Fable 5"
+author1: "Prompt Library Team"
+post_slug: "13-anthropic-claude-fable-5"
+microsoft_alias: "promptlibrary"
+featured_image: "https://learn.microsoft.com/en-us/azure/ai-services/openai/media/overview/openai-overview.png"
+categories:
+  - "AI"
+  - "Developer Tools"
+tags:
+  - "prompt-engineering"
+  - "llm"
+  - "model-templates"
+  - "ai-assisted-engineering"
+  - "anthropic"
+  - "claude-fable"
+  - "agentic"
+  - "context-engineering"
+ai_note: "Content created with AI assistance."
+summary: >
+  Prompt template for Claude Fable 5, Anthropic's frontier-ceiling model:
+  full-specification scaffold, a steering block library for long autonomous
+  runs, memory-system and subagent guidance, and context-engineering rules for
+  the Claude 5 generation.
+post_date: "2026-03-03"
+last_updated: "2026-07-25"
+---
 
 ## Model Profile
 
