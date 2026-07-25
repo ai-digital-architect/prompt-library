@@ -23,12 +23,13 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
-> **Status update (June 2026):** Gemini 3 Pro is no longer the newest Pro-tier
-> model. **Gemini 3.1 Pro (Preview, `gemini-3.1-pro-preview`)** is now
-> Google's latest flagship and no longer appears alongside Gemini 3 Pro on the
-> current Gemini API model page. For new work, see [Gemini 3.1 Pro
-> template](./18-google-gemini-3-1-pro.md). The guidance below remains valid
-> for existing Gemini 3 Pro deployments.
+> **Status (July 2026):** Gemini 3 Pro Preview now appears in Google's
+> **deprecated / shut down** list — it is no longer a deployable model. The
+> newest Pro-tier model is **Gemini 3.1 Pro** (still Preview,
+> `gemini-3.1-pro-preview`, [template 18](./18-google-gemini-3-1-pro.md)); there
+> is no Gemini 3.5 Pro in the public lineup. Google's model page positions
+> **Gemini 3.6 Flash** ([template 26](./26-google-gemini-3-6-flash.md)) as its
+> latest and default model. The guidance below is retained for reference only.
 
 ## Model Profile
 
@@ -36,7 +37,7 @@ last_updated: "2026-07-25"
 |---|---|
 | **Model** | Gemini 3 Pro (gemini-3-pro) |
 | **Provider** | Google DeepMind |
-| **Tier** | Flagship — advanced reasoning, coding, and multimodal understanding |
+| **Tier** | Flagship (retired preview) — shut down; see Gemini 3.1 Pro |
 | **Context Window** | 1M tokens |
 | **Strengths** | Multimodal input (text, images, audio, video, PDFs), advanced math and coding, agentic tool calling, long-context processing, complex reasoning |
 | **Best For** | Multi-modal analysis, scientific reasoning, complex coding, long-document processing, agentic workflows requiring deep reasoning |

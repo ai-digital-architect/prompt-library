@@ -23,13 +23,21 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
+> **Status (July 2026):** the stable `gemini-3.1-flash-lite` is still listed,
+> but the preview variant now appears in Google's **deprecated / shut down**
+> list, and the recommended Flash-Lite tier is **Gemini 3.5 Flash-Lite**
+> ([template 27](./27-google-gemini-3-5-flash-lite.md)) — faster, with a larger
+> output ceiling and native support for the newer thinking controls. 3.1
+> Flash-Lite retains the lower input price ($0.25/M vs. $0.30/M); that is the
+> only remaining reason to choose it.
+
 ## Model Profile
 
 | Attribute | Detail |
 |---|---|
 | **Model** | Gemini 3.1 Flash-Lite (`gemini-3.1-flash-lite`) |
 | **Provider** | Google DeepMind |
-| **Tier** | Economy — lowest-cost, lowest-latency tier for high-volume tasks |
+| **Tier** | Economy (prior generation) — superseded by Gemini 3.5 Flash-Lite |
 | **Status** | Stable (as of June 2026) |
 | **Context Window** | 1M input tokens / 64K output tokens |
 | **Knowledge Cutoff** | January 2025 |

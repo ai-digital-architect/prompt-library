@@ -235,7 +235,7 @@ User:
 | Multi-step agentic orchestration in a single call | ❌ [GPT-5.6 Terra](./24-openai-gpt-5-6-terra.md) |
 | Hard reasoning, production coding, security-critical work | ❌ [GPT-5.6 Sol](./23-openai-gpt-5-6-sol.md) |
 | Native audio, video, or PDF input | ❌ [Gemini 3.6 Flash](./26-google-gemini-3-6-flash.md) |
-| Absolute lowest cost per token | ❌ Gemini 3.1 Flash-Lite ($0.25/$1.50) or [Claude Haiku 4.5](./03-anthropic-claude-haiku.md) |
+| Absolute lowest cost per token | ❌ [Gemini 3.5 Flash-Lite](./27-google-gemini-3-5-flash-lite.md) ($0.30/$2.50) or [Claude Haiku 4.5](./03-anthropic-claude-haiku.md) |
 
 ---
 

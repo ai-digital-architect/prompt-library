@@ -59,7 +59,7 @@ quality requirements.
 | 01 | [01-anthropic-claude-opus-4-5-4-6.md](01-anthropic-claude-opus-4-5-4-6.md) | Claude Opus 4.5 / 4.6 | Anthropic | Flagship (prior gen) | Legacy — see 21 |
 | 02 | [02-anthropic-claude-sonnet-4-5-4-6.md](02-anthropic-claude-sonnet-4-5-4-6.md) | Claude Sonnet 4.5 / 4.6 | Anthropic | Balanced (prior gen) | Legacy — see 22 |
 | 03 | [03-anthropic-claude-haiku.md](03-anthropic-claude-haiku.md) | Claude Haiku 4.5 | Anthropic | Fast frontier | **Current** |
-| 04 | [04-google-gemini-3-pro.md](04-google-gemini-3-pro.md) | Gemini 3 Pro | Google DeepMind | Flagship (prior gen) | Legacy — see 18 |
+| 04 | [04-google-gemini-3-pro.md](04-google-gemini-3-pro.md) | Gemini 3 Pro | Google DeepMind | Flagship (prior gen) | **Shut down** — see 18 |
 | 05 | [05-google-gemini-3-flash.md](05-google-gemini-3-flash.md) | Gemini 3 Flash | Google DeepMind | Fast frontier | Preview — see 26 |
 | 06 | [06-openai-gpt-5-1.md](06-openai-gpt-5-1.md) | GPT-5.1 | OpenAI | Balanced frontier | Deprecated — see 23 |
 | 07 | [07-openai-gpt-5-2.md](07-openai-gpt-5-2.md) | GPT-5.2 | OpenAI | Flagship (prior gen) | Deprecated — see 23 |
@@ -68,20 +68,20 @@ quality requirements.
 | 10 | [10-openai-gpt-5-3-codex.md](10-openai-gpt-5-3-codex.md) | GPT-5.3 Codex | OpenAI | Agentic coding | Deprecated — see 23 |
 | 11 | [11-openai-gpt-5-4.md](11-openai-gpt-5-4.md) | GPT-5.4 | OpenAI | Affordable frontier | Legacy — see 24 |
 | 12 | [12-anthropic-claude-opus-4-6.md](12-anthropic-claude-opus-4-6.md) | Claude Opus 4.6 | Anthropic | Flagship (prior gen) | Legacy — see 21 |
-| 13 | [13-anthropic-claude-fable-5.md](13-anthropic-claude-fable-5.md) | Claude Fable 5 | Anthropic | Frontier ceiling (above Opus) | **Current** |
+| 13 | [13-anthropic-claude-fable-5.md](13-anthropic-claude-fable-5.md) | Claude Fable 5 | Anthropic | **Flagship** (above Opus) | **Current** |
 | 14 | [14-anthropic-claude-opus-4-8.md](14-anthropic-claude-opus-4-8.md) | Claude Opus 4.8 | Anthropic | Flagship (prior gen) | Legacy — see 21 |
 | 15 | [15-openai-gpt-5-5.md](15-openai-gpt-5-5.md) | GPT-5.5 | OpenAI | Flagship (prior gen) | Legacy — see 23 |
 | 16 | [16-openai-gpt-5-4-mini.md](16-openai-gpt-5-4-mini.md) | GPT-5.4 mini | OpenAI | Balanced / low latency | Legacy — see 24 |
 | 17 | [17-openai-gpt-5-4-nano.md](17-openai-gpt-5-4-nano.md) | GPT-5.4 nano | OpenAI | Fast / lowest cost | Legacy — see 25 |
-| 18 | [18-google-gemini-3-1-pro.md](18-google-gemini-3-1-pro.md) | Gemini 3.1 Pro | Google DeepMind | Flagship | **Current** (Preview) |
+| 18 | [18-google-gemini-3-1-pro.md](18-google-gemini-3-1-pro.md) | Gemini 3.1 Pro | Google DeepMind | Pro tier (deepest reasoning) | **Current** (Preview) |
 | 19 | [19-google-gemini-3-5-flash.md](19-google-gemini-3-5-flash.md) | Gemini 3.5 Flash | Google DeepMind | Fast frontier (prior gen) | Legacy — see 26 |
 | 20 | [20-google-gemini-3-1-flash-lite.md](20-google-gemini-3-1-flash-lite.md) | Gemini 3.1 Flash-Lite | Google DeepMind | Fast / lowest cost (prior gen) | Legacy — see 27 |
-| 21 | [21-anthropic-claude-opus-5.md](21-anthropic-claude-opus-5.md) | Claude Opus 5 | Anthropic | Flagship | **Current** |
+| 21 | [21-anthropic-claude-opus-5.md](21-anthropic-claude-opus-5.md) | Claude Opus 5 | Anthropic | High-capability / enterprise | **Current** |
 | 22 | [22-anthropic-claude-sonnet-5.md](22-anthropic-claude-sonnet-5.md) | Claude Sonnet 5 | Anthropic | Balanced frontier | **Current** |
-| 23 | [23-openai-gpt-5-6-sol.md](23-openai-gpt-5-6-sol.md) | GPT-5.6 Sol | OpenAI | Flagship | **Current** |
+| 23 | [23-openai-gpt-5-6-sol.md](23-openai-gpt-5-6-sol.md) | GPT-5.6 Sol | OpenAI | **Flagship** | **Current** |
 | 24 | [24-openai-gpt-5-6-terra.md](24-openai-gpt-5-6-terra.md) | GPT-5.6 Terra | OpenAI | Balanced / mid-tier | **Current** |
 | 25 | [25-openai-gpt-5-6-luna.md](25-openai-gpt-5-6-luna.md) | GPT-5.6 Luna | OpenAI | Fast / lowest cost | **Current** |
-| 26 | [26-google-gemini-3-6-flash.md](26-google-gemini-3-6-flash.md) | Gemini 3.6 Flash | Google DeepMind | Fast frontier workhorse | **Current** (Stable) |
+| 26 | [26-google-gemini-3-6-flash.md](26-google-gemini-3-6-flash.md) | Gemini 3.6 Flash | Google DeepMind | **Flagship** / workhorse | **Current** (Stable) |
 | 27 | [27-google-gemini-3-5-flash-lite.md](27-google-gemini-3-5-flash-lite.md) | Gemini 3.5 Flash-Lite | Google DeepMind | Fast / lowest cost | **Current** (Stable) |
 
 > **Intentionally excluded:** Anthropic's Claude Mythos 5 / Mythos Preview
@@ -91,9 +91,10 @@ quality requirements.
 > transcription, embedding, and robotics models — this library covers
 > general-purpose text/reasoning prompting only.
 >
-> **Documented but not yet templated:** Gemini 3.5 Pro is testing with partners
-> and has no public specification, so the Pro tier remains Gemini 3.1 Pro
-> (template 18).
+> **Documented but not yet templated:** Gemini 3.5 Pro is still absent from
+> Google's public lineup, so the Pro tier remains Gemini 3.1 Pro (template 18).
+> **Gemini Omni Flash** appeared in the Preview section during the 25 July 2026
+> scan with no published specification yet — worth watching.
 
 ---
 
@@ -152,7 +153,7 @@ Four tiers cover the full range of latency and depth requirements. (Claude
 Mythos 5 / Mythos Preview are limited-availability research models and have no
 template by design.)
 
-### Claude Fable 5 — Frontier Ceiling :sparkles:
+### Claude Fable 5 — Flagship :sparkles:
 
 - **Context window:** 1M tokens | **Max output:** 128K tokens
 - **Pricing:** $10 / $50 per million input/output tokens
@@ -168,7 +169,7 @@ template by design.)
   subagents. Individual turns can run for many minutes: raise client timeouts and
   stream.
 
-### Claude Opus 5 — Flagship Daily Driver for Hard Tasks
+### Claude Opus 5 — Enterprise and Agentic-Coding Workhorse
 
 - **Context window:** 1M tokens (default and maximum) | **Max output:** 128K tokens
   (300K via Message Batches with beta header `output-300k-2026-03-24`)
@@ -214,7 +215,7 @@ All current Gemini models share a **1M token context window** and native
 multimodal processing — the primary differentiators from other families.
 (Gemini 2.5 and media/TTS/Live models are out of scope for this library.)
 
-### Gemini 3.1 Pro — Flagship Reasoning + Multimodal (Preview)
+### Gemini 3.1 Pro — Deepest Reasoning + Multimodal (Preview)
 
 - **Context window:** 1M tokens | **Max output:** 64K tokens
 - **Pricing:** $2 / $12 per million tokens (≤200K prompt); $4 / $18 above 200K
@@ -224,7 +225,7 @@ multimodal processing — the primary differentiators from other families.
   (defaults to `thinking_level: "high"`, cannot be disabled); keep sampling
   parameters at defaults; ground with Google Search for current facts.
 
-### Gemini 3.6 Flash — Current Workhorse (Stable)
+### Gemini 3.6 Flash — Flagship and Workhorse (Stable)
 
 - **Context window:** 1,048,576 input tokens | **Max output:** 65,536 tokens
 - **Pricing:** $1.50 / $7.50 per million input/output tokens (Batch API at 50%;
@@ -350,6 +351,49 @@ August 10, 2026, with the GPT-5.6 family as the designated replacement
 banners.
 
 ---
+
+## Current Flagship by Family
+
+Verified against each provider's own model documentation on **25 July 2026**.
+"Flagship" here means the model the vendor's own page designates as most capable
+or presents as the default starting point — not simply the newest release.
+
+| Provider | Flagship | Also current | No longer flagship |
+|---|---|---|---|
+| Anthropic | **Claude Fable 5** — designated the most capable widely released model | Claude Opus 5 (enterprise / agentic coding), Claude Sonnet 5 (mid-tier), Claude Haiku 4.5 (fast) | Claude Opus 4.8, 4.7, 4.6, 4.5; Claude Sonnet 4.6, 4.5 — all delisted from the current models table |
+| OpenAI | **GPT-5.6 Sol** — "start with GPT-5.6 Sol for complex reasoning and coding"; `gpt-5.6` and `gpt-5` alias to it | GPT-5.6 Terra (mid-tier), GPT-5.6 Luna (fast/budget) | GPT-5.5, GPT-5.4 and its mini/nano variants, GPT-5.1–5.3 and the Codex variants |
+| Google | **Gemini 3.6 Flash** — presented as the latest and default model | Gemini 3.5 Flash-Lite (throughput), Gemini 3.1 Pro (Preview, deepest reasoning) | Gemini 3.5 Flash, Gemini 3.1 Flash-Lite; Gemini 3 Pro Preview is shut down |
+
+Two things worth noting from this scan. Anthropic's top tier is **not** the Opus
+line — Fable 5 sits above it, so "flagship Claude" and "flagship Opus" are
+different models. And Google's flagship is a **Flash**-tier model: there is no
+Gemini 3.5 Pro in the public lineup, and the newest Pro-tier model, Gemini 3.1
+Pro, is still Preview.
+
+### Retirement dates worth planning around
+
+Anthropic publishes retirement dates for every model; the others largely do not.
+
+| Model | Retires no sooner than |
+|---|---|
+| Claude Haiku 4.5 (`claude-haiku-4-5-20251001`) | **October 15, 2026** — the nearest of any current Claude model |
+| Claude Sonnet 4.5 | September 29, 2026 |
+| Claude Opus 4.5 | November 24, 2026 |
+| Claude Opus 4.6 | February 5, 2027 |
+| Claude Sonnet 4.6 | February 17, 2027 |
+| Claude Opus 4.7 | April 16, 2027 |
+| Claude Opus 4.8 | May 28, 2027 |
+| Claude Fable 5 | June 9, 2027 |
+| Claude Sonnet 5 | June 30, 2027 |
+| Claude Opus 5 | July 24, 2027 |
+
+OpenAI has announced no retirement date for GPT-5.4 or GPT-5.5 despite delisting
+both; the `gpt-5`, `gpt-5-mini`, and `gpt-5-nano` snapshots shut down
+December 11, 2026. Google lists Gemini 3 Pro Preview, Gemini 3.1 Flash-Lite
+Preview, Gemini 2.0 Flash, and Gemini 2.0 Flash-Lite as deprecated or shut down.
+
+---
+
 
 ## Choosing the Right Model
 

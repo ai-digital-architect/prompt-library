@@ -24,6 +24,10 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
+> **Status (July 2026):** GPT-5.4 mini is no longer listed in OpenAI's model
+> documentation. OpenAI's current lineup is the three-tier GPT-5.6 family. For
+> new work, prefer **GPT-5.6 Terra** ([template 24](./24-openai-gpt-5-6-terra.md)) for mid-complexity work, or **GPT-5.6 Luna** ([template 25](./25-openai-gpt-5-6-luna.md)) where cost and latency dominate. No formal retirement date has been announced.
+
 > **Provenance note:** Model specs and positioning are sourced from OpenAI's model
 > docs and prompt-guidance pages (June 2026). The exact `reasoning_effort` levels
 > exposed on mini are inferred from the GPT-5.4 family documentation — verify

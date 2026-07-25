@@ -24,13 +24,20 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
+> **Status (July 2026):** GPT-5.5 is no longer OpenAI's flagship and no longer
+> appears in its model documentation. The current flagship is **GPT-5.6 Sol**
+> ([template 23](./23-openai-gpt-5-6-sol.md)), which reaches frontier
+> performance with fewer output tokens at the same $5.00 / $30.00 rate and adds
+> `reasoning.mode: "pro"`. No formal retirement date has been announced for
+> GPT-5.5. Prefer GPT-5.6 Sol for new work.
+
 ## Model Profile
 
 | Attribute | Detail |
 | --- | --- |
 | **Model** | GPT-5.5 |
 | **Provider** | OpenAI |
-| **Tier** | Current flagship — "a new class of intelligence for coding and professional work" |
+| **Tier** | Flagship (prior generation) — superseded by GPT-5.6 Sol |
 | **Context Window** | 1,050,000 tokens (long-prompt pricing applies above 272K input tokens) |
 | **Max Output** | 128K tokens |
 | **Strengths** | Efficient reasoning (strong results with fewer reasoning tokens), outcome-first prompt execution, precise tool selection and argument accuracy across large tool surfaces, complex multi-step coding, professional knowledge work |

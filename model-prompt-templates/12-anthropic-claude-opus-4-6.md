@@ -23,11 +23,12 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
-> **Status (June 2026):** Opus 4.6 remains active but has been superseded by
-> **Claude Opus 4.8** ([template 14](./14-anthropic-claude-opus-4-8.md)) as the
-> current Opus-tier model, with **Claude Fable 5**
-> ([template 13](./13-anthropic-claude-fable-5.md)) above it. Prefer Opus 4.8 for
-> new work.
+> **Status (July 2026):** Opus 4.6 remains active — Anthropic lists it as
+> retiring no sooner than February 5, 2027 — but it has been superseded twice
+> over. The current Opus-tier model is **Claude Opus 5**
+> ([template 21](./21-anthropic-claude-opus-5.md)), and Anthropic's designated
+> flagship is **Claude Fable 5** ([template 13](./13-anthropic-claude-fable-5.md)).
+> Prefer Opus 5 for new work.
 
 ## Model Profile
 
@@ -35,7 +36,7 @@ last_updated: "2026-07-25"
 |---|---|
 | **Model** | Claude Opus 4.6 |
 | **Provider** | Anthropic |
-| **Tier** | Flagship — maximum intelligence, extended reasoning, and agentic depth |
+| **Tier** | Flagship (prior generation) — superseded by Claude Opus 5 |
 | **Context Window** | 1M tokens |
 | **Max Output** | 128K tokens (streaming required for large outputs) |
 | **Strengths** | Extended thinking, deep multi-step reasoning, agentic workflows, complex bug detection, long-document synthesis, nuanced judgment |

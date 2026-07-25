@@ -38,7 +38,7 @@ last_updated: "2026-07-25"
 |---|---|
 | **Model** | Claude Opus 4.5 / Opus 4.6 |
 | **Provider** | Anthropic |
-| **Tier** | Flagship — maximum intelligence and reasoning depth |
+| **Tier** | Flagship (prior generation) — superseded by Claude Opus 5 |
 | **Context Window** | 1M tokens (Opus 4.6; Opus 4.5 is 200K) |
 | **Max Output** | 128K tokens (streaming required for large outputs) |
 | **Strengths** | Deep reasoning, nuanced analysis, complex multi-step tasks, creative writing, subtle bug detection, research synthesis |

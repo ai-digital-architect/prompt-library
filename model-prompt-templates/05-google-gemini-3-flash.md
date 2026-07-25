@@ -23,7 +23,11 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
-> **Status update (June 2026):** Gemini 3 Flash remains in **Preview** (`gemini-3-flash-preview`), while **Gemini 3.5 Flash (Stable, `gemini-3.5-flash`)** is now the newest Flash-tier model and Google's recommended stable choice for agentic and coding tasks. For new work, see [Gemini 3.5 Flash template](./19-google-gemini-3-5-flash.md).
+> **Status (July 2026):** Gemini 3 Flash remains in **Preview**
+> (`gemini-3-flash-preview`) and is now two generations behind. The current
+> Flash-tier model — and the model Google's own page presents as its latest and
+> default — is **Gemini 3.6 Flash** (Stable, `gemini-3.6-flash`,
+> [template 26](./26-google-gemini-3-6-flash.md)). For new work, use that.
 
 ## Model Profile
 

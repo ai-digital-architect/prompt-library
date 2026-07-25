@@ -31,7 +31,7 @@ last_updated: "2026-07-25"
 |---|---|
 | **Model** | Gemini 3.1 Pro (`gemini-3.1-pro-preview`) |
 | **Provider** | Google DeepMind |
-| **Tier** | Flagship — advanced reasoning, agentic coding, and multimodal understanding |
+| **Tier** | Pro tier — the deepest reasoning in the Gemini lineup; note Google's model page presents Gemini 3.6 Flash as its latest and default model |
 | **Status** | Preview (as of June 2026) |
 | **Context Window** | 1M input tokens / 64K output tokens |
 | **Knowledge Cutoff** | January 2025 |
@@ -227,10 +227,10 @@ Board memo in Markdown: TO/FROM/DATE/RE header, ## Recommendation,
 | Full-codebase or multi-document analysis up to 1M tokens | ✅ 1M context with strong coherence |
 | Mixed media research (PDFs + audio + video in one pass) | ✅ Native multimodal |
 | Long-horizon agentic coding with heavy tool use | ✅ Improved tool use vs. 3 Pro |
-| Latency-sensitive interactive chat | ❌ Use Gemini 3.5 Flash |
-| High-volume classification/extraction pipelines | ❌ Use Gemini 3.1 Flash-Lite |
-| Stable production workloads requiring a GA model | ⚠️ 3.1 Pro is Preview — use Gemini 3.5 Flash for stability |
-| Simple tasks where thinking overhead wastes cost | ❌ Use Gemini 3.5 Flash or 3.1 Flash-Lite |
+| Latency-sensitive interactive chat | ❌ Use [Gemini 3.6 Flash](./26-google-gemini-3-6-flash.md) |
+| High-volume classification/extraction pipelines | ❌ Use [Gemini 3.5 Flash-Lite](./27-google-gemini-3-5-flash-lite.md) |
+| Stable production workloads requiring a GA model | ⚠️ 3.1 Pro is Preview — use [Gemini 3.6 Flash](./26-google-gemini-3-6-flash.md) for stability |
+| Simple tasks where thinking overhead wastes cost | ❌ Use Gemini 3.6 Flash or 3.5 Flash-Lite |
 
 ---
 

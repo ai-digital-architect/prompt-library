@@ -23,13 +23,20 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
+> **Status (July 2026):** Gemini 3.5 Flash is still listed as Stable but is no
+> longer the newest Flash-tier model. **Gemini 3.6 Flash**
+> ([template 26](./26-google-gemini-3-6-flash.md)) supersedes it, costs less per
+> output token ($7.50/M vs. $9.00/M), and Google reports it uses roughly 17%
+> fewer output tokens for the same work — there is no cost argument for staying.
+> Note that 3.6 Flash also drops sampling parameters and prefilled model turns.
+
 ## Model Profile
 
 | Attribute | Detail |
 |---|---|
 | **Model** | Gemini 3.5 Flash (`gemini-3.5-flash`) |
 | **Provider** | Google DeepMind |
-| **Tier** | Fast frontier — Google's newest-generation Flash model; "most intelligent model for sustained frontier performance on agentic and coding tasks" |
+| **Tier** | Fast frontier (prior generation) — superseded by Gemini 3.6 Flash |
 | **Status** | Stable (as of June 2026) |
 | **Context Window** | 1M input tokens / 64K output tokens |
 | **Knowledge Cutoff** | January 2025 |

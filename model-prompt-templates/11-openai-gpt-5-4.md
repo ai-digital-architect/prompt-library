@@ -24,12 +24,13 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
-> **Status (June 2026):** GPT-5.4 is current and listed in OpenAI's model docs as
-> "a more affordable model for coding and professional work." Note that
-> [GPT-5.5](./15-openai-gpt-5-5.md) now sits above it as the flagship for complex
-> reasoning and coding. Smaller siblings:
-> [GPT-5.4 mini](./16-openai-gpt-5-4-mini.md) and
-> [GPT-5.4 nano](./17-openai-gpt-5-4-nano.md).
+> **Status (July 2026):** GPT-5.4 is no longer listed in OpenAI's model
+> documentation. OpenAI's current lineup is the three-tier GPT-5.6 family, with
+> **GPT-5.6 Sol** ([template 23](./23-openai-gpt-5-6-sol.md)) as the flagship.
+> The closest successor to GPT-5.4 on price and positioning is
+> **GPT-5.6 Terra** ([template 24](./24-openai-gpt-5-6-terra.md)) — same
+> $2.50 / $15.00 rate, same 1,050,000-token window. No formal retirement date
+> has been announced for GPT-5.4 itself.
 
 ## Model Profile
 

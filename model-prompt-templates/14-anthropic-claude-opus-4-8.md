@@ -24,13 +24,22 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
+> **Status (July 2026):** Opus 4.8 is no longer listed in Anthropic's current
+> models table and is a prior-generation model, though it remains active —
+> Anthropic lists it as retiring no sooner than May 28, 2027. The current
+> Opus-tier model is **Claude Opus 5**
+> ([template 21](./21-anthropic-claude-opus-5.md)); Anthropic's designated
+> flagship is **Claude Fable 5** ([template 13](./13-anthropic-claude-fable-5.md)).
+> Prefer Opus 5 for new work — see its migration table for what to delete from
+> Opus 4.8 prompts.
+
 ## Model Profile
 
 | Attribute | Detail |
 |---|---|
 | **Model** | Claude Opus 4.8 |
 | **Provider** | Anthropic |
-| **Tier** | Flagship — most capable Opus-tier model; the recommended default for hard tasks |
+| **Tier** | Flagship (prior generation) — superseded by Claude Opus 5 |
 | **API Model ID** | `claude-opus-4-8` |
 | **Context Window** | 1M tokens (standard API pricing — no long-context premium) |
 | **Max Output** | 128K tokens (streaming required for large outputs) |

@@ -32,7 +32,7 @@ last_updated: "2026-07-25"
 |---|---|
 | **Model** | Claude Fable 5 |
 | **Provider** | Anthropic |
-| **Tier** | Frontier ceiling — a tier above Opus; Anthropic's most capable widely released model |
+| **Tier** | **Flagship** — Anthropic's most capable widely released model, a tier above Opus |
 | **API Model ID** | `claude-fable-5` |
 | **Context Window** | 1M tokens |
 | **Max Output** | 128K tokens (streaming required for large outputs) |
@@ -343,7 +343,7 @@ content. Use send_to_user only for user-facing content, not for narration or rea
 | **Restructure for asynchronous checking** | Turns run for many minutes — don't block on them; poll or stream |
 | **Raise client timeouts, enable streaming and progress indicators** | Same reason |
 | **Prefer long-lived subagents** | Cache reads across subtasks cut cost and latency |
-| **Configure a fallback model** | Safety classifiers can decline; route those requests to a non-classifier model (Anthropic's guide names Opus 4.8 — [Opus 5](./21-anthropic-claude-opus-5.md) is the current equivalent) |
+| **Configure a fallback model** | Safety classifiers can decline; route those requests to a non-classifier model — [Opus 5](./21-anthropic-claude-opus-5.md) is the current equivalent (Anthropic's guide still names Opus 4.8) |
 | **Confirm data retention posture** | 30-day retention is mandatory; ZDR arrangements are not available |
 
 **Safety classifiers** target offensive cybersecurity techniques, sensitive

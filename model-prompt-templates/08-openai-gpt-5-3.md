@@ -23,11 +23,11 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
-> **Status (June 2026):** GPT-5.3 is no longer listed in OpenAI's current model
-> documentation and is presumed deprecated/legacy. OpenAI's deprecation page
-> schedules `gpt-5.3-chat-latest` for retirement on August 10, 2026, with
-> `gpt-5.5` as the recommended replacement. For new work, prefer
-> [GPT-5.5](./15-openai-gpt-5-5.md) or [GPT-5.4](./11-openai-gpt-5-4.md).
+> **Status (July 2026):** GPT-5.3 is no longer listed in OpenAI's model
+> documentation and is deprecated — `gpt-5.3-chat-latest` was scheduled for retirement on August 10, 2026. The replacement named in the earlier
+> guidance, GPT-5.5, has itself since been delisted. OpenAI's current flagship is
+> **GPT-5.6 Sol** ([template 23](./23-openai-gpt-5-6-sol.md)); use it for new
+> work, including agentic coding.
 
 ## Model Profile
 

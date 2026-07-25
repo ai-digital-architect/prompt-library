@@ -51,7 +51,7 @@ using the prompt-template library in the model-prompt-templates/ folder.
 ## My request
 
 - TARGET_MODEL: {{TARGET_MODEL}}            (a specific model, e.g. "Claude Opus 5",
-                                             "GPT-5.5", "Gemini 3.5 Flash" — or "auto"
+                                             "GPT-5.6 Sol", "Gemini 3.6 Flash" — or "auto"
                                              to have you select the best fit)
 - INTENT: {{INTENT}}                        (what the generated prompt must accomplish,
                                              in plain language — be specific)

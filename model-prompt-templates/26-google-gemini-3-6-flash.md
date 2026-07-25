@@ -262,7 +262,7 @@ One page, Markdown: ## Headline, ## What Went Well, ## What Needs Attention,
 | Deepest reasoning on the hardest problems | ⚠️ Consider [Gemini 3.1 Pro](./18-google-gemini-3-1-pro.md) (Preview) |
 | Real-time audio conversation | ❌ No Live API and no audio generation on this model |
 | Image generation | ❌ Not supported — use a Google image model |
-| Massive-volume classification at lowest cost | ❌ Gemini 3.1 Flash-Lite ($0.25/$1.50) or 3.5 Flash-Lite ($0.30/$2.50) |
+| Massive-volume classification at lowest cost | ❌ [Gemini 3.5 Flash-Lite](./27-google-gemini-3-5-flash-lite.md) ($0.30/$2.50) |
 
 ---
 

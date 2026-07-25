@@ -18,7 +18,7 @@ tags:
   - "context-engineering"
 ai_note: "Content created with AI assistance."
 summary: >
-  Prompt template for Claude Opus 5, Anthropic's flagship for complex agentic
+  Prompt template for Claude Opus 5, Anthropic's model for complex agentic
   coding and enterprise work: a lean scaffold, a steering block library for
   length, narration, scope, and delegation, and a migration table of what to
   delete from Opus 4.8 prompts.
@@ -32,7 +32,7 @@ last_updated: "2026-07-25"
 |---|---|
 | **Model** | Claude Opus 5 |
 | **Provider** | Anthropic |
-| **Tier** | Flagship — the recommended default for complex agentic coding and enterprise work |
+| **Tier** | High-capability tier — Anthropic's model for complex agentic coding and enterprise work; below Fable 5, which Anthropic designates its flagship |
 | **API Model ID** | `claude-opus-5` |
 | **Context Window** | 1M tokens (default *and* maximum) |
 | **Max Output** | 128K tokens (up to 300K via the Message Batches API with beta header `output-300k-2026-03-24`) |

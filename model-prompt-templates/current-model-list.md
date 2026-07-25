@@ -23,7 +23,7 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
-**Date:** June 12, 2026 — *Anthropic, OpenAI, and Google sections updated July 25, 2026*
+**Date:** June 12, 2026 — *all three provider sections re-scanned and updated July 25, 2026*
 
 This document summarizes the currently listed models from OpenAI, Anthropic, and Google, based on the model information referenced in the prior response.
 
@@ -45,8 +45,8 @@ This document summarizes the currently listed models from OpenAI, Anthropic, and
 
 | Category                     | Models Listed                                                               |
 | ---------------------------- | --------------------------------------------------------------------------- |
-| Image                        | GPT Image 2                                                                 |
-| Realtime voice / translation | GPT-Realtime-2, GPT-Realtime-Translate, GPT-Realtime-1.5, GPT-Realtime mini |
+| Image                        | `gpt-image-2`                                                               |
+| Realtime voice / translation | `gpt-realtime-2.1`, `gpt-realtime-2.1-mini`, `gpt-realtime-2`, `gpt-realtime-translate`, `gpt-realtime-1.5`, `gpt-realtime-mini` (deprecated) |
 | Speech generation            | GPT-4o mini TTS — marked deprecated                                         |
 | Transcription                | GPT-Realtime-Whisper, GPT-4o Transcribe, GPT-4o mini Transcribe             |
 
@@ -73,21 +73,25 @@ session, and cache writes bill at 1.25× uncached input.
 
 | Model                 | API Model ID                                     | Context / Max output | Pricing (in/out per MTok) | Notes                                                              |
 | --------------------- | ------------------------------------------------ | -------------------- | ------------------------- | ------------------------------------------------------------------ |
-| Claude Fable 5        | `claude-fable-5`                                 | 1M / 128K            | $10 / $50                 | Most capable widely released model; adaptive thinking always on; 30-day retention required (no ZDR) |
+| Claude Fable 5        | `claude-fable-5`                                 | 1M / 128K            | $10 / $50                 | **Flagship** — most capable widely released model; adaptive thinking always on; 30-day retention required (no ZDR); retires no sooner than Jun 9, 2027 |
 | Claude Mythos 5       | `claude-mythos-5`                                | 1M / 128K            | $10 / $50                 | Limited availability via Project Glasswing; Fable 5 capabilities without safety classifiers |
 | Claude Mythos Preview | `claude-mythos-preview`                          | —                    | —                         | Invitation-only research preview                                   |
-| Claude Opus 5         | `claude-opus-5`                                  | 1M / 128K            | $5 / $25                  | Most capable Opus-tier model; adaptive thinking on by default (disable only at effort ≤ `high`); knowledge cutoff May 2026 |
+| Claude Opus 5         | `claude-opus-5`                                  | 1M / 128K            | $5 / $25                  | Complex agentic coding and enterprise work; below Fable 5; adaptive thinking on by default (disable only at effort ≤ `high`); knowledge cutoff May 2026; retires no sooner than Jul 24, 2027 |
 | Claude Sonnet 5       | `claude-sonnet-5`                                | 1M / 128K            | $3 / $15                  | Speed/intelligence balance; adaptive thinking on by default; new tokenizer (~30% more tokens); intro pricing $2 / $10 through Aug 31, 2026 |
-| Claude Haiku 4.5      | `claude-haiku-4-5` / `claude-haiku-4-5-20251001` | 200K / 64K           | $1 / $5                   | Fastest current Claude family model                                |
-| Claude Opus 4.8       | `claude-opus-4-8`                                | 1M / 128K            | $5 / $25                  | Prior generation — superseded by Opus 5                            |
-| Claude Sonnet 4.6     | `claude-sonnet-4-6`                              | 1M / 64K             | $3 / $15                  | Prior generation — superseded by Sonnet 5                          |
+| Claude Haiku 4.5      | `claude-haiku-4-5` / `claude-haiku-4-5-20251001` | 200K / 64K           | $1 / $5                   | Fastest current Claude model; no Haiku 5 exists; **retires no sooner than Oct 15, 2026** — nearest retirement in the lineup |
+| Claude Opus 4.8       | `claude-opus-4-8`                                | 1M / 128K            | $5 / $25                  | Prior generation, delisted from the current models table — superseded by Opus 5; retires no sooner than May 28, 2027 |
+| Claude Sonnet 4.6     | `claude-sonnet-4-6`                              | 1M / 64K             | $3 / $15                  | Prior generation, delisted from the current models table — superseded by Sonnet 5; retires no sooner than Feb 17, 2027 |
 
 ### Notes
 
 Anthropic’s documentation states that current Claude models support text and image input, text output, multilingual capabilities, and vision.
 
 **Claude 5 generation (July 2026):** Opus 5 and Sonnet 5 join Fable 5 as the current
-lineup. Across all three, `temperature` / `top_p` / `top_k`, `budget_tokens`, and
+lineup, with Haiku 4.5 unchanged as the fast tier. Anthropic designates **Fable 5**
+its most capable widely released model — the flagship is not in the Opus line.
+Opus 4.5–4.8 and Sonnet 4.5–4.6 remain callable but no longer appear in the
+current models table. Note also that `temperature`, `top_p`, and `top_k` are
+deprecated on **Opus 4.7 and later**, not only on the Claude 5 generation. Across all three, `temperature` / `top_p` / `top_k`, `budget_tokens`, and
 assistant-turn prefills return a 400; use `output_config.effort`
 (`low`/`medium`/`high`/`xhigh`/`max`, default `high`) and structured outputs instead.
 The prompt-caching minimum drops from 1,024 to 512 tokens, and the beta headers
@@ -107,10 +111,11 @@ The prompt-caching minimum drops from 1,024 to 512 tokens, and the beta headers
 | ------------------------- | ------------------------ | ------- | ----------------------- | ------------------------- |
 | Gemini 3.6 Flash          | `gemini-3.6-flash`       | Stable  | 1,048,576 / 65,536      | $1.50 / $7.50             |
 | Gemini 3.1 Pro            | `gemini-3.1-pro-preview` | Preview | 1M / 64K                | $2.00 / $12.00 (≤200K prompt); $4.00 / $18.00 above |
-| Gemini 3.5 Flash          | `gemini-3.5-flash`       | Stable  | 1M / 64K                | $1.50 / $9.00             |
+| Gemini 3.5 Flash          | `gemini-3.5-flash`       | Stable (superseded) | 1M / 64K    | $1.50 / $9.00             |
 | Gemini 3.5 Flash-Lite     | `gemini-3.5-flash-lite`  | Stable  | 1,048,576 / 65,536      | $0.30 / $2.50             |
-| Gemini 3.1 Flash-Lite     | `gemini-3.1-flash-lite`  | Stable  | 1M / 64K                | $0.25 / $1.50             |
+| Gemini 3.1 Flash-Lite     | `gemini-3.1-flash-lite`  | Stable (superseded; preview variant shut down) | 1M / 64K | $0.25 / $1.50 |
 | Gemini 3 Flash            | `gemini-3-flash`         | Preview | 1M / 64K                | $0.50 / $3.00             |
+| Gemini Omni Flash         | —                        | Preview | —                       | — (no published specification as of Jul 25, 2026) |
 | Gemini 3.5 Flash Cyber    | —                        | Limited-access pilot | —          | —                         |
 | Gemini 3.5 Live Translate | —                        | Preview | —                       | —                         |
 | Gemini 3.1 Flash Live     | —                        | Preview | —                       | —                         |
@@ -171,7 +176,9 @@ otherwise terminate early. The same migration changes as 3.6 Flash apply.
 
 **Pro tier:** Gemini 3.1 Pro (Preview) remains the newest Pro-tier model on the model page. Google has stated that Gemini 3.5 Pro is testing with partners with broader availability "as soon as it's ready," and that Gemini 4 pre-training has begun; neither has a published specification.
 
-Google’s model page identifies some previous Gemini 2.0 models and older previews as deprecated or shut down.
+**Deprecated or shut down (July 2026 scan):** Gemini 3 Pro Preview, Gemini 3.1 Flash-Lite Preview, Gemini 2.0 Flash, Gemini 2.0 Flash-Lite, and Imagen 4. Note that Gemini 3 Pro Preview moving to this list makes template 04 a reference-only document.
+
+**Flagship:** Google's model page presents **Gemini 3.6 Flash** as its latest and default model. The Pro tier has not moved — Gemini 3.1 Pro is still Preview and still the newest Pro-tier model, and no Gemini 3.5 Pro appears in the public lineup.
 
 **Source:** [Google Gemini API model
 documentation](https://ai.google.dev/gemini-api/docs/models), [Gemini 3.6
@@ -187,11 +194,11 @@ verified July 25, 2026.
 
 ## Summary Table
 
-| Provider  | Primary Current Families                                                    |
-| --------- | --------------------------------------------------------------------------- |
-| OpenAI    | GPT-5.6 (Sol / Terra / Luna), GPT-Realtime, GPT Image                       |
-| Anthropic | Claude Fable, Claude Mythos, Claude Opus, Claude Sonnet, Claude Haiku       |
-| Google    | Gemini 3, Gemini 2.5, Imagen, Veo, Lyria, Gemini Embedding, Gemini Robotics |
+| Provider  | Flagship (vendor-designated) | Primary Current Families                       |
+| --------- | ---------------------------- | ---------------------------------------------- |
+| OpenAI    | **GPT-5.6 Sol**              | GPT-5.6 (Sol / Terra / Luna), GPT-Realtime, GPT Image |
+| Anthropic | **Claude Fable 5**           | Claude Fable, Claude Mythos, Claude Opus, Claude Sonnet, Claude Haiku |
+| Google    | **Gemini 3.6 Flash**         | Gemini 3, Gemini 2.5, Imagen, Veo, Lyria, Gemini Embedding, Gemini Robotics |
 
 ---
 

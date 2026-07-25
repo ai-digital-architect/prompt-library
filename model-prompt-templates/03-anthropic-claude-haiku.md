@@ -23,6 +23,13 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
+> **Status (July 2026):** Claude Haiku 4.5 is still the current Haiku-tier model
+> — there is no Haiku 5. Note its retirement date: Anthropic lists
+> `claude-haiku-4-5-20251001` as retiring **no sooner than October 15, 2026**,
+> the nearest retirement of any current Claude model. For fast, low-cost work
+> beyond that date, plan a migration path to
+> [Claude Sonnet 5](./22-anthropic-claude-sonnet-5.md) at `low` effort.
+
 ## Model Profile
 
 | Attribute | Detail |
@@ -67,7 +74,7 @@ Output: {{sample output}}
 3. **Few-shot examples are critical** — One or two examples improve consistency dramatically, especially for classification and extraction.
 4. **Enable extended thinking selectively** — Haiku 4.5 supports extended thinking (a first for Haiku models), but use it only for genuinely hard reasoning tasks to preserve speed advantage.
 5. **Design for pipelines** — Haiku is ideal as a worker in multi-model architectures. Sonnet plans, Haiku executes.
-6. **Batch aggressively** — Haiku's low cost makes it viable for high-volume processing. Design prompts that handle one unit of work cleanly. (Note: Haiku 4.5 does not accept the `effort` parameter — that is an Opus/Sonnet 4.6+ feature.)
+6. **Batch aggressively** — Haiku's low cost makes it viable for high-volume processing. Design prompts that handle one unit of work cleanly. (Note: Haiku 4.5 does not accept the `effort` parameter — that is an Opus 4.5+/Sonnet 4.6+ and Claude 5-generation feature.)
 
 ---
 

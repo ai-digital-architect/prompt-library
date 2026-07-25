@@ -24,10 +24,11 @@ post_date: "2026-03-03"
 last_updated: "2026-07-25"
 ---
 
-> **Status (June 2026):** GPT-5.3-Codex is no longer listed in OpenAI's current
-> model documentation and is presumed deprecated/legacy; OpenAI's deprecation
-> guidance points Codex-era models to `gpt-5.5`. For new agentic coding work,
-> prefer [GPT-5.5](./15-openai-gpt-5-5.md).
+> **Status (July 2026):** GPT-5.3-Codex is no longer listed in OpenAI's model
+> documentation and is deprecated — OpenAI's deprecation guidance points Codex-era models to the current generation. The replacement named in the earlier
+> guidance, GPT-5.5, has itself since been delisted. OpenAI's current flagship is
+> **GPT-5.6 Sol** ([template 23](./23-openai-gpt-5-6-sol.md)); use it for new
+> work, including agentic coding.
 
 ## Model Profile
 
