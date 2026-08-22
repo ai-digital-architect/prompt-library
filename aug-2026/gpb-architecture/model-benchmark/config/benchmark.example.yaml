@@ -1,0 +1,159 @@
+# Example benchmark study definition.
+#
+# Run it:
+#   python3 mb.py plan --benchmark config/benchmark.example.yaml --estimate
+#   python3 mb.py run  --benchmark config/benchmark.example.yaml --replay
+#
+# Copy this file, edit, and keep it in version control next to your results.
+# The study definition is part of the reproducibility record.
+
+benchmark_version: "1.0.0"
+study_id: "2026-08-R1-semantic-security-bakeoff"
+description: >
+  First round. Semantic understanding plus the security suite across the full
+  eleven-model roster, Optimized lane, five trials, effort swept within a
+  per-model spend cap.
+
+# --------------------------------------------------------------------------
+# What to run
+# --------------------------------------------------------------------------
+suites:
+  - path: suites/semantic-v1.yaml
+    tasks: all
+  - path: suites/security-v1.yaml
+    tasks: all
+
+lanes: [optimized]          # add `parity` to attribute gains to adapters
+                            # add `production` once the platform integration lands
+
+models:
+  # Current generation
+  - claude-fable-5
+  - claude-opus-5
+  - claude-sonnet-5
+  # Prior generation — included to measure generational delta
+  - claude-opus-4-8
+  - claude-opus-4-7        # DERIVED profile — footnoted in every report
+  - claude-opus-4-6
+  # OpenAI
+  - gpt-5.6-sol
+  - gpt-5.6-terra
+  - gpt-5.6-luna
+  # Google
+  - gemini-3.6-flash
+  # - gemini-3-pro         # retired; requires --include-retired. Expect PROVIDER_ERROR.
+
+# --------------------------------------------------------------------------
+# How to run it
+# --------------------------------------------------------------------------
+trials: 5                   # floor. Sampling params no longer exist on any
+                            # current generation, so variance is irreducible.
+
+effort:
+  policy: sweep             # sweep | fixed_default | fixed
+  # Sweeping the full ladder on eleven models is expensive. The spend cap is the
+  # real control: the sweeper walks each model's ladder from cheapest upward and
+  # stops when the cap is reached, so every model gets its cheap points even if
+  # the expensive ones are truncated.
+  spend_cap_usd_per_model: 40.00
+  extra_axes:
+    gpt-5.6-sol:
+      reasoning_mode: [standard, pro]   # independent axis; Sol only
+
+# Iso-budget comparison points. Headline model-vs-model claims are made here, by
+# interpolating each model's cost/quality frontier. A model that cannot reach a
+# point is reported ABSENT, never extrapolated.
+iso_cost_points_usd_per_task: [0.05, 0.25, 1.00]
+iso_latency_points_p50_ms: [15000, 60000]
+
+evidence:
+  provider: local_graph     # local_graph | codegraph
+  # provider: codegraph
+  # endpoint: "${CODEGRAPH_ENDPOINT}"     # resolved from env at invoke time
+  corpus:
+    repository: fixtures/sample-repo
+    commit: "fixture"
+  budget:
+    max_tool_calls: 30
+    max_graph_queries: 20
+    max_files_opened: 60
+    max_wall_clock_s: 900
+    max_input_tokens: 400000
+    max_output_tokens: 32000
+
+# --------------------------------------------------------------------------
+# Grading
+# --------------------------------------------------------------------------
+grading:
+  response_schema: schemas/findings-v1.schema.json
+  schema_repair_attempts: 1     # one reprompt on schema failure, then SCHEMA_INVALID
+  matching:
+    assignment: hungarian       # one-to-one; stops one oracle finding being
+                                # claimed five times for five true positives
+    location_tolerance_lines: 0 # >=1 line of overlap required
+  f_beta:
+    semantic-v1: 1.0
+    security-v1: 1.5            # recall-leaning: a missed vulnerability costs
+                                # more than a false alarm
+    controls-v1: 0.7            # precision-leaning: false non-compliance
+                                # findings carry real organizational cost
+  abstention:
+    enabled: true
+    over_claim_penalty_multiplier: 1.5
+  calibration:
+    enabled: true
+    bins: 10
+    report_reliability_diagram: true
+
+tribunal:
+  enabled: false            # turn on only AFTER the human calibration set exists
+                            # and its inter-rater reliability has been measured.
+                            # See skills/judge-tribunal/SKILL.md.
+  panel:
+    evidence_auditor:      { model: gemini-3.6-flash }
+    domain_expert:         { model: gpt-5.6-sol, reasoning_mode: pro }
+    adversarial_reviewer:  { model: claude-opus-5 }
+    arbiter:               { model: gpt-5.6-sol }
+  cross_family_rule: true   # a candidate is never judged by its own family
+  blinding: true
+  position_check: true      # run A/B and B/A, detect position inconsistency
+  gold_set: fixtures/gold-set.json
+  drift_threshold: 0.08     # agreement drop that quarantines the round
+
+statistics:
+  resample_unit: task       # NOT trial — trials within a task are correlated
+  method: paired_cluster_bootstrap
+  resamples: 10000
+  ci: 0.95
+  multiple_comparisons: benjamini_hochberg
+  report_minimum_detectable_effect: true
+
+# --------------------------------------------------------------------------
+# Output
+# --------------------------------------------------------------------------
+reporting:
+  out_dir: runs
+  formats: [md, json]
+  include:
+    - frontiers               # cost/quality and latency/quality Pareto curves
+    - iso_budget_table
+    - exclusions              # dispositions, refusal rates by category
+    - calibration
+    - abstention
+    - economics
+    - reliability
+    - version_block
+    - comparability_statement # explicit: is this round comparable to the last?
+  footnote_derived_profiles: true    # Opus 4.7
+  footnote_imputed_pricing: true     # Opus 4.7, Opus 4.6
+  footnote_promotional_pricing: true # Sonnet 5 through 2026-08-31
+
+# --------------------------------------------------------------------------
+# Safety rails
+# --------------------------------------------------------------------------
+guards:
+  require_fairness_pass: true        # abort the study on any FAIL
+  abort_on_exclusion_rate: 0.10      # per model per suite; marks LOW_CONFIDENCE
+  max_total_spend_usd: 500.00
+  redact_transcripts: true
+  refuse_if_credentials_in_config: true

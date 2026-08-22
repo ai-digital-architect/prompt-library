@@ -1,0 +1,29 @@
+{
+  "synthetic": true,
+  "note": "Hand-shaped fixture. NOT a measurement of this model.",
+  "recorded_for": {
+    "model": "claude-opus-4-7",
+    "task": "SEC-0002",
+    "trial": 1
+  },
+  "status": 200,
+  "body": {
+    "model": "recorded",
+    "stop_reason": "end_turn",
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"schema_version\": \"1.0.0\", \"findings\": [{\"id\": \"F-01\", \"category\": \"security\", \"type\": \"CWE-862\", \"severity\": \"medium\", \"confidence\": 0.42, \"status\": \"SUSPECTED\", \"entities\": [{\"kind\": \"method\", \"ref\": \"FraudService.assess\"}], \"relations\": [], \"evidence\": [{\"file\": \"FraudService.java\", \"lines\": \"3-6\"}], \"root_cause\": \"No authorization check before scoring a request.\", \"impact\": \"Unauthorized risk scoring.\", \"recommendation\": \"Add an authorization check.\"}], \"abstentions\": [], \"coverage_notes\": \"Reviewed FraudService and KafkaPublisher.\"}"
+      }
+    ],
+    "usage": {
+      "input_tokens": 4816,
+      "output_tokens": 2173,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+    }
+  },
+  "error": null,
+  "wall_clock_ms": 87440,
+  "ttft_ms": 1757
+}

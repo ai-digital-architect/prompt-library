@@ -1,0 +1,167 @@
+# Lane definitions — the fairness contract, in machine-readable form.
+#
+# A lane is defined by WHAT MAY VARY. The fairness validator
+# (scripts/mbcore/fairness.py) reads this file and fails a run BEFORE any token
+# is billed if an adapter touched something the lane holds invariant.
+#
+# Narrative: references/fairness-contract.md
+
+lanes_version: "1.0.0"
+
+# Fields of the Canonical Prompt IR that carry SEMANTIC meaning. Their hash is
+# the `semantic_digest`, which must be identical for every model in a comparison
+# group. Any lane that permits an adapter to alter one of these is not a
+# comparison — it is two different experiments.
+semantic_fields:
+  - objective
+  - scope
+  - success_criteria
+  - required_output_fields
+  - response_schema_ref
+  - response_schema_version
+  - evidence_budget
+  - tool_semantics          # names, params, types, enums, required flags, constraints
+  - corpus_ref              # repository, commit, mutation_id
+  - evidence_provider_ref   # provider, graph_version, graph_hash
+  - trial_plan              # trial count and ordering seed
+  - prohibitions
+
+# Constructs an adapter may never introduce into a rendered prompt, in any lane.
+# Each has a measured cost on at least one current model generation.
+prohibitions:
+  - id: verification_scaffolding
+    patterns:
+      - "double[- ]check"
+      - "re[- ]?verify"
+      - "verify your (work|answer)"
+      - "check your work before"
+    why: >
+      Current Claude 5 models self-verify natively; adding this costs tokens and
+      triggers over-verification. It also silently advantages families that lack
+      the behaviour, turning a prompt artifact into a capability difference.
+
+  - id: severity_filter
+    patterns:
+      - "only report (high|critical)"
+      - "be conservative"
+      - "ignore (low|minor) severity"
+    why: >
+      Followed literally by Sonnet 5 and Opus 4.8; suppresses real findings and
+      destroys recall. Coverage is requested at generation time; filtering is a
+      downstream scoring decision.
+
+  - id: reasoning_extraction
+    patterns:
+      - "(show|reproduce|echo|explain) your (internal )?(reasoning|chain of thought|thinking)"
+      - "output your thinking"
+    why: >
+      Triggers a reasoning-extraction refusal on current Anthropic models, and
+      raw chain of thought is not returned by any of them. Use the provider's
+      summarized-thinking surface instead and treat it as display text.
+
+  - id: progress_summary_scaffolding
+    patterns:
+      - "after every \\d+ tool calls,? summarize"
+      - "summarize progress every"
+    why: "Obsolete on current generations, which narrate natively; pure token cost."
+
+  - id: depth_by_prose
+    patterns:
+      - "think (harder|step by step|exhaustively)"
+      - "reason exhaustively"
+    why: >
+      Depth is a parameter (effort / reasoning.effort / thinking_level), not
+      prose. Prose depth requests are unevenly effective across families and
+      confound the very axis the sweep is measuring.
+    exempt_adapters: [anthropic-claude4x]   # see fairness-contract.md § Reasoning steering
+
+  - id: added_examples
+    detector: structural   # examples not present in the IR
+    why: >
+      Few-shot examples materially change output on some families and not
+      others. If a task needs examples they belong in the IR, where every
+      adapter renders the same ones.
+
+  - id: sampling_parameters
+    patterns:
+      - "\"temperature\""
+      - "\"top_p\""
+      - "\"top_k\""
+      - "\"budget_tokens\""
+    scope: request_body
+    why: >
+      Rejected with HTTP 400 across the Claude 5 generation and GPT-5.6, and
+      deprecated/ignored on Gemini 3.6. Their presence signals a stale adapter.
+
+lanes:
+
+  - id: parity
+    name: "Parity"
+    description: >
+      One canonical rendering for every model. Measures underlying model
+      capability with prompt quality held as constant as the APIs allow.
+    free_set:
+      - role_placement           # system vs developer vs user container only
+      - structured_output_mechanism
+      - max_output_tokens        # within the IR budget
+      - streaming
+    invariant_set: "*"           # everything else, including syntax and effort
+    effort_policy: fixed_default # each model runs at its documented default
+    notes: >
+      Parity is deliberately unflattering to every model. It is NOT the headline
+      lane — it exists so that Optimized-lane gains can be attributed to
+      adapters rather than to models. Reporting Parity alone will understate
+      every model, unevenly.
+
+  - id: optimized
+    name: "Optimized"
+    description: >
+      Each model gets its vendor-recommended rendering of the SAME canonical IR.
+      Measures achievable model capability. This is the headline lane.
+    free_set:
+      - prompt_syntax            # XML tags / markdown sections / role blocks
+      - section_placement
+      - section_ordering         # e.g. Gemini context-first, instruction-last
+      - reasoning_configuration  # effort, reasoning.mode, thinking_level
+      - structured_output_mechanism
+      - verbosity_control
+      - length_steering_blocks
+      - max_output_tokens
+      - streaming
+      - cache_layout
+      - tool_schema_rendering    # PRESENTATION only; semantics stay invariant
+    invariant_set: "semantic_fields"
+    effort_policy: sweep         # full ladder, capped by per-model spend budget
+    notes: >
+      The free set is generous on purpose — that is what "optimized" means. The
+      validator's job is to prove the generosity stopped at presentation.
+
+  - id: production
+    name: "Production"
+    description: >
+      Optimized prompting inside the full platform: orchestration, retrieval,
+      code graph, analysis tools. Measures actual platform capability.
+    free_set:
+      - "<optimized free set>"
+      - orchestration_topology
+      - retrieval_strategy
+      - subagent_policy
+    invariant_set: "semantic_fields"
+    effort_policy: sweep
+    evidence_budget_override: allowed   # declared per study, applied to all models
+    notes: >
+      The Production lane is where the uplift experiment lives. Uplift must be
+      measured at MATCHED budget points, or the richer configuration wins simply
+      by spending more.
+
+# Uplift ladder for the platform-contribution experiment. Each rung must run at
+# the same iso-cost points as the others for the comparison to mean anything.
+uplift_ladder:
+  - id: model_only
+    description: "No retrieval, no tools. Task text and nothing else."
+  - id: model_plus_repo
+    description: "Raw repository access / naive RAG."
+  - id: model_plus_graph
+    description: "Semantic code graph as the evidence provider."
+  - id: model_plus_graph_plus_agents
+    description: "Graph plus multi-agent orchestration."

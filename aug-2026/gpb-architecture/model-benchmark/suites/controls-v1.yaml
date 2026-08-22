@@ -1,0 +1,99 @@
+# Controls suite.
+#
+# beta = 0.7: precision-leaning. A false non-compliance finding costs real
+# organizational time — an engineer investigates, a control owner is pulled in,
+# an audit trail is created. Missing one is bad; manufacturing one is expensive
+# in a way the security suite's trade-off is not.
+#
+# This is also the suite where ABSTENTION matters most. INSUFFICIENT_EVIDENCE is
+# a first-class correct answer, and a model that guesses COMPLIANT rather than
+# admitting the evidence is absent is actively dangerous in a controls workflow.
+# The over-claim penalty (1.5x a normal false positive) exists for exactly this.
+
+suite: controls-v1
+version: 1.0.0
+description: Control compliance assessment with a four-state oracle including INSUFFICIENT_EVIDENCE.
+f_beta: 0.7
+corpus: fixtures/sample-repo
+
+tasks:
+
+  - id: CTL-0001
+    suite: controls-v1
+    version: 1.0.0
+    title: "RES-014 — external calls must define timeout and bounded retries"
+    difficulty: 3
+    sealed: false
+    tags: [java, controls, resiliency]
+
+    prompt:
+      persona: "a controls assessor producing evidence for an internal audit"
+      domain: "engineering controls assessment"
+      objective: >
+        Assess the corpus against control RES-014 and return a compliance status
+        for each control in scope, with the evidence that supports it.
+      scope: >
+        Only the controls listed in <rubric>, assessed only against the attached
+        corpus. Do not assess controls that are not listed.
+      success_criteria:
+        - "Each control receives exactly one of COMPLIANT, NON_COMPLIANT, NOT_APPLICABLE or INSUFFICIENT_EVIDENCE."
+        - "Every status cites the specific evidence location that supports it."
+        - "Where the corpus does not contain the evidence a control requires, return INSUFFICIENT_EVIDENCE rather than inferring a status."
+      context:
+        why_this_matters: >
+          These assessments feed an audit. A false non-compliance finding pulls a
+          control owner into an investigation that finds nothing; a false
+          compliance finding puts an unmitigated risk on the accepted list. Both
+          cost more than an honest "the evidence is not here".
+        audience: "internal audit and the control owners"
+      reference_material:
+        - label: "payments package"
+          kind: code
+          path: "src/com/acme/payments"
+        - label: "control rubric"
+          kind: rubric
+          inline: |
+            RES-014  External service calls must define an explicit timeout and a
+                     bounded retry policy.
+            SEC-021  Credentials must not be embedded in source.
+            OBS-007  Every external call must emit a latency metric tagged with
+                     the dependency name.
+      questions:
+        - id: RES-014
+          text: "Is the corpus compliant with RES-014?"
+          answerable: true
+        - id: SEC-021
+          text: "Is the corpus compliant with SEC-021?"
+          answerable: true
+        - id: OBS-007
+          text: "Is the corpus compliant with OBS-007?"
+          answerable: false   # no observability configuration is present at all
+
+    oracle:
+      provenance: HUMAN_CURATED
+      curator: "engineering-intelligence"
+      reviewed_on: "2026-08-22"
+      answerable: true
+      findings:
+        - oracle_id: CTL-0001-F1
+          type: missing_timeout
+          category: controls
+          severity: high
+          entities: [PaymentClient.callGateway]
+          compliance_status: NON_COMPLIANT
+          evidence:
+            - { file: "PaymentClient.java", lines: "12-20" }
+          expected_root_cause: ["no_timeout_configured", "retry_max_attempts_unbounded"]
+      answers:
+        - question_id: SEC-021
+          expected_entities: []
+        - question_id: OBS-007
+          expected_abstention: true   # correct answer is INSUFFICIENT_EVIDENCE
+
+    budget:
+      max_tool_calls: 25
+      max_graph_queries: 15
+      max_files_opened: 30
+      max_wall_clock_s: 600
+      max_input_tokens: 150000
+      max_output_tokens: 16000

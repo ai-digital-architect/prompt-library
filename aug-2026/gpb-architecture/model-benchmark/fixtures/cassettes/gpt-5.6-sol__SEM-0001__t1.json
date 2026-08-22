@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "note": "Hand-shaped fixture. NOT a measurement of this model.",
+  "recorded_for": {
+    "model": "gpt-5.6-sol",
+    "task": "SEM-0001",
+    "trial": 1
+  },
+  "status": 200,
+  "body": {
+    "model": "recorded",
+    "status": "completed",
+    "output": [
+      {
+        "content": [
+          {
+            "type": "output_text",
+            "text": "{\"schema_version\": \"1.0.0\", \"findings\": [], \"abstentions\": [{\"question_id\": \"Q-03\", \"reason\": \"The corpus contains no telemetry or latency measurements.\", \"what_would_resolve_it\": \"Production latency metrics for the gateway dependency.\"}], \"answers\": [{\"question_id\": \"Q-01\", \"answer\": \"PaymentService calls the repository, fraud service, Kafka publisher and gateway client.\", \"confidence\": 0.94, \"entities\": [{\"kind\": \"method\", \"ref\": \"PaymentRepository.save\"}, {\"kind\": \"method\", \"ref\": \"FraudService.assess\"}, {\"kind\": \"method\", \"ref\": \"KafkaPublisher.publish\"}, {\"kind\": \"method\", \"ref\": \"PaymentClient.callGateway\"}], \"relations\": [{\"subject\": \"PaymentService\", \"predicate\": \"CALLS\", \"object\": \"PaymentRepository.save\", \"modality\": \"synchronous\"}, {\"subject\": \"PaymentService\", \"predicate\": \"CALLS\", \"object\": \"FraudService.assess\", \"modality\": \"synchronous\"}, {\"subject\": \"PaymentService\", \"predicate\": \"CALLS\", \"object\": \"KafkaPublisher.publish\", \"modality\": \"asynchronous\"}, {\"subject\": \"PaymentService\", \"predicate\": \"CALLS\", \"object\": \"PaymentClient.callGateway\", \"modality\": \"synchronous\"}]}, {\"question_id\": \"Q-02\", \"answer\": \"No. The Kafka publisher does not write to the payment repository.\", \"confidence\": 0.89, \"entities\": [{\"kind\": \"class\", \"ref\": \"KafkaPublisher\"}], \"relations\": []}], \"coverage_notes\": \"Examined every file in the payments package.\"}"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "input_tokens": 4020,
+      "output_tokens": 2230,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens_details": {
+        "reasoning_tokens": 892
+      }
+    }
+  },
+  "error": null,
+  "wall_clock_ms": 87160,
+  "ttft_ms": 2886
+}

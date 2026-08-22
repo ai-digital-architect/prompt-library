@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "note": "Hand-shaped fixture. NOT a measurement of this model.",
+  "recorded_for": {
+    "model": "gpt-5.6-luna",
+    "task": "SEC-0001",
+    "trial": 1
+  },
+  "status": 200,
+  "body": {
+    "model": "recorded",
+    "status": "completed",
+    "output": [
+      {
+        "content": [
+          {
+            "type": "output_text",
+            "text": "{\"schema_version\": \"1.0.0\", \"findings\": [{\"id\": \"F-01\", \"category\": \"security\", \"type\": \"injection\", \"severity\": \"medium\", \"confidence\": 0.69, \"status\": \"ASSERTED\", \"entities\": [{\"kind\": \"method\", \"ref\": \"OrderRepository.findOrders\", \"role\": \"sink\"}, {\"kind\": \"method\", \"ref\": \"PaymentController.search\", \"role\": \"source\"}], \"relations\": [{\"subject\": \"PaymentController.search\", \"predicate\": \"CALLS\", \"object\": \"OrderRepository.findOrders\"}], \"evidence\": [{\"file\": \"OrderRepository.java\", \"symbol\": \"findOrders\", \"lines\": \"8-12\", \"excerpt\": \"\\\"SELECT * FROM orders WHERE customer_name = '\\\" + query\"}], \"root_cause\": \"User input reaches the database layer.\", \"impact\": \"Full read access to the orders table, and potentially write access.\", \"recommendation\": \"Use a parameterized statement with a bound parameter for query.\", \"exploitability\": \"theoretical\"}, {\"id\": \"F-02\", \"category\": \"security\", \"type\": \"CWE-798\", \"severity\": \"high\", \"confidence\": 0.81, \"status\": \"ASSERTED\", \"entities\": [{\"kind\": \"method\", \"ref\": \"PaymentClient.callGateway\"}], \"relations\": [], \"evidence\": [{\"file\": \"PaymentClient.java\", \"lines\": \"18\"}], \"root_cause\": \"Hardcoded gateway endpoint suggests embedded credentials.\", \"impact\": \"Credential exposure.\", \"recommendation\": \"Move to a secret manager.\"}], \"abstentions\": [], \"coverage_notes\": \"Reviewed every file in the payments package.\"}"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "input_tokens": 4136,
+      "output_tokens": 1865,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens_details": {
+        "reasoning_tokens": 746
+      }
+    }
+  },
+  "error": null,
+  "wall_clock_ms": 41647,
+  "ttft_ms": 1580
+}

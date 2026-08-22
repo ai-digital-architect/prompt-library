@@ -1,51 +1,70 @@
-Yes. I think the idea is strong, but I would make one important architectural change:
+---
+post_title: "Engineering Intelligence Benchmark: Model Evaluation Approach"
+author1: "Engineering Intelligence Team"
+post_slug: "engineering-intelligence-benchmark-model-evaluation"
+microsoft_alias: ""
+featured_image: ""
+categories:
+  - Engineering
+tags:
+  - model-evaluation
+  - benchmarking
+  - engineering-intelligence
+  - code-graph
+ai_note: "AI-assisted content"
+summary: "A proposal for evaluating AI systems that reason about enterprise software using deterministic evidence, code graphs, and calibrated model judges."
+post_date: "2026-08-22"
+---
 
-Do not make the Skill itself the benchmark. Make the Skill the declarative front door into a model-evaluation harness that is built into your existing code-graph platform.
+## Executive Summary
+
+The core recommendation is to avoid treating a Skill as the benchmark. Instead,
+use the Skill as the declarative front door to a model-evaluation harness built
+into the existing code-graph platform.
 
 Your existing system already possesses something most generic model benchmarks do not: a structured, lossless representation of the software system plus multiple domain-specific analysis capabilities. That means you can benchmark something much more valuable than “which model writes the nicest answer?” You can measure which model most accurately understands, investigates, reasons about, and reviews a real software system.
 
-That starts to look like a combination of SWE-bench, Artificial Analysis, Terminal-Bench and an engineering-specific version of GDPval.
+This starts to look like a combination of SWE-bench, Artificial Analysis,
+Terminal-Bench, and an engineering-specific version of GDPval.
 
-I would think of the internal project as an Engineering Intelligence Benchmark, with the code graph acting as the benchmark’s evidence and oracle layer.
+Treat the internal project as an **Engineering Intelligence Benchmark**, with
+the code graph acting as the benchmark's evidence and oracle layer.
 
-⸻
-
-1. What you are really trying to measure
+## Evaluation Lanes
 
 There are actually three different questions hidden inside “which model is better?”
 
-Question A — Raw model capability
+### Raw Model Capability
 
 Given exactly the same task, context and constraints, which model performs best?
 
 This is analogous to a traditional benchmark.
 
-Question B — Optimized model capability
+### Optimized Model Capability
 
 If I prompt each model according to its vendor-recommended practices, what is the best performance I can achieve?
 
-This matters because different frontier models genuinely want different prompting strategies. For example, Google’s current Gemini 3 guidance recommends relatively concise/direct instructions and using its thinking controls rather than complicated reasoning prompts; forcing every model through an identical elaborate prompt may therefore disadvantage it. 
+This matters because different frontier models genuinely want different prompting strategies. For example, Google’s current Gemini 3 guidance recommends relatively concise/direct instructions and using its thinking controls rather than complicated reasoning prompts; forcing every model through an identical elaborate prompt may therefore disadvantage it.
 
-Question C — Production-system capability
+### Production-System Capability
 
 When the model operates inside your multi-agent orchestration + code graph + retrieval + tools, which model produces the best engineering outcomes?
 
 This is ultimately the most important question for your organization.
 
-I would therefore create three benchmark lanes:
+Create three benchmark lanes:
 
-Lane	Prompt	Tools	What it measures
-Parity	identical canonical prompt	identical	underlying model capability
-Optimized	provider/model-specific template	identical	achievable model capability
-Production	optimized	full agent/code-graph orchestration	actual platform capability
+| Lane | Prompt | Tools | Measures |
+| --- | --- | --- | --- |
+| Parity | Identical canonical prompt | Identical | Underlying model capability |
+| Optimized | Provider/model-specific template | Identical | Achievable model capability |
+| Production | Optimized | Full agent/code-graph orchestration | Actual platform capability |
 
 This distinction is essential.
 
 Otherwise, if Gemini beats Claude, you won’t know whether Gemini is better or whether your Gemini prompt happened to be better.
 
-⸻
-
-2. The architecture I would build
+## Reference Architecture
 
 Conceptually:
 
@@ -107,11 +126,13 @@ The key architectural principle is:
 
 Models generate hypotheses. Your graph and deterministic tooling should verify facts whenever possible. LLM judges should judge only what cannot be objectively verified.
 
-Anthropic’s current agent-evaluation guidance recommends essentially this hierarchy: deterministic/code graders where possible, model graders where needed, and human experts for calibration. It also distinguishes the task, trial, transcript, outcome, grader and evaluation harness as separate artifacts. 
+Anthropic’s current agent-evaluation guidance recommends essentially this hierarchy: deterministic/code graders where possible, model graders where needed, and human experts for calibration. It also distinguishes the task, trial, transcript, outcome, grader and evaluation harness as separate artifacts.
 
 ⸻
 
-3. Your code graph is the differentiator
+## Evidence Model
+
+### Code Graph as the Differentiator
 
 This is where I think your benchmark could become unusually good.
 
@@ -160,7 +181,9 @@ This is much stronger.
 
 ⸻
 
-4. Build benchmark packs, not one benchmark
+## Benchmark Suites
+
+### Create Versioned Benchmark Packs
 
 I would create independently versioned suites.
 
@@ -183,7 +206,7 @@ These are largely deterministic.
 
 ⸻
 
-5. Architecture Reasoning Benchmark
+### Architecture Reasoning Benchmark
 
 This should go substantially beyond static-analysis rules.
 
@@ -222,7 +245,7 @@ You can then measure whether the model:
 
 ⸻
 
-6. Security Benchmark
+### Security Benchmark
 
 This is particularly suitable for objective grading.
 
@@ -230,18 +253,19 @@ Start with repositories containing deliberately seeded vulnerabilities.
 
 For example:
 
-CWE-89 SQL injection
-CWE-79 XSS
-CWE-798 embedded credentials
-CWE-22 path traversal
-broken authorization
-unsafe deserialization
-missing authentication
-dependency vulnerability
-improper cryptography
+- CWE-89 SQL injection
+- CWE-79 XSS
+- CWE-798 embedded credentials
+- CWE-22 path traversal
+- Broken authorization
+- Unsafe deserialization
+- Missing authentication
+- Dependency vulnerability
+- Improper cryptography
 
 Each benchmark item has hidden metadata:
 
+```yaml
 finding:
   type: CWE-89
   file: OrderRepository.java
@@ -252,6 +276,7 @@ evidence:
   sink: jdbc.execute
 expected_root_cause:
   - unparameterized query
+```
 
 Now you can calculate:
 
@@ -269,7 +294,7 @@ This prevents a model that reports 100 speculative vulnerabilities from beating 
 
 ⸻
 
-7. Controls benchmark
+### Controls Benchmark
 
 This may ultimately be one of the most valuable internally.
 
@@ -284,30 +309,31 @@ conditions.
 
 For example:
 
+```yaml
 control: RES-014
-requirement:
-  External service calls must define
-  timeout and bounded retries.
+requirement: External service calls must define timeout and bounded retries.
 oracle:
   status: NON_COMPLIANT
 evidence:
   - PaymentClient.java:86
   - no timeout configuration
   - RetryPolicy maxAttempts=unbounded
+```
 
 Ask each model to determine compliance.
 
 You now get a confusion matrix:
 
-	Actual compliant	Actual non-compliant
-Model says compliant	TP	FN
-Model says non-compliant	FP	TN
+| Model assessment | Actual compliant | Actual non-compliant |
+| --- | --- | --- |
+| Model says compliant | TP | FN |
+| Model says non-compliant | FP | TN |
 
 This matters tremendously because in enterprise-control analysis, false positives have a real organizational cost.
 
 ⸻
 
-8. Resiliency benchmark
+### Resiliency Benchmark
 
 Your existing resiliency principles become excellent adversarial benchmark tasks.
 
@@ -358,11 +384,11 @@ These are substantially better tests of engineering intelligence than generic co
 
 ⸻
 
-9. Introduce dynamic mutations
+### Dynamic Mutations
 
 This is one of the most important pieces.
 
-A weakness of public benchmarks is contamination. LiveCodeBench addresses this by continuously incorporating newer problems, and newer benchmarks such as DeepSWE have explicitly created original unpublished tasks with custom verifiers to avoid training-data leakage. 
+A weakness of public benchmarks is contamination. LiveCodeBench addresses this by continuously incorporating newer problems, and newer benchmarks such as DeepSWE have explicitly created original unpublished tasks with custom verifiers to avoid training-data leakage.
 
 You have an opportunity to go even further.
 
@@ -395,7 +421,9 @@ That makes memorization almost irrelevant.
 
 ⸻
 
-10. Score findings, not documents
+## Response Normalization and Scoring
+
+### Score Findings, Not Documents
 
 Don’t primarily ask a judge:
 
@@ -405,6 +433,7 @@ Force every model into a normalized response schema.
 
 Something resembling:
 
+```json
 {
   "findings": [
     {
@@ -427,39 +456,42 @@ Something resembling:
     }
   ]
 }
+```
 
-Gemini supports structured output, and current Gemini 3 models can combine structured output with tools, which fits this architecture particularly well. 
+Gemini supports structured output, and current Gemini 3 models can combine structured output with tools, which fits this architecture particularly well.
 
 Normalize equivalent structures from Claude/OpenAI into the same canonical representation.
 
 ⸻
 
-11. My proposed quality scoring model
+### Quality Scoring Model
 
-I would initially score each finding approximately as:
+I would initially score each finding approximately as follows:
 
-Dimension	Weight
-Detection / correctness	30%
-Evidence grounding	20%
-Root-cause reasoning	15%
-Severity/prioritization	10%
-Completeness	10%
-Remediation quality	10%
-Communication/actionability	5%
+| Dimension | Weight |
+| --- | ---: |
+| Detection / correctness | 30% |
+| Evidence grounding | 20% |
+| Root-cause reasoning | 15% |
+| Severity / prioritization | 10% |
+| Completeness | 10% |
+| Remediation quality | 10% |
+| Communication / actionability | 5% |
 
 But detection should incorporate both precision and recall.
 
 For example:
 
-DetectionScore =
-    F1(known_findings, reported_findings)
+$$
+\text{DetectionScore} = F_1(\text{known findings}, \text{reported findings})
+$$
 
 Evidence can be much more objective:
 
-EvidenceScore =
- correct referenced entities
- ---------------------------
- total referenced entities
+$$
+\text{EvidenceScore} =
+\frac{\text{correct referenced entities}}{\text{total referenced entities}}
+$$
 
 You can also assess calibration:
 
@@ -473,9 +505,9 @@ Over time, a calibrated model is much more useful than a model that confidently 
 
 ⸻
 
-12. Don’t collapse everything into one number
+### Report Multiple Outcome Dimensions
 
-Artificial Analysis does provide composite indexes, but importantly retains the underlying dimensions and separately exposes things such as tokens, costs and speed. Its current v4.1.1 Intelligence Index combines multiple evaluations and emphasizes agentic tasks; GDPval-AA v2 uses blind pairwise comparisons, multiple frontier judges and Bradley–Terry ranking. 
+Artificial Analysis does provide composite indexes, but importantly retains the underlying dimensions and separately exposes things such as tokens, costs and speed. Its current v4.1.1 Intelligence Index combines multiple evaluations and emphasizes agentic tasks; GDPval-AA v2 uses blind pairwise comparisons, multiple frontier judges and Bradley–Terry ranking.
 
 I would publish at least four numbers.
 
@@ -505,7 +537,7 @@ Variance
 pass@1
 pass^3
 
-Anthropic specifically recommends considering both pass@k—whether one of several attempts succeeds—and pass^k—whether repeated attempts all succeed. The latter is particularly relevant when you need predictable production behavior. 
+Anthropic specifically recommends considering both pass@k—whether one of several attempts succeeds—and pass^k—whether repeated attempts all succeed. The latter is particularly relevant when you need predictable production behavior.
 
 Efficiency
 
@@ -544,7 +576,9 @@ QUALITY
 
 ⸻
 
-13. Your CO-STORM evaluator is useful—but should not be the oracle
+## Judge Design and Calibration
+
+### CO-STORM-Inspired Tribunal
 
 I like this part of your proposal, with a modification.
 
@@ -556,7 +590,7 @@ consensus
         ↓
 truth
 
-LLM judges have documented position bias and non-transitive preferences. Research also shows that simply increasing the number of judges does not necessarily create independent evidence: a 2026 Apple study found strong correlated errors across model panels. 
+LLM judges have documented position bias and non-transitive preferences. Research also shows that simply increasing the number of judges does not necessarily create independent evidence: a 2026 Apple study found strong correlated errors across model panels.
 
 Instead create a CO-STORM-inspired tribunal.
 
@@ -598,7 +632,7 @@ rather than allowing one family to dominate evaluation.
 
 ⸻
 
-14. Blind the judging process
+### Blind the Judging Process
 
 Never provide:
 
@@ -632,11 +666,11 @@ C ↔ D
 
 and calculate a Bradley–Terry score.
 
-This is quite close to the stronger parts of Artificial Analysis’ current GDPval-AA methodology. 
+This is quite close to the stronger parts of Artificial Analysis’ current GDPval-AA methodology.
 
 ⸻
 
-15. Calibrate the judges themselves
+### Calibrate the Judges
 
 Before trusting the CO-STORM panel, create perhaps 100–200 responses graded by senior architects/security engineers.
 
@@ -646,7 +680,7 @@ Human verdict
       vs
 Judge verdict
 
-Google’s Vertex evaluation tooling explicitly supports this concept: human ratings can serve as ground truth for validating pointwise or pairwise model graders, including balanced accuracy and F1 measures. 
+Google’s Vertex evaluation tooling explicitly supports this concept: human ratings can serve as ground truth for validating pointwise or pairwise model graders, including balanced accuracy and F1 measures.
 
 You might discover something interesting such as:
 
@@ -663,11 +697,13 @@ Your judging system can then use domain-specific judge weights, rather than decl
 
 ⸻
 
-16. The Skill you proposed
+## Skill and Adapter Design
+
+### Skill Package Design
 
 I would absolutely build it—but like this.
 
-GitHub Copilot now supports Agent Skills as directories containing SKILL.md, scripts and resources, including repository skills under .github/skills. 
+GitHub Copilot now supports Agent Skills as directories containing SKILL.md, scripts and resources, including repository skills under .github/skills.
 
 Something like:
 
@@ -716,7 +752,7 @@ But SKILL.md should orchestrate these scripts rather than contain the entire imp
 
 ⸻
 
-17. Model templates should be adapters
+### Model Templates as Adapters
 
 This part of your idea is particularly good.
 
@@ -740,6 +776,7 @@ use:
 
 The canonical task might say:
 
+```yaml
 task:
   objective: architecture_review
 context:
@@ -752,6 +789,7 @@ requirements:
   confidence_required: true
 output:
   schema: findings-v1
+```
 
 The model adapter determines:
 
@@ -774,10 +812,13 @@ This gives you auditability.
 
 ⸻
 
-18. Make every benchmark run completely reproducible
+## Experiment Management
+
+### Make Every Run Reproducible
 
 A run manifest should capture at least:
 
+```yaml
 benchmark:
   suite: architecture-v1.3
   task: ARCH-00291
@@ -807,12 +848,13 @@ metrics:
   cost: ...
 result:
   artifact_hash: ...
+```
 
-Artificial Analysis’ endpoint work is a useful reminder that even supposedly identical models can behave differently because of endpoint settings, sampling, context handling and other serving configuration. 
+Artificial Analysis’ endpoint work is a useful reminder that even supposedly identical models can behave differently because of endpoint settings, sampling, context handling and other serving configuration.
 
 ⸻
 
-19. Treat each invocation as an experiment
+### Treat Each Invocation as an Experiment
 
 I’d make the fundamental unit:
 
@@ -845,7 +887,7 @@ Your experiment metadata lets you know.
 
 ⸻
 
-20. Run repeated trials
+### Run Repeated Trials
 
 One result is not sufficient.
 
@@ -855,7 +897,7 @@ Start with something like:
 
 and report task-level confidence intervals.
 
-Terminal-Bench has used repeated benchmark runs for leaderboard submissions, while Artificial Analysis explicitly uses repeats and confidence intervals in parts of its methodology. 
+Terminal-Bench has used repeated benchmark runs for leaderboard submissions, while Artificial Analysis explicitly uses repeats and confidence intervals in parts of its methodology.
 
 For comparisons between models, because every candidate runs the same tasks, use paired statistics rather than treating samples as independent.
 
@@ -873,7 +915,7 @@ B = 87
 
 ⸻
 
-21. Maintain two benchmark datasets
+### Maintain Two Benchmark Datasets
 
 I strongly recommend:
 
@@ -903,11 +945,11 @@ public regression
    ↓
 new sealed problems
 
-This is conceptually similar to LiveCodeBench’s approach of refreshing tasks to resist contamination. 
+This is conceptually similar to LiveCodeBench’s approach of refreshing tasks to resist contamination.
 
 ⸻
 
-22. Add an extremely interesting fourth benchmark lane
+### Measure Code-Graph Uplift
 
 Your architecture allows an experiment that I think would be strategically valuable:
 
@@ -955,7 +997,7 @@ That is enormously useful information for an enterprise technology strategy.
 
 ⸻
 
-23. You can also measure graph efficiency
+### Measure Graph Efficiency
 
 An additional score:
 
@@ -988,14 +1030,17 @@ This gives you an Artificial Analysis-like price/performance dimension, but tail
 
 ⸻
 
-24. The benchmark eventually becomes a matrix
+## Operating Model
+
+### Benchmark Matrix and Model Routing
 
 Your internal dashboard might look like:
 
-Model	Semantic	Architecture	Security	Controls	Resiliency	Reliability	$/correct finding
-Model A	94	91	88	93	84	96	$0.08
-Model B	96	87	94	89	91	92	$0.11
-Model C	91	94	90	96	93	97	$0.06
+| Model | Semantic | Architecture | Security | Controls | Resiliency | Reliability | $ / correct finding |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Model A | 94 | 91 | 88 | 93 | 84 | 96 | $0.08 |
+| Model B | 96 | 87 | 94 | 89 | 91 | 92 | $0.11 |
+| Model C | 91 | 94 | 90 | 96 | 93 | 97 | $0.06 |
 
 And that leads to something considerably more sophisticated than a winner-takes-all leaderboard.
 
@@ -1015,7 +1060,9 @@ That is, in my view, one of the most interesting long-term outcomes of the proje
 
 ⸻
 
-25. How I would build the MVP
+## Implementation Roadmap
+
+### Minimum Viable Product
 
 I would not begin with every analysis dimension.
 
@@ -1041,7 +1088,7 @@ Create ~50 graph-provable tasks.
 
 These establish that your evaluation pipeline works because grading is almost entirely deterministic.
 
-Anthropic’s current guidance similarly recommends beginning with roughly 20–50 good tasks rather than waiting until hundreds exist. 
+Anthropic’s current guidance similarly recommends beginning with roughly 20–50 good tasks rather than waiting until hundreds exist.
 
 Phase 3 — Security benchmark
 
@@ -1071,7 +1118,9 @@ Then introduce the sealed benchmark and private mutation engine.
 
 ⸻
 
-26. One change to your original Skill idea
+## Recommended Evolution
+
+### From Skill-First to Evidence-First Evaluation
 
 Your original flow was roughly:
 
@@ -1126,7 +1175,7 @@ That small conceptual change—from LLM judging model responses to multi-source 
 
 ⸻
 
-27. The deeper opportunity
+## Strategic Opportunity
 
 There are already plenty of benchmarks answering:
 
@@ -1165,6 +1214,6 @@ And importantly, the same framework would serve three purposes simultaneously:
 2. Platform benchmarking — graph vs no graph, agents vs no agents, prompt/orchestration versions.
 3. Model routing — dynamically select the best model for security, architecture, controls, resiliency, etc.
 
-I would therefore build the GitHub Copilot Skill first, but treat it as the authoring and execution interface for version 0.1 of this larger evaluation architecture, rather than letting the Skill itself become the architecture. GitHub’s current Skill model is actually well suited to this because Skills can package instructions, scripts and resources and are supported across several Copilot agent experiences. 
+I would therefore build the GitHub Copilot Skill first, but treat it as the authoring and execution interface for version 0.1 of this larger evaluation architecture, rather than letting the Skill itself become the architecture. GitHub’s current Skill model is actually well suited to this because Skills can package instructions, scripts and resources and are supported across several Copilot agent experiences.
 
 A very natural next step would be to turn this into a concrete model-benchmark Agent Skill package with the actual SKILL.md, canonical benchmark schema, three model adapter templates, CO-STORM judge definitions, normalized response JSON schema, scoring algorithm, repository layout, and a sample Architecture + Security benchmark pack. That would give you something you could drop into .github/skills/model-benchmark/ and have Copilot start implementing against your existing platform.

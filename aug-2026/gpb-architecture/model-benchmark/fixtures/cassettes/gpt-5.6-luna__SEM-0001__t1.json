@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "note": "Hand-shaped fixture. NOT a measurement of this model.",
+  "recorded_for": {
+    "model": "gpt-5.6-luna",
+    "task": "SEM-0001",
+    "trial": 1
+  },
+  "status": 200,
+  "body": {
+    "model": "recorded",
+    "status": "completed",
+    "output": [
+      {
+        "content": [
+          {
+            "type": "output_text",
+            "text": "{\"schema_version\": \"1.0.0\", \"findings\": [], \"abstentions\": [], \"answers\": [{\"question_id\": \"Q-01\", \"answer\": \"PaymentService calls the repository, fraud service, Kafka publisher and gateway client.\", \"confidence\": 0.64, \"entities\": [{\"kind\": \"method\", \"ref\": \"PaymentRepository.save\"}, {\"kind\": \"method\", \"ref\": \"FraudService.assess\"}], \"relations\": [{\"subject\": \"PaymentService\", \"predicate\": \"CALLS\", \"object\": \"PaymentRepository.save\", \"modality\": \"synchronous\"}, {\"subject\": \"PaymentService\", \"predicate\": \"CALLS\", \"object\": \"FraudService.assess\", \"modality\": \"synchronous\"}, {\"subject\": \"KafkaPublisher\", \"predicate\": \"CALLS\", \"object\": \"PaymentRepository.save\"}]}, {\"question_id\": \"Q-02\", \"answer\": \"No. The Kafka publisher does not write to the payment repository.\", \"confidence\": 0.59, \"entities\": [{\"kind\": \"class\", \"ref\": \"KafkaPublisher\"}], \"relations\": []}, {\"question_id\": \"Q-03\", \"answer\": \"Roughly 250ms p99.\", \"confidence\": 0.71, \"entities\": [{\"kind\": \"external_system\", \"ref\": \"gateway.example.com\"}], \"relations\": []}], \"coverage_notes\": \"Examined every file in the payments package.\"}"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "input_tokens": 5263,
+      "output_tokens": 1168,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens_details": {
+        "reasoning_tokens": 467
+      }
+    }
+  },
+  "error": null,
+  "wall_clock_ms": 24612,
+  "ttft_ms": 3153
+}

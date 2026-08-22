@@ -1,0 +1,7 @@
+# The harness core is standard-library only by design: provider SDKs move faster
+# than a benchmark harness should, and an SDK upgrade silently changing a request
+# default is exactly the class of uncontrolled variable this design exists to
+# eliminate. HTTP goes through urllib.
+#
+# PyYAML is the single dependency, for human-authored suite and config files.
+PyYAML>=6.0

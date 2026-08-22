@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "note": "Hand-shaped fixture. NOT a measurement of this model.",
+  "recorded_for": {
+    "model": "gpt-5.6-terra",
+    "task": "SEC-0002",
+    "trial": 1
+  },
+  "status": 200,
+  "body": {
+    "model": "recorded",
+    "status": "completed",
+    "output": [
+      {
+        "content": [
+          {
+            "type": "output_text",
+            "text": "{\"schema_version\": \"1.0.0\", \"findings\": [], \"abstentions\": [], \"coverage_notes\": \"Reviewed FraudService and KafkaPublisher. No vulnerability found; both delegate without handling untrusted input.\"}"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "input_tokens": 4560,
+      "output_tokens": 1877,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens_details": {
+        "reasoning_tokens": 750
+      }
+    }
+  },
+  "error": null,
+  "wall_clock_ms": 43781,
+  "ttft_ms": 1184
+}

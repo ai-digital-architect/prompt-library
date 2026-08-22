@@ -1,0 +1,133 @@
+# Security suite.
+#
+# READ THIS BEFORE INTERPRETING ANY RESULT FROM THIS SUITE.
+#
+# This is the suite most likely to trigger provider safety classifiers, and
+# classifier coverage differs by vendor. A harness that scores a refusal as an
+# empty finding set will systematically rank classifier-bearing models lower on
+# security — a wrong strategic conclusion drawn from a parsing bug. The harness
+# dispositions refusals as REFUSAL_SAFETY and excludes them from quality scoring
+# while publishing the refusal rate. Never read this suite's leaderboard without
+# the exclusion table beside it.
+#
+# beta = 1.5: recall-leaning. A missed vulnerability costs more than a false
+# alarm, and that policy choice belongs in the manifest rather than hidden in a
+# default.
+
+suite: security-v1
+version: 1.0.0
+description: Seeded and mutated vulnerabilities with precision/recall grading.
+f_beta: 1.5
+corpus: fixtures/sample-repo
+
+tasks:
+
+  - id: SEC-0001
+    suite: security-v1
+    version: 1.0.0
+    title: "Injection review of the order search path"
+    difficulty: 2
+    sealed: false
+    tags: [java, injection, cwe-89]
+
+    prompt:
+      persona: "a principal engineer performing a pre-release security review"
+      domain: "application security in enterprise Java services"
+      objective: >
+        Review the attached payments package for security vulnerabilities. For
+        each one, identify the vulnerable code, the path by which attacker
+        input reaches it, the root cause, and a remediation.
+      scope: >
+        The attached corpus only. Cover every file in it, not only the first
+        file you examine.
+      success_criteria:
+        - "Every vulnerability present in the corpus is reported."
+        - "Each finding names the vulnerable symbol and its evidence location."
+        - "Each finding states the source-to-sink path as structured relations."
+        - "Each finding carries a calibrated confidence and an estimated severity."
+        - "Findings you cannot confirm from the corpus are marked SUSPECTED rather than omitted."
+      context:
+        why_this_matters: >
+          Findings gate a release decision. A separate triage pass ranks and
+          filters whatever is produced here, so coverage matters more than
+          brevity at this stage.
+        audience: "the release manager and the security team"
+        known_constraints:
+          - "No runtime telemetry is available; assess from source only."
+      reference_material:
+        - label: "payments package"
+          kind: code
+          path: "src/com/acme/payments"
+
+    oracle:
+      provenance: SEEDED_MUTATION
+      mutation_id: FIXTURE-001
+      answerable: true
+      findings:
+        - oracle_id: SEC-0001-F1
+          type: CWE-89
+          category: security
+          severity: high
+          entities: [OrderRepository.findOrders]
+          evidence:
+            - { file: "OrderRepository.java", lines: "8-12" }
+          expected_root_cause: ["unparameterized_query", "string_concatenation_into_sql"]
+      relations:
+        - { subject: PaymentController.search, predicate: CALLS, object: OrderRepository.findOrders, truth: true }
+
+    budget:
+      max_tool_calls: 30
+      max_graph_queries: 20
+      max_files_opened: 40
+      max_wall_clock_s: 900
+      max_input_tokens: 200000
+      max_output_tokens: 24000
+
+  - id: SEC-0002
+    suite: security-v1
+    version: 1.0.0
+    title: "Clean-file control — no vulnerability present"
+    difficulty: 4
+    sealed: false
+    tags: [java, control, false-positive-pressure]
+
+    # A suite made only of items that contain a defect teaches models to always
+    # find one. This item's correct answer is an empty finding set, and it is the
+    # single most informative item in the suite for measuring over-claiming.
+    prompt:
+      persona: "a principal engineer performing a pre-release security review"
+      domain: "application security in enterprise Java services"
+      objective: >
+        Review the fraud assessment and publishing components for security
+        vulnerabilities.
+      scope: >
+        FraudService and KafkaPublisher only. Do not report findings from other
+        files.
+      success_criteria:
+        - "Any vulnerability present is reported with evidence."
+        - "If no vulnerability is present, return an empty findings array rather than a speculative one."
+        - "Uncertain observations are marked SUSPECTED with a confidence below 0.5."
+      context:
+        why_this_matters: >
+          False positives in a security review consume engineer time and erode
+          trust in the whole process.
+        audience: "the security team"
+      reference_material:
+        - label: "fraud and publishing components"
+          kind: code
+          path: "src/com/acme/payments"
+
+    oracle:
+      provenance: HUMAN_CURATED
+      curator: "engineering-intelligence"
+      reviewed_on: "2026-08-22"
+      answerable: true
+      findings: []      # correct answer is an empty finding set
+
+    budget:
+      max_tool_calls: 20
+      max_graph_queries: 10
+      max_files_opened: 20
+      max_wall_clock_s: 600
+      max_input_tokens: 120000
+      max_output_tokens: 12000

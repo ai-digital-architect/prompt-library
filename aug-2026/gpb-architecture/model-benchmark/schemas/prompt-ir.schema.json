@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://internal/model-benchmark/schemas/prompt-ir.schema.json",
+  "title": "Canonical Prompt Intermediate Representation v1",
+  "description": "The single authored form of a benchmark task. Adapters compile this into provider-native requests. Fields listed in config/lanes.yaml `semantic_fields` form the semantic_digest, which must be byte-identical across every model in a comparison group. An adapter that changes one of them has not optimized a prompt — it has run a different experiment.",
+  "type": "object",
+  "required": ["ir_version", "task_id", "objective", "scope", "success_criteria", "response", "budget", "corpus", "prohibitions"],
+  "additionalProperties": false,
+  "properties": {
+    "ir_version": { "const": "1.0.0" },
+    "task_id": { "type": "string" },
+    "suite": { "type": "string" },
+    "suite_version": { "type": "string" },
+
+    "role": {
+      "type": "object",
+      "description": "PRESENTATION only — an adapter may render this as a system block, a developer message, or a system_instruction. It is not part of the semantic digest because placement conventions differ by provider by design.",
+      "properties": {
+        "persona": { "type": "string" },
+        "domain": { "type": "string" }
+      }
+    },
+
+    "objective": {
+      "type": "string",
+      "description": "SEMANTIC. What the model must accomplish, stated as an end state rather than a procedure."
+    },
+
+    "scope": {
+      "type": "string",
+      "description": "SEMANTIC. What is in and out of bounds. State the scope of every requirement explicitly — models that follow instructions literally (Sonnet 5) will not infer it, and models that expand scope readily (Opus 5) need the boundary."
+    },
+
+    "success_criteria": {
+      "type": "array",
+      "description": "SEMANTIC. Numbered, most to least critical. Defines 'done'.",
+      "minItems": 1,
+      "items": { "type": "string" }
+    },
+
+    "context": {
+      "type": "object",
+      "description": "Background the model needs. Ordering within the rendered prompt is FREE (Gemini wants context first, instruction last; Claude wants the full spec up front) but the content is semantic.",
+      "properties": {
+        "why_this_matters": { "type": "string" },
+        "audience": { "type": "string" },
+        "known_constraints": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "reference_material": {
+      "type": "array",
+      "description": "Real artifacts, not prose descriptions of them. A failing test or an actual schema outperforms a paragraph describing one on every model in the roster.",
+      "items": {
+        "type": "object",
+        "required": ["label", "kind"],
+        "properties": {
+          "label": { "type": "string" },
+          "kind": { "enum": ["code", "tests", "spec", "schema", "logs", "config", "graph_excerpt", "rubric", "mockup"] },
+          "path": { "type": "string" },
+          "inline": { "type": "string" }
+        }
+      }
+    },
+
+    "response": {
+      "type": "object",
+      "description": "SEMANTIC. The output contract. The MECHANISM by which each provider enforces it is free (output_config.format / Structured Outputs / response_mime_type + schema); the required fields are not.",
+      "required": ["schema_ref", "schema_version", "required_fields"],
+      "properties": {
+        "schema_ref": { "type": "string" },
+        "schema_version": { "type": "string" },
+        "required_fields": { "type": "array", "items": { "type": "string" } },
+        "prose_sections": {
+          "type": "array",
+          "description": "Only for tasks that deliberately elicit prose (communication quality). Prose triggers the fallback claim extractor, which carries its own measured error — prefer structured emission wherever the task allows.",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "tools": {
+      "type": "array",
+      "description": "Canonical tool IR. Tool SEMANTICS (names, params, types, enums, required flags, constraint text) are invariant; tool schema RENDERING is free, because a schema written in one vendor's house style disadvantages the others.",
+      "items": {
+        "type": "object",
+        "required": ["name", "description", "parameters"],
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "parameters": { "type": "object" },
+          "when_to_use": {
+            "type": "string",
+            "description": "Capability trigger. Prior-generation models (Opus 4.8/4.7) are conservative about reaching for tools and measurably improve with explicit 'call this when…' guidance. It lives in the IR so every adapter renders the same trigger."
+          }
+        }
+      }
+    },
+
+    "budget": {
+      "type": "object",
+      "description": "SEMANTIC and ENFORCED. Without a cap, brute-force retrieval outscores efficient reasoning and 'graph queries per finding' becomes a description rather than a constraint.",
+      "required": ["max_tool_calls", "max_graph_queries", "max_wall_clock_s", "max_output_tokens"],
+      "properties": {
+        "max_tool_calls": { "type": "integer", "minimum": 0 },
+        "max_graph_queries": { "type": "integer", "minimum": 0 },
+        "max_files_opened": { "type": "integer", "minimum": 0 },
+        "max_wall_clock_s": { "type": "integer", "minimum": 1 },
+        "max_input_tokens": { "type": "integer", "minimum": 1 },
+        "max_output_tokens": { "type": "integer", "minimum": 1 }
+      }
+    },
+
+    "corpus": {
+      "type": "object",
+      "description": "SEMANTIC. What the model is reasoning about.",
+      "required": ["repository", "commit"],
+      "properties": {
+        "repository": { "type": "string" },
+        "commit": { "type": "string" },
+        "mutation_id": { "type": ["string", "null"] }
+      }
+    },
+
+    "evidence_provider": {
+      "type": "object",
+      "description": "SEMANTIC. Two models given different graph versions are not comparable.",
+      "properties": {
+        "provider": { "type": "string" },
+        "graph_version": { "type": "string" },
+        "graph_hash": { "type": "string" }
+      }
+    },
+
+    "trial_plan": {
+      "type": "object",
+      "properties": {
+        "trials": { "type": "integer", "minimum": 1 },
+        "ordering_seed": { "type": "integer" }
+      }
+    },
+
+    "prohibitions": {
+      "type": "array",
+      "description": "SEMANTIC. Constructs no adapter may introduce. Defaults come from config/lanes.yaml; a task may add to them but never remove one.",
+      "items": { "type": "string" }
+    },
+
+    "notes_for_adapters": {
+      "type": "string",
+      "description": "Guidance about RENDERING only — never additional task content. The fairness validator treats content that appears here and in no rendered prompt as suspicious, and content that appears in one rendered prompt and not others as a violation."
+    }
+  }
+}

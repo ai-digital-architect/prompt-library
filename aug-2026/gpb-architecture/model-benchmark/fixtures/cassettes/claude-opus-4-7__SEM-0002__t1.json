@@ -1,0 +1,29 @@
+{
+  "synthetic": true,
+  "note": "Hand-shaped fixture. NOT a measurement of this model.",
+  "recorded_for": {
+    "model": "claude-opus-4-7",
+    "task": "SEM-0002",
+    "trial": 1
+  },
+  "status": 200,
+  "body": {
+    "model": "recorded",
+    "stop_reason": "end_turn",
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"schema_version\": \"1.0.0\", \"findings\": [{\"id\": \"F-01\", \"category\": \"architecture\", \"type\": \"shared_datastore\", \"severity\": \"low\", \"confidence\": 0.69, \"status\": \"ASSERTED\", \"entities\": [{\"kind\": \"class\", \"ref\": \"ReportingService\", \"role\": \"site\"}, {\"kind\": \"class\", \"ref\": \"PaymentRepository\", \"role\": \"dependency\"}], \"relations\": [{\"subject\": \"ReportingService\", \"predicate\": \"DEPENDS_ON\", \"object\": \"PaymentRepository\"}], \"evidence\": [{\"file\": \"ReportingService.java\", \"symbol\": \"build\", \"lines\": \"4-9\"}], \"root_cause\": \"ReportingService and PaymentService both use the same repository.\", \"impact\": \"Extracting reporting into its own service becomes a distributed coupling problem.\", \"recommendation\": \"Expose a published read interface from the payments context.\"}, {\"id\": \"F-02\", \"category\": \"architecture\", \"type\": \"cyclic_dependency\", \"severity\": \"high\", \"confidence\": 0.66, \"status\": \"ASSERTED\", \"entities\": [{\"kind\": \"class\", \"ref\": \"PaymentService\"}], \"relations\": [], \"evidence\": [{\"file\": \"PaymentService.java\", \"lines\": \"1-20\"}], \"root_cause\": \"Suspected cycle between service and repository layers.\", \"impact\": \"Difficult to test in isolation.\", \"recommendation\": \"Introduce an interface.\"}], \"abstentions\": [], \"answers\": [{\"question_id\": \"Q-01\", \"answer\": \"PaymentService and ReportingService reference PaymentRepository.\", \"confidence\": 0.72, \"entities\": [{\"kind\": \"class\", \"ref\": \"PaymentService\"}, {\"kind\": \"class\", \"ref\": \"ReportingService\"}], \"relations\": [{\"subject\": \"PaymentService\", \"predicate\": \"DEPENDS_ON\", \"object\": \"PaymentRepository\"}, {\"subject\": \"ReportingService\", \"predicate\": \"DEPENDS_ON\", \"object\": \"PaymentRepository\"}]}]}"
+      }
+    ],
+    "usage": {
+      "input_tokens": 5022,
+      "output_tokens": 1170,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+    }
+  },
+  "error": null,
+  "wall_clock_ms": 60232,
+  "ttft_ms": 2959
+}

@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "note": "Hand-shaped fixture. NOT a measurement of this model.",
+  "recorded_for": {
+    "model": "gpt-5.6-luna",
+    "task": "SEM-0002",
+    "trial": 1
+  },
+  "status": 200,
+  "body": {
+    "model": "recorded",
+    "status": "completed",
+    "output": [
+      {
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Here is my analysis:\n\nPaymentService and ReportingService both reference PaymentRepository. I was unable to produce the requested JSON structure."
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "input_tokens": 5353,
+      "output_tokens": 300,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens_details": {
+        "reasoning_tokens": 120
+      }
+    }
+  },
+  "error": null,
+  "wall_clock_ms": 55645,
+  "ttft_ms": 493
+}

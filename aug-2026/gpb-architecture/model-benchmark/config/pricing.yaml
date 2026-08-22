@@ -1,0 +1,176 @@
+# Versioned pricing oracle.
+#
+# WHY THIS FILE EXISTS
+# Cost is the one benchmark number that is trivially auditable and trivially
+# wrong. Pricing moves, promotional rates expire, long prompts surcharge, and
+# cached input bills at a different rate from uncached. Estimating cost from a
+# constant $/token produces figures that look precise and are not.
+#
+# RULES
+#  1. Cost is computed from the BILLED token categories the provider returns,
+#     never from local token counting.
+#  2. Every figure carries an `effective_from`. A run stamps
+#     `pricing_table_version` into its manifest.
+#  3. Any figure with an `expires` date is footnoted in the report.
+#  4. Re-verify against vendor pricing pages before each leaderboard round.
+#     `mb.py doctor --check-pricing` warns when this table is older than
+#     `staleness_warn_days`.
+#  5. NEVER compare token counts across providers. Compare cost and wall-clock.
+#
+# All figures are USD per million tokens (MTok) unless stated otherwise.
+# Transcribed from the read-only prompt-template library, verified 2026-07-25.
+
+pricing_table_version: "2026-07-25"
+verified_on: "2026-07-25"
+currency: USD
+staleness_warn_days: 45
+
+defaults:
+  # Applied when a model omits the field. Marked `imputed: true` in the manifest
+  # so an imputed cost is never mistaken for an observed one.
+  cache_read_per_mtok: null
+  cache_write_multiplier: 1.0
+
+models:
+
+  # -------------------------------- Anthropic --------------------------------
+  claude-fable-5:
+    effective_from: "2026-07-24"
+    input_per_mtok: 10.00
+    output_per_mtok: 50.00
+    cache_read_per_mtok: null          # not transcribed; imputed as uncached
+    prompt_cache_min_tokens: 512
+    notes: "~2x Opus 5. Mandatory 30-day retention; no ZDR."
+
+  claude-opus-5:
+    effective_from: "2026-07-24"
+    input_per_mtok: 5.00
+    output_per_mtok: 25.00
+    cache_read_per_mtok: null
+    prompt_cache_min_tokens: 512
+
+  claude-sonnet-5:
+    effective_from: "2026-07-24"
+    input_per_mtok: 3.00
+    output_per_mtok: 15.00
+    cache_read_per_mtok: null
+    prompt_cache_min_tokens: 512
+    promotional:
+      input_per_mtok: 2.00
+      output_per_mtok: 10.00
+      expires: "2026-08-31"
+      note: >
+        Introductory pricing. Any Sonnet 5 cost figure computed before this date
+        is footnoted in the report and is NOT comparable to a post-expiry figure.
+    tokenizer_warning: >
+      Emits ~30% more tokens than Sonnet 4.6 for identical text. Cost comparisons
+      are valid; token-count comparisons across families are not.
+
+  claude-opus-4-8:
+    effective_from: "2026-03-01"
+    input_per_mtok: 5.00
+    output_per_mtok: 25.00
+
+  claude-opus-4-7:
+    effective_from: "2026-03-01"
+    input_per_mtok: 5.00
+    output_per_mtok: 25.00
+    imputed: true
+    imputed_from: claude-opus-4-8
+    note: >
+      No published rate transcribed for 4.7. Imputed from the 4.8 Opus-tier rate.
+      Every cost figure for this model is marked `imputed` in the report.
+
+  claude-opus-4-6:
+    effective_from: "2026-03-01"
+    input_per_mtok: 5.00
+    output_per_mtok: 25.00
+    imputed: true
+    imputed_from: claude-opus-4-8
+    note: "Opus-tier rate assumed; not separately transcribed."
+
+  # --------------------------------- OpenAI ----------------------------------
+  gpt-5.6-sol:
+    effective_from: "2026-07-25"
+    input_per_mtok: 5.00
+    output_per_mtok: 30.00
+    cache_read_per_mtok: 0.50
+    cache_write_multiplier: 1.25
+    long_prompt_surcharge:
+      threshold_input_tokens: 272000
+      input_multiplier: 2.0
+      output_multiplier: 1.5
+      scope: session
+      note: >
+        Applies to the whole session once crossed, not just the offending call.
+        The cost engine applies it per-session, not per-request.
+
+  gpt-5.6-terra:
+    effective_from: "2026-07-25"
+    input_per_mtok: 2.50
+    output_per_mtok: 15.00
+    cache_read_per_mtok: 0.25
+    cache_write_multiplier: 1.25
+    long_prompt_surcharge:
+      threshold_input_tokens: 272000
+      input_multiplier: 2.0
+      output_multiplier: 1.5
+      scope: session
+
+  gpt-5.6-luna:
+    effective_from: "2026-07-25"
+    input_per_mtok: 1.00
+    output_per_mtok: 6.00
+    cache_read_per_mtok: 0.10
+    cache_write_multiplier: 1.25
+    long_prompt_surcharge:
+      threshold_input_tokens: 272000
+      input_multiplier: 2.0
+      output_multiplier: 1.5
+      scope: session
+
+  # --------------------------------- Google ----------------------------------
+  gemini-3.6-flash:
+    effective_from: "2026-07-25"
+    input_per_mtok: 1.50
+    output_per_mtok: 7.50
+    cache_read_per_mtok: 0.15
+    cache_storage_per_mtok_hour: 1.00
+    batch_discount: 0.5
+    grounding:
+      free_requests_per_month: 5000       # shared across Gemini 3 models
+      per_1000_queries_after: 14.00
+      note: >
+        Grounding is billed separately from tokens. If a suite enables Search
+        grounding, grounding cost is added to the run and reported as a
+        separate line — otherwise Gemini looks cheaper than it is.
+
+  gemini-3-pro:
+    effective_from: "2026-03-01"
+    input_per_mtok: null
+    output_per_mtok: null
+    status: retired
+    note: >
+      Shut down; no current published rate. Cost for any historical run must be
+      read from that run's stored manifest, not recomputed from this table.
+
+# ---------------------------------------------------------------------------
+# Cost accounting model — implemented in scripts/mbcore/pricing.py
+# ---------------------------------------------------------------------------
+accounting:
+  categories:
+    - input_tokens_uncached
+    - input_tokens_cached
+    - cache_write_tokens
+    - reasoning_tokens      # billed where the provider bills them; null otherwise
+    - output_tokens
+  reporting:
+    headline: cold          # cold = cache-write inclusive, no cache reads.
+                            # Cold is the honest marginal cost of a NEW task.
+    secondary: warm         # warm = steady state with a populated prefix cache.
+    primary_operational_metric: cost_per_correct_finding
+  rules:
+    - "Imputed rates are labelled `imputed` everywhere they appear."
+    - "Promotional rates past their expiry raise a STALE_PRICING warning."
+    - "Grounding, tool, and storage charges are line items, not folded into token cost."
+    - "Reasoning tokens are reported only where the provider exposes them; never imputed."

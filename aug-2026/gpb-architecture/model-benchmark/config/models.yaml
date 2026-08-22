@@ -1,0 +1,398 @@
+# Model registry — model-benchmark skill
+#
+# Source of truth for capability facts is the read-only prompt-template library
+# in the parent folder (model-prompt-templates/). Each entry cites the template
+# it was derived from. NEVER edit those templates; when one is updated upstream,
+# update this registry and bump the adapter version.
+#
+# Facts here were transcribed from templates last verified 25 July 2026.
+# `mb.py doctor --check-registry` re-validates internal consistency, not vendor
+# truth. Before a leaderboard round, re-verify pricing and status against vendor
+# documentation (see config/pricing.yaml).
+
+registry_version: "1.0.0"
+verified_against_templates: "2026-07-25"
+
+# ---------------------------------------------------------------------------
+# Effort ladders are PROVIDER-NATIVE and NOT comparable across providers.
+# `effort_ladder` exists so the sweeper knows what values the API accepts.
+# It is never used to align models with each other. See references/scoring-spec.md
+# § Iso-Budget Comparison.
+# ---------------------------------------------------------------------------
+
+models:
+
+  # ===================== Anthropic — Claude 5 generation =====================
+
+  - id: claude-fable-5
+    display_name: "Claude Fable 5"
+    provider: anthropic
+    adapter: anthropic-claude5
+    status: current
+    enabled: true
+    tier: flagship
+    template_ref: "13-anthropic-claude-fable-5.md"
+    context_window_tokens: 1000000
+    max_output_tokens: 128000
+    default_max_output_tokens: 64000
+    effort_param: "output_config.effort"
+    effort_ladder: [low, medium, high, xhigh, max]
+    effort_default: high
+    thinking:
+      mode: adaptive_always_on
+      can_disable: false
+      budget_tokens_supported: false
+      display_summarized_supported: true
+    structured_output: "output_config.format"
+    rejects: [temperature, top_p, top_k, budget_tokens, assistant_prefill]
+    prompt_cache_min_tokens: 512
+    retention_posture: mandatory-30d      # no zero-data-retention available
+    safety_classifiers: true              # offensive-cyber, life-sciences, reasoning-extraction
+    refusal_shape: "http_200 stop_reason=refusal, stop_details.category"
+    notes: >
+      Anthropic's designated flagship, a tier above Opus. Long-horizon strength.
+      Compliance-relevant: mandatory 30-day retention and no ZDR — see
+      references/security.md before sending proprietary corpora.
+
+  - id: claude-opus-5
+    display_name: "Claude Opus 5"
+    provider: anthropic
+    adapter: anthropic-claude5
+    status: current
+    enabled: true
+    tier: high
+    template_ref: "21-anthropic-claude-opus-5.md"
+    context_window_tokens: 1000000
+    max_output_tokens: 128000
+    default_max_output_tokens: 64000
+    effort_param: "output_config.effort"
+    effort_ladder: [low, medium, high, xhigh, max]
+    effort_default: high
+    thinking:
+      mode: adaptive_on_by_default
+      can_disable: true
+      can_disable_only_at_effort_lte: high
+      budget_tokens_supported: false
+      display_summarized_supported: true
+    structured_output: "output_config.format"
+    rejects: [temperature, top_p, top_k, budget_tokens, assistant_prefill]
+    prompt_cache_min_tokens: 512
+    retention_posture: standard
+    safety_classifiers: true
+    refusal_shape: "http_200 stop_reason=refusal, stop_details.category"
+    notes: >
+      Self-verifies natively; the adapter must NOT add verification scaffolding.
+
+  - id: claude-sonnet-5
+    display_name: "Claude Sonnet 5"
+    provider: anthropic
+    adapter: anthropic-claude5
+    status: current
+    enabled: true
+    tier: balanced
+    template_ref: "22-anthropic-claude-sonnet-5.md"
+    context_window_tokens: 1000000
+    max_output_tokens: 128000
+    default_max_output_tokens: 32000
+    effort_param: "output_config.effort"
+    effort_ladder: [low, medium, high, xhigh, max]
+    effort_default: high
+    thinking:
+      mode: adaptive_on_by_default
+      can_disable: true
+      budget_tokens_supported: false
+      display_summarized_supported: true
+    structured_output: "output_config.format"
+    rejects: [temperature, top_p, top_k, budget_tokens, assistant_prefill]
+    prompt_cache_min_tokens: 512
+    retention_posture: standard
+    safety_classifiers: true
+    refusal_shape: "http_200 stop_reason=refusal, stop_details.category"
+    tokenizer_note: >
+      New tokenizer emits roughly 30% more tokens than Sonnet 4.6 for identical
+      text. NEVER compare this model's raw token counts to another family's.
+    instruction_following: literal
+    notes: >
+      Follows instructions literally — the IR compiler must state the SCOPE of
+      every requirement ("for every endpoint, not just the first").
+
+  # =================== Anthropic — Claude 4.x generation =====================
+
+  - id: claude-opus-4-8
+    display_name: "Claude Opus 4.8"
+    provider: anthropic
+    adapter: anthropic-claude4x
+    status: legacy
+    enabled: true
+    tier: prior-flagship
+    template_ref: "14-anthropic-claude-opus-4-8.md"
+    context_window_tokens: 1000000
+    max_output_tokens: 128000
+    default_max_output_tokens: 64000
+    effort_param: "output_config.effort"
+    effort_ladder: [low, medium, high, xhigh, max]
+    effort_default: high
+    thinking:
+      mode: adaptive
+      explicit_thinking_block: true       # thinking: {"type": "adaptive"}
+      can_disable: true
+      budget_tokens_supported: false
+    structured_output: "output_config.format"
+    rejects: [temperature, top_p, top_k, budget_tokens, assistant_prefill]
+    retention_posture: standard
+    capability_triggers_required: true    # 4.8 is conservative about tools/search
+    notes: >
+      Delisted from the current models table but active. Retires no sooner than
+      2027-05-28. Needs explicit "call this when…" capability triggers; the
+      adapter supplies them from the canonical tool IR, not from prose.
+
+  - id: claude-opus-4-7
+    display_name: "Claude Opus 4.7"
+    provider: anthropic
+    adapter: anthropic-claude4x
+    status: legacy
+    enabled: true
+    derived: true
+    derived_from: claude-opus-4-8
+    tier: prior-flagship
+    template_ref: null
+    template_note: >
+      NO dedicated template exists in the prompt library. The library states
+      Opus 4.8 has the "same API surface as Opus 4.7" and that sampling
+      parameters are deprecated on "Opus 4.7 and later". This profile is
+      therefore DERIVED from template 14 (Opus 4.8). Every report footnotes it.
+      Validate against vendor documentation before treating an Opus 4.7 result
+      as load-bearing.
+    context_window_tokens: 1000000
+    max_output_tokens: 128000
+    default_max_output_tokens: 64000
+    effort_param: "output_config.effort"
+    effort_ladder: [low, medium, high, xhigh, max]
+    effort_default: high
+    thinking:
+      mode: adaptive
+      explicit_thinking_block: true
+      can_disable: true
+      budget_tokens_supported: false
+    structured_output: "output_config.format"
+    rejects: [temperature, top_p, top_k, budget_tokens, assistant_prefill]
+    retention_posture: standard
+    capability_triggers_required: true
+    notes: >
+      Retires no sooner than 2027-04-16. Terser default voice than 4.8.
+
+  - id: claude-opus-4-6
+    display_name: "Claude Opus 4.6"
+    provider: anthropic
+    adapter: anthropic-claude4x
+    status: legacy
+    enabled: true
+    tier: prior-flagship
+    template_ref: "12-anthropic-claude-opus-4-6.md"
+    context_window_tokens: 1000000
+    max_output_tokens: 128000
+    default_max_output_tokens: 16000
+    effort_param: "output_config.effort"
+    effort_ladder: [low, medium, high, max]
+    effort_default: high
+    thinking:
+      mode: adaptive
+      explicit_thinking_block: true
+      can_disable: true
+      budget_tokens_supported: false      # deprecated on 4.6
+    structured_output: "output_config.format"
+    rejects: [budget_tokens, assistant_prefill]
+    rejects_note: >
+      Sampling parameters are deprecated from Opus 4.7 onward; on 4.6 the
+      adapter still omits them so that the Parity lane stays comparable.
+    retention_posture: standard
+    notes: >
+      Retires no sooner than 2027-02-05. Accepts explicit thinking_instructions
+      blocks that later generations penalize — the adapter may add them only
+      because they live in the FREE set for this family. See
+      references/fairness-contract.md § Reasoning steering.
+
+  # ========================== OpenAI — GPT-5.6 ==============================
+
+  - id: gpt-5.6-sol
+    display_name: "GPT-5.6 Sol"
+    provider: openai
+    adapter: openai-gpt56
+    status: current
+    enabled: true
+    tier: flagship
+    template_ref: "23-openai-gpt-5-6-sol.md"
+    aliases: ["gpt-5.6", "gpt-5"]
+    context_window_tokens: 1050000
+    max_output_tokens: 128000
+    default_max_output_tokens: 16000
+    effort_param: "reasoning.effort"
+    effort_ladder: [minimal, low, medium, high, xhigh, max]
+    effort_default: medium
+    reasoning_mode:
+      param: "reasoning.mode"
+      values: [standard, pro]
+      default: standard
+      documented_for_this_model: true
+    verbosity_param: "text.verbosity"
+    verbosity_values: [low, medium, high]
+    structured_output: "structured_outputs"
+    api_surface: responses
+    long_prompt_surcharge:
+      threshold_input_tokens: 272000
+      input_multiplier: 2.0
+      output_multiplier: 1.5
+    cache_write_multiplier: 1.25
+    knowledge_cutoff: "2026-02-16"
+    reasoning_tokens_observable: billed_only
+    retention_posture: standard
+    notes: >
+      Only GPT-5.6 tier documented to support reasoning.mode "pro". `pro` is an
+      INDEPENDENT axis from effort; the sweeper treats it as a second dimension.
+
+  - id: gpt-5.6-terra
+    display_name: "GPT-5.6 Terra"
+    provider: openai
+    adapter: openai-gpt56
+    status: current
+    enabled: true
+    tier: mid
+    template_ref: "24-openai-gpt-5-6-terra.md"
+    context_window_tokens: 1050000
+    max_output_tokens: 128000
+    default_max_output_tokens: 8000
+    effort_param: "reasoning.effort"
+    effort_ladder: [minimal, low, medium, high, xhigh, max]
+    effort_default: medium
+    reasoning_mode:
+      param: "reasoning.mode"
+      values: [standard]
+      default: standard
+      documented_for_this_model: false
+    verbosity_param: "text.verbosity"
+    verbosity_values: [low, medium, high]
+    structured_output: "structured_outputs"
+    api_surface: responses
+    long_prompt_surcharge:
+      threshold_input_tokens: 272000
+      input_multiplier: 2.0
+      output_multiplier: 1.5
+    cache_write_multiplier: 1.25
+    knowledge_cutoff: "2026-02-16"
+    reasoning_tokens_observable: billed_only
+    retention_posture: standard
+    notes: >
+      Same context window, output ceiling and tool surface as Sol at half the
+      price. `reasoning.mode: pro` is NOT confirmed for this tier — the adapter
+      refuses to set it rather than risking a silent behavioural difference.
+
+  - id: gpt-5.6-luna
+    display_name: "GPT-5.6 Luna"
+    provider: openai
+    adapter: openai-gpt56
+    status: current
+    enabled: true
+    tier: fast
+    template_ref: "25-openai-gpt-5-6-luna.md"
+    context_window_tokens: 1050000
+    max_output_tokens: 128000
+    default_max_output_tokens: 4000
+    effort_param: "reasoning.effort"
+    effort_ladder: [none, minimal, low, medium, high]
+    effort_default: low
+    reasoning_mode:
+      param: "reasoning.mode"
+      values: [standard]
+      default: standard
+      documented_for_this_model: false
+    verbosity_param: "text.verbosity"
+    verbosity_values: [low, medium, high]
+    structured_output: "structured_outputs"
+    api_surface: responses
+    long_prompt_surcharge:
+      threshold_input_tokens: 272000
+      input_multiplier: 2.0
+      output_multiplier: 1.5
+    cache_write_multiplier: 1.25
+    knowledge_cutoff: "2026-02-16"
+    reasoning_tokens_observable: billed_only
+    retention_posture: standard
+    rate_limit_note: "Highest ceiling in the family (Tier 5 ~30K RPM / 180M TPM)."
+    notes: >
+      Pipeline tier. Give it an explicit abstain branch in the response schema;
+      a cheap model that guesses is worse than one that flags.
+
+  # ========================== Google — Gemini ===============================
+
+  - id: gemini-3.6-flash
+    display_name: "Gemini 3.6 Flash"
+    provider: google
+    adapter: google-gemini3x
+    status: current
+    enabled: true
+    tier: flagship
+    template_ref: "26-google-gemini-3-6-flash.md"
+    context_window_tokens: 1048576
+    max_output_tokens: 65536
+    default_max_output_tokens: 32000
+    effort_param: "thinking_level"
+    effort_ladder: [minimal, low, medium, high]
+    effort_default: medium
+    structured_output: "response_mime_type+schema"
+    rejects: [temperature, top_p, top_k, model_role_final_turn]
+    rejects_note: >
+      Sampling parameters are deprecated and silently ignored (future HTTP 400).
+      A request may NOT end on a model-role turn — prefill-style steering must
+      move into system_instruction or the response schema.
+    prompt_ordering: context_first_instruction_last
+    grounding:
+      google_search: true
+      free_requests_per_month: 5000       # shared across Gemini 3 models
+    knowledge_cutoff: null                # not published on the model page
+    retention_posture: standard
+    notes: >
+      Google's latest and default model — note the flagship is a Flash-tier
+      model. Agentic execution is the generational gain; give it function
+      declarations and let it orchestrate.
+
+  - id: gemini-3-pro
+    display_name: "Gemini 3 Pro"
+    provider: google
+    adapter: google-gemini3x
+    status: retired
+    enabled: false                         # requires --include-retired to run
+    tier: retired-flagship
+    template_ref: "04-google-gemini-3-pro.md"
+    template_note: >
+      Upstream template is reference-only. Google lists Gemini 3 Pro Preview in
+      the deprecated / shut-down set — it is not a deployable model. Registered
+      so the roster is complete and so historical results remain interpretable.
+    context_window_tokens: 1000000
+    max_output_tokens: 65536
+    default_max_output_tokens: 16000
+    effort_param: "thinking_level"
+    effort_ladder: [minimal, low, medium, high]
+    effort_default: medium
+    structured_output: "response_mime_type+schema"
+    prompt_ordering: context_first_instruction_last
+    retention_posture: standard
+    expected_disposition: PROVIDER_ERROR
+    notes: >
+      Expect transport or 404-class errors. Disposition these as PROVIDER_ERROR,
+      never as a capability failure. The nearest deployable Pro-tier model is
+      Gemini 3.1 Pro (Preview) — add it to the registry if the study needs a
+      Pro-tier data point.
+
+# ---------------------------------------------------------------------------
+# Models deliberately NOT registered, and why. Recorded so the omission is a
+# decision rather than an oversight.
+# ---------------------------------------------------------------------------
+excluded:
+  - id: claude-mythos-5
+    reason: "Invitation-only (Project Glasswing); no safety classifiers — not a like-for-like comparand."
+  - id: claude-haiku-4-5
+    reason: "Not in the requested roster. Retires no sooner than 2026-10-15; add only for short-horizon studies."
+  - id: gemini-3.1-pro-preview
+    reason: "Not in the requested roster. Add it if a deployable Pro-tier Google data point is needed."
+  - id: gemini-3.5-flash-lite
+    reason: "Not in the requested roster; thinking_level defaults to minimal and terminates agentic subagents early."

@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://internal/model-benchmark/schemas/run-manifest.schema.json",
+  "title": "Run Manifest v1",
+  "description": "Everything needed to reproduce and audit one trial. Note what is ABSENT: there is no `temperature` field. Sampling parameters are rejected with HTTP 400 across the Claude 5 generation and GPT-5.6, and deprecated/ignored on Gemini 3.6. Carrying the field would imply a determinism lever the platform does not have — run-to-run variance is irreducible, which is why repeated trials and pass^k matter more, not less.",
+  "type": "object",
+  "required": ["schema_version", "run_id", "benchmark", "corpus", "model", "prompt", "runtime", "trial", "disposition"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "run_id": { "type": "string" },
+    "study_id": { "type": "string" },
+    "created_at": { "type": "string" },
+    "lane": { "enum": ["parity", "optimized", "production"] },
+    "mode": { "enum": ["live", "dry-run", "replay"] },
+
+    "benchmark": {
+      "type": "object",
+      "required": ["suite", "suite_version", "task"],
+      "properties": {
+        "suite": { "type": "string" },
+        "suite_version": { "type": "string" },
+        "task": { "type": "string" },
+        "task_version": { "type": "string" }
+      }
+    },
+
+    "corpus": {
+      "type": "object",
+      "required": ["repository", "commit"],
+      "properties": {
+        "repository": { "type": "string" },
+        "commit": { "type": "string" },
+        "mutation_id": { "type": ["string", "null"] }
+      }
+    },
+
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "provider": { "type": "string" },
+        "graph_version": { "type": ["string", "null"] },
+        "graph_hash": { "type": ["string", "null"] }
+      }
+    },
+
+    "model": {
+      "type": "object",
+      "required": ["provider", "model_id"],
+      "properties": {
+        "provider": { "type": "string" },
+        "model_id": { "type": "string" },
+        "resolved_model_version": {
+          "type": ["string", "null"],
+          "description": "As returned by the provider. A silent provider-side model update re-bases every comparison; recording this is how that becomes visible instead of invisible."
+        },
+        "endpoint": { "type": ["string", "null"] },
+        "derived_profile": { "type": "boolean", "description": "True for models with no upstream template (Opus 4.7). Footnoted in every report." },
+        "retention_posture": { "enum": ["zdr", "standard", "mandatory-30d", "unknown"] },
+        "status": { "enum": ["current", "legacy", "retired"] }
+      }
+    },
+
+    "prompt": {
+      "type": "object",
+      "required": ["canonical_ir_version", "canonical_ir_hash", "semantic_digest", "adapter", "rendered_prompt_hash", "fairness_verdict"],
+      "properties": {
+        "canonical_ir_version": { "type": "string" },
+        "canonical_ir_hash": { "type": "string" },
+        "semantic_digest": {
+          "type": "string",
+          "description": "Hash of invariant-set fields only. MUST be identical for every model in a comparison group — this is what turns 'the comparison was fair' from an assertion into a checkable artifact."
+        },
+        "adapter": {
+          "type": "object",
+          "properties": { "id": { "type": "string" }, "version": { "type": "string" } }
+        },
+        "rendered_prompt_hash": { "type": "string" },
+        "tools_ir_hash": { "type": ["string", "null"] },
+        "fairness_verdict": { "enum": ["PASS", "FAIL"] },
+        "fairness_violations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "runtime": {
+      "type": "object",
+      "properties": {
+        "effort": {
+          "type": ["string", "null"],
+          "description": "PROVIDER-NATIVE label. NOT comparable across providers. Comparisons are made at iso-cost / iso-latency budget points on a swept frontier, never at the string value here."
+        },
+        "effort_param": { "type": ["string", "null"] },
+        "reasoning_mode": { "type": ["string", "null"] },
+        "thinking_level": { "type": ["string", "null"] },
+        "verbosity": { "type": ["string", "null"] },
+        "max_output_tokens": { "type": "integer" },
+        "sampling": {
+          "const": "not-applicable",
+          "description": "Sampling parameters do not exist on any current generation. Recorded as a constant so a reader does not wonder whether it was omitted by accident."
+        },
+        "structured_output_mechanism": { "type": ["string", "null"] },
+        "budget": { "type": "object" }
+      }
+    },
+
+    "trial": {
+      "type": "object",
+      "required": ["number", "of"],
+      "properties": { "number": { "type": "integer" }, "of": { "type": "integer" } }
+    },
+
+    "usage": {
+      "type": "object",
+      "description": "Billed categories as returned by the provider. Cost is computed from these, never from local token counting.",
+      "properties": {
+        "input_tokens_uncached": { "type": ["integer", "null"] },
+        "input_tokens_cached": { "type": ["integer", "null"] },
+        "cache_write_tokens": { "type": ["integer", "null"] },
+        "reasoning_tokens": { "type": ["integer", "null"], "description": "null where the provider does not expose it. Never imputed." },
+        "output_tokens": { "type": ["integer", "null"] },
+        "billed_cost_usd": { "type": ["number", "null"] },
+        "pricing_table_version": { "type": "string" },
+        "cost_flags": { "type": "array", "items": { "enum": ["imputed", "promotional", "long_prompt_surcharge", "stale_pricing", "grounding_billed_separately"] } },
+        "cache_state": { "enum": ["cold", "warm", "unknown"] }
+      }
+    },
+
+    "timing": {
+      "type": "object",
+      "properties": {
+        "ttft_ms": { "type": ["integer", "null"] },
+        "wall_clock_ms": { "type": ["integer", "null"] }
+      }
+    },
+
+    "disposition": { "type": "string" },
+    "retries": { "type": "integer" },
+    "result": {
+      "type": "object",
+      "properties": {
+        "artifact_hash": { "type": ["string", "null"] },
+        "schema_valid": { "type": ["boolean", "null"] },
+        "transcript_ref": { "type": ["string", "null"], "description": "Transcripts are stored with candidate identity separated from content, so blinding cannot be trivially undone by a reviewer with store access." }
+      }
+    },
+
+    "versions": {
+      "type": "object",
+      "description": "Component versions. A change to scoring, matching, resolution or the response schema invalidates cross-version comparison until a backfill runs; the report refuses to render such a comparison unless explicitly allowed.",
+      "properties": {
+        "harness": { "type": "string" },
+        "registry": { "type": "string" },
+        "lanes": { "type": "string" },
+        "pricing_table": { "type": "string" },
+        "resolver": { "type": "string" },
+        "matcher": { "type": "string" },
+        "scoring": { "type": "string" },
+        "response_schema": { "type": "string" }
+      }
+    }
+  }
+}

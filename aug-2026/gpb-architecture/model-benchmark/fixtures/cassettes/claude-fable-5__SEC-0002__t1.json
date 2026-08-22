@@ -1,0 +1,29 @@
+{
+  "synthetic": true,
+  "note": "Hand-shaped fixture. NOT a measurement of this model.",
+  "recorded_for": {
+    "model": "claude-fable-5",
+    "task": "SEC-0002",
+    "trial": 1
+  },
+  "status": 200,
+  "body": {
+    "model": "recorded",
+    "stop_reason": "end_turn",
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"schema_version\": \"1.0.0\", \"findings\": [], \"abstentions\": [], \"coverage_notes\": \"Reviewed FraudService and KafkaPublisher. No vulnerability found; both delegate without handling untrusted input.\"}"
+      }
+    ],
+    "usage": {
+      "input_tokens": 5988,
+      "output_tokens": 941,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0
+    }
+  },
+  "error": null,
+  "wall_clock_ms": 53365,
+  "ttft_ms": 3037
+}

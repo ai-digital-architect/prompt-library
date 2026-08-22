@@ -1,0 +1,166 @@
+# Semantic Understanding suite.
+#
+# These are the tasks whose answers the graph can decide outright. That is why
+# this suite ships first and runs first: grading here is almost entirely
+# deterministic, so it validates the whole pipeline before any subjectivity
+# enters. If the semantic suite disagrees with itself, nothing downstream is
+# trustworthy.
+#
+# Two design details worth keeping when you extend this:
+#
+#  * Oracle relations come in TRUE/FALSE pairs over the same structure. Asserting
+#    the true ones measures recall; asserting the false ones measures
+#    hallucination. A suite with only true relations rewards a model that asserts
+#    everything.
+#
+#  * Every suite carries at least one UNANSWERABLE question. Correct abstention
+#    is a capability, and without an unanswerable item you cannot tell a model
+#    that knows the limits of the evidence from one that guesses well.
+
+suite: semantic-v1
+version: 1.0.0
+description: Graph-provable questions about structure, dependencies and data flow.
+f_beta: 1.0
+corpus: fixtures/sample-repo
+
+tasks:
+
+  - id: SEM-0001
+    suite: semantic-v1
+    version: 1.0.0
+    title: "Trace the synchronous and asynchronous dependencies of a charge"
+    difficulty: 2
+    sealed: false
+    tags: [java, dependencies, dataflow]
+
+    prompt:
+      persona: "a staff engineer mapping an unfamiliar service"
+      domain: "distributed payment systems"
+      objective: >
+        Identify the dependencies involved when a payment charge is created, and
+        state for each whether it is invoked synchronously or asynchronously.
+        Then identify the failure-propagation paths: which downstream failures
+        can surface as a failed charge.
+      scope: >
+        Only the payments package in the attached corpus. Do not speculate about
+        components that are not present in it.
+      success_criteria:
+        - "Every direct dependency of the charge path is named, with its modality."
+        - "Each named dependency is expressed as a structured relation so it can be checked."
+        - "Failure-propagation paths are stated as relations, not as prose only."
+        - "Any question the corpus cannot answer is recorded as an abstention."
+      context:
+        why_this_matters: >
+          This mapping feeds an availability review. A dependency named that does
+          not exist is worse than one missed, because it sends the review down a
+          path that does not exist.
+        audience: "platform engineers preparing an availability review"
+      reference_material:
+        - label: "payments package"
+          kind: code
+          path: "src/com/acme/payments"
+      questions:
+        - id: Q-01
+          text: "What does PaymentService call directly, and with what modality?"
+          answerable: true
+        - id: Q-02
+          text: "Does the Kafka publisher write to the payment repository?"
+          answerable: true
+        - id: Q-03
+          text: "What is the p99 latency of the external gateway call in production?"
+          answerable: false     # no telemetry in the corpus — abstention is the correct answer
+
+    oracle:
+      provenance: STATIC_ANALYSIS
+      answerable: true
+      relations:
+        - { subject: PaymentController, predicate: CALLS, object: PaymentService.charge, truth: true }
+        - { subject: PaymentService, predicate: CALLS, object: PaymentRepository.save, modality: synchronous, truth: true }
+        - { subject: PaymentService, predicate: CALLS, object: FraudService.assess, modality: synchronous, truth: true }
+        - { subject: PaymentService, predicate: CALLS, object: KafkaPublisher.publish, modality: asynchronous, truth: true }
+        - { subject: PaymentService, predicate: CALLS, object: PaymentClient.callGateway, modality: synchronous, truth: true }
+        # Deliberate falsehoods — a model that asserts these is hallucinating structure.
+        - { subject: KafkaPublisher, predicate: CALLS, object: PaymentRepository.save, truth: false }
+        - { subject: PaymentController, predicate: CALLS, object: PaymentRepository.save, truth: false }
+        - { subject: FraudService, predicate: CALLS, object: KafkaPublisher.publish, truth: false }
+      answers:
+        - question_id: Q-01
+          expected_entities: [PaymentRepository.save, FraudService.assess, KafkaPublisher.publish, PaymentClient.callGateway]
+        - question_id: Q-02
+          expected_entities: [KafkaPublisher.publish]
+        - question_id: Q-03
+          expected_abstention: true
+      findings: []
+
+    budget:
+      max_tool_calls: 20
+      max_graph_queries: 15
+      max_files_opened: 30
+      max_wall_clock_s: 600
+      max_input_tokens: 200000
+      max_output_tokens: 16000
+
+  - id: SEM-0002
+    suite: semantic-v1
+    version: 1.0.0
+    title: "Blast radius of changing the payment repository interface"
+    difficulty: 3
+    sealed: false
+    tags: [java, blast-radius, coupling]
+
+    prompt:
+      persona: "a staff engineer scoping a refactor"
+      domain: "distributed payment systems"
+      objective: >
+        Determine which components would be affected by changing the
+        PaymentRepository interface, and identify any component that reaches it
+        from outside the payments bounded context.
+      scope: >
+        The attached corpus only. Report reach through direct references; do not
+        assume framework-level injection that is not visible in the code.
+      success_criteria:
+        - "Every component that references PaymentRepository is named."
+        - "Cross-context access is called out specifically as a distinct finding."
+        - "Each claim is expressed as a structured relation."
+      context:
+        why_this_matters: >
+          The refactor is scheduled for a release window. An under-counted blast
+          radius means a broken service ships; an over-counted one means the
+          window is wasted.
+        audience: "the team executing the refactor"
+      reference_material:
+        - label: "payments package"
+          kind: code
+          path: "src/com/acme/payments"
+      questions:
+        - id: Q-01
+          text: "Which components reference PaymentRepository?"
+          answerable: true
+
+    oracle:
+      provenance: STATIC_ANALYSIS
+      answerable: true
+      relations:
+        - { subject: PaymentService, predicate: DEPENDS_ON, object: PaymentRepository, truth: true }
+        - { subject: ReportingService, predicate: DEPENDS_ON, object: PaymentRepository, truth: true }
+        - { subject: FraudService, predicate: DEPENDS_ON, object: PaymentRepository, truth: false }
+      findings:
+        - oracle_id: SEM-0002-F1
+          type: shared_datastore
+          category: architecture
+          severity: medium
+          entities: [ReportingService, PaymentRepository]
+          evidence:
+            - { file: "ReportingService.java", lines: "4-8" }
+          expected_root_cause: ["cross_context_datastore_access", "bounded_context_leakage"]
+      answers:
+        - question_id: Q-01
+          expected_entities: [PaymentService, ReportingService]
+
+    budget:
+      max_tool_calls: 20
+      max_graph_queries: 15
+      max_files_opened: 30
+      max_wall_clock_s: 600
+      max_input_tokens: 200000
+      max_output_tokens: 16000

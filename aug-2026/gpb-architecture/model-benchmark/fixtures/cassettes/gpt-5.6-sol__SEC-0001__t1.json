@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "note": "Hand-shaped fixture. NOT a measurement of this model.",
+  "recorded_for": {
+    "model": "gpt-5.6-sol",
+    "task": "SEC-0001",
+    "trial": 1
+  },
+  "status": 200,
+  "body": {
+    "model": "recorded",
+    "status": "completed",
+    "output": [
+      {
+        "content": [
+          {
+            "type": "output_text",
+            "text": "{\"schema_version\": \"1.0.0\", \"findings\": [{\"id\": \"F-01\", \"category\": \"security\", \"type\": \"CWE-89\", \"severity\": \"high\", \"confidence\": 0.96, \"status\": \"ASSERTED\", \"entities\": [{\"kind\": \"method\", \"ref\": \"OrderRepository.findOrders\", \"role\": \"sink\"}, {\"kind\": \"method\", \"ref\": \"PaymentController.search\", \"role\": \"source\"}], \"relations\": [{\"subject\": \"PaymentController.search\", \"predicate\": \"CALLS\", \"object\": \"OrderRepository.findOrders\"}], \"evidence\": [{\"file\": \"OrderRepository.java\", \"symbol\": \"findOrders\", \"lines\": \"8-12\", \"excerpt\": \"\\\"SELECT * FROM orders WHERE customer_name = '\\\" + query\"}], \"root_cause\": \"String concatenation into SQL \\u2014 an unparameterized_query reachable from an untrusted request parameter.\", \"impact\": \"Full read access to the orders table, and potentially write access.\", \"recommendation\": \"Use a parameterized statement with a bound parameter for query.\", \"exploitability\": \"confirmed\"}], \"abstentions\": [], \"coverage_notes\": \"Reviewed every file in the payments package.\"}"
+          }
+        ]
+      }
+    ],
+    "usage": {
+      "input_tokens": 5556,
+      "output_tokens": 1128,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens_details": {
+        "reasoning_tokens": 451
+      }
+    }
+  },
+  "error": null,
+  "wall_clock_ms": 69082,
+  "ttft_ms": 965
+}

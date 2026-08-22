@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://internal/model-benchmark/schemas/grade.schema.json",
+  "title": "Trial Grade v1",
+  "description": "The graded outcome of one trial. Every axis is reported separately: calibration and abstention are deliberately NOT blended into the quality index, because a slightly less accurate but well-calibrated model is often the better production choice and blending hides exactly that trade-off.",
+  "type": "object",
+  "required": ["grade_version", "run_id", "task_id", "model_id", "disposition"],
+  "additionalProperties": false,
+  "properties": {
+    "grade_version": { "const": "1.0.0" },
+    "run_id": { "type": "string" },
+    "task_id": { "type": "string" },
+    "model_id": { "type": "string" },
+    "lane": { "type": "string" },
+    "trial": { "type": "integer" },
+    "effort": { "type": ["string", "null"] },
+
+    "disposition": {
+      "enum": ["OK", "REFUSAL_SAFETY", "REFUSAL_POLICY", "SCHEMA_INVALID", "TRUNCATED", "BUDGET_EXCEEDED", "TIMEOUT", "RATE_LIMITED", "PROVIDER_ERROR", "HARNESS_ERROR"],
+      "description": "REFUSAL_SAFETY is EXCLUDED from quality scoring and reported as a refusal rate. Scoring it as an empty finding set would systematically penalize classifier-bearing models on the security suite — the single most likely way this benchmark produces a wrong strategic conclusion."
+    },
+    "disposition_detail": { "type": ["string", "null"] },
+    "scored": { "type": "boolean", "description": "False when the disposition excludes this trial from quality scoring. Exclusions are always published beside the scores." },
+
+    "matching": {
+      "type": "object",
+      "properties": {
+        "assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "finding_id": { "type": "string" },
+              "oracle_id": { "type": ["string", "null"] },
+              "tier": { "enum": ["full", "located", "adjacent", "miss", "false_positive", "unverifiable"] },
+              "credit": { "type": "number" },
+              "reason": { "type": "string" }
+            }
+          }
+        },
+        "true_positive_credit": { "type": "number" },
+        "false_positive_count": { "type": "number" },
+        "unverifiable_count": { "type": "integer", "description": "Reported, unmatched, and not refutable from the corpus. Excluded from precision rather than counted against the model." },
+        "oracle_total": { "type": "integer" }
+      }
+    },
+
+    "resolution": {
+      "type": "object",
+      "description": "Entity resolution outcome. UNRESOLVED is reported separately from WRONG: a model that names a real thing imprecisely differs from one that invents a symbol, and both differ from a resolver bug.",
+      "properties": {
+        "referenced": { "type": "integer" },
+        "exact": { "type": "integer" },
+        "located": { "type": "integer" },
+        "fuzzy": { "type": "integer" },
+        "unresolved": { "type": "integer" },
+        "resolution_rate": { "type": "number" }
+      }
+    },
+
+    "claims": {
+      "type": "object",
+      "properties": {
+        "asserted": { "type": "integer" },
+        "verified_true": { "type": "integer" },
+        "contradicted": { "type": "integer" },
+        "unknown": { "type": "integer" },
+        "source": { "enum": ["EMITTED", "EXTRACTED"], "description": "EXTRACTED claims carry the pinned extractor's measured error as an explicit uncertainty band." },
+        "extractor_version": { "type": ["string", "null"] }
+      }
+    },
+
+    "scores": {
+      "type": "object",
+      "properties": {
+        "detection_f_beta": { "type": "number" },
+        "precision": { "type": "number" },
+        "recall": { "type": "number" },
+        "beta": { "type": "number" },
+        "evidence": { "type": "number" },
+        "root_cause": { "type": ["number", "null"] },
+        "severity_agreement": { "type": ["number", "null"] },
+        "completeness": { "type": "number" },
+        "remediation": { "type": ["number", "null"] },
+        "communication": { "type": ["number", "null"] },
+        "quality_index": { "type": "number", "description": "0-100 weighted blend of the above ONLY. Calibration, abstention, reliability and economics are separate axes." }
+      }
+    },
+
+    "calibration": {
+      "type": "object",
+      "properties": {
+        "brier": { "type": ["number", "null"] },
+        "ece": { "type": ["number", "null"] },
+        "discrimination_auc": { "type": ["number", "null"] },
+        "n": { "type": "integer" }
+      }
+    },
+
+    "abstention": {
+      "type": "object",
+      "properties": {
+        "abstained": { "type": "integer" },
+        "correct_abstentions": { "type": "integer" },
+        "over_claims": { "type": "integer", "description": "Confident answers on items the oracle marks unanswerable. Penalized at 1.5x a normal false positive." },
+        "abstention_precision": { "type": ["number", "null"] }
+      }
+    },
+
+    "budget_use": {
+      "type": "object",
+      "properties": {
+        "tool_calls": { "type": "integer" },
+        "graph_queries": { "type": "integer" },
+        "files_opened": { "type": "integer" },
+        "wall_clock_ms": { "type": "integer" },
+        "exceeded": { "type": "boolean" }
+      }
+    },
+
+    "economics": {
+      "type": "object",
+      "properties": {
+        "cold_cost_usd": { "type": ["number", "null"] },
+        "warm_cost_usd": { "type": ["number", "null"] },
+        "cost_per_correct_finding": { "type": ["number", "null"] },
+        "pricing_table_version": { "type": "string" },
+        "imputed_pricing": { "type": "boolean" },
+        "promotional_pricing": { "type": "boolean" }
+      }
+    },
+
+    "tribunal": {
+      "type": ["object", "null"],
+      "properties": {
+        "panel_version": { "type": "string" },
+        "effective_panel_size": { "type": "number", "description": "Discounted for measured inter-judge error correlation. Three highly-correlated judges are reported as closer to one than to three." },
+        "verdicts": { "type": "array", "items": { "type": "object" } },
+        "position_consistent": { "type": ["boolean", "null"] }
+      }
+    }
+  }
+}

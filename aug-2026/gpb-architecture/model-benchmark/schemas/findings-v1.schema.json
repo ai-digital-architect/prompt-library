@@ -1,0 +1,172 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://internal/model-benchmark/schemas/findings-v1.schema.json",
+  "title": "Normalized Engineering Findings Response v1",
+  "description": "The response contract every candidate model must satisfy. Claims are EMITTED here as structured entities and relations rather than extracted post hoc from prose, because post-hoc extraction is an unmeasured LLM step applied asymmetrically across candidates. Every current model in the roster supports native structured output, so this costs nothing in fairness terms.",
+  "type": "object",
+  "required": ["schema_version", "findings", "abstentions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+
+    "findings": {
+      "type": "array",
+      "description": "Every issue found. Report coverage, not a filtered shortlist — filtering is a downstream scoring decision. An empty array is a valid answer and is scored as such.",
+      "items": { "$ref": "#/definitions/finding" }
+    },
+
+    "abstentions": {
+      "type": "array",
+      "description": "Questions the corpus does not support answering. Correct abstention earns full credit; guessing on an unanswerable item is penalized more than a normal false positive.",
+      "items": {
+        "type": "object",
+        "required": ["question_id", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "question_id": { "type": "string" },
+          "reason": { "type": "string", "maxLength": 500 },
+          "what_would_resolve_it": { "type": "string", "maxLength": 500 }
+        }
+      }
+    },
+
+    "answers": {
+      "type": "array",
+      "description": "Direct answers for suites that pose questions rather than ask for findings (the semantic suite). Each answer carries its own claim set so it can be graph-verified.",
+      "items": {
+        "type": "object",
+        "required": ["question_id", "answer", "confidence"],
+        "additionalProperties": false,
+        "properties": {
+          "question_id": { "type": "string" },
+          "answer": { "type": "string" },
+          "confidence": { "$ref": "#/definitions/confidence" },
+          "entities": { "type": "array", "items": { "$ref": "#/definitions/entity" } },
+          "relations": { "type": "array", "items": { "$ref": "#/definitions/relation" } }
+        }
+      }
+    },
+
+    "coverage_notes": {
+      "type": "string",
+      "description": "What was examined and what was not. Used to distinguish 'looked and found nothing' from 'did not look'.",
+      "maxLength": 2000
+    }
+  },
+
+  "definitions": {
+
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Calibrated probability that this claim is correct. Scored with a proper scoring rule (Brier, ECE) as its own axis — it is NOT blended into the quality index, because a slightly less accurate but well-calibrated model is often the better production choice."
+    },
+
+    "entity": {
+      "type": "object",
+      "required": ["kind", "ref"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": ["module", "package", "class", "interface", "method", "function", "field", "endpoint", "table", "queue", "topic", "service", "config", "file", "external_system"]
+        },
+        "ref": {
+          "type": "string",
+          "description": "Name of the entity. A fully-qualified name resolves most reliably, but the resolver accepts simple names and disambiguates using the finding's evidence. Unresolvable refs are bucketed as UNRESOLVED and reported separately from wrong — see references/scoring-spec.md § Entity Resolution."
+        },
+        "role": {
+          "enum": ["site", "source", "sink", "caller", "callee", "owner", "dependency", "affected"],
+          "description": "How this entity participates in the finding."
+        }
+      }
+    },
+
+    "relation": {
+      "type": "object",
+      "description": "A checkable assertion about the system. These are what the code graph verifies. Predicates outside the enum are accepted but graded as UNKNOWN rather than counted against the model.",
+      "required": ["subject", "predicate", "object"],
+      "additionalProperties": false,
+      "properties": {
+        "subject": { "type": "string" },
+        "predicate": {
+          "type": "string",
+          "examples": ["CALLS", "CALLS_EXTERNAL", "READS", "WRITES", "DEPENDS_ON", "PUBLISHES_TO", "SUBSCRIBES_TO", "EXPOSES", "PERSISTS_TO", "TRANSITIVELY_DEPENDS_ON", "SHARES_DATASTORE_WITH", "VIOLATES_LAYER"]
+        },
+        "object": { "type": "string" },
+        "modality": { "enum": ["synchronous", "asynchronous", "unknown"] },
+        "negated": {
+          "type": "boolean",
+          "default": false,
+          "description": "Assert the ABSENCE of a relation (e.g. no timeout configured). Verified the same way; absence claims are frequently the whole point of a resiliency finding."
+        }
+      }
+    },
+
+    "evidence": {
+      "type": "object",
+      "description": "Where in the corpus the claim can be checked. Evidence grounding is 25% of the quality index because the code graph makes it objective.",
+      "required": ["file"],
+      "additionalProperties": false,
+      "properties": {
+        "file": { "type": "string" },
+        "symbol": { "type": "string" },
+        "lines": { "type": "string", "pattern": "^\\d+(-\\d+)?$" },
+        "excerpt": { "type": "string", "maxLength": 600 }
+      }
+    },
+
+    "finding": {
+      "type": "object",
+      "required": ["id", "category", "type", "severity", "confidence", "entities", "evidence", "root_cause", "impact", "recommendation"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^F-\\d{2,4}$" },
+        "category": {
+          "enum": ["semantic", "architecture", "security", "controls", "resiliency", "maintainability", "observability", "testing"]
+        },
+        "type": {
+          "type": "string",
+          "description": "The specific finding type. Use a CWE identifier for security findings (e.g. CWE-89) and a controlled architecture/resiliency type otherwise (e.g. layer_violation, missing_timeout, unbounded_retry, shared_datastore, cyclic_dependency, single_az_dependency, shared_thread_pool). Matching against oracles tolerates one level of ontology distance."
+        },
+        "severity": { "enum": ["critical", "high", "medium", "low", "info"] },
+        "confidence": { "$ref": "#/definitions/confidence" },
+        "status": {
+          "enum": ["ASSERTED", "SUSPECTED"],
+          "default": "ASSERTED",
+          "description": "SUSPECTED signals a finding worth surfacing that the model could not confirm from the corpus. It is scored with reduced precision cost — surfacing an honest suspicion should not be punished as hard as a confident false positive."
+        },
+        "entities": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/entity" }
+        },
+        "relations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/relation" }
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/evidence" }
+        },
+        "root_cause": {
+          "type": "string",
+          "description": "WHY this is wrong, not what it is. Causal agreement with the oracle is required for full match credit.",
+          "maxLength": 1500
+        },
+        "impact": { "type": "string", "maxLength": 1500 },
+        "recommendation": { "type": "string", "maxLength": 2000 },
+        "exploitability": {
+          "enum": ["confirmed", "theoretical", "not_applicable"],
+          "description": "Security suite only. Distinguishes a demonstrable path from a pattern match."
+        },
+        "compliance_status": {
+          "enum": ["COMPLIANT", "NON_COMPLIANT", "NOT_APPLICABLE", "INSUFFICIENT_EVIDENCE"],
+          "description": "Controls suite only. INSUFFICIENT_EVIDENCE is a first-class correct answer, not a failure to answer."
+        },
+        "control_id": { "type": "string" }
+      }
+    }
+  }
+}

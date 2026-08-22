@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://internal/model-benchmark/schemas/task.schema.json",
+  "title": "Benchmark Task v1",
+  "description": "One item in a suite. Carries the authored task, the oracle, the budget, and the metadata that makes item analysis possible. Items whose discrimination falls below threshold are retired to a regression set — every model passing or every model failing carries no information and costs money.",
+  "type": "object",
+  "required": ["id", "suite", "version", "prompt", "oracle", "budget"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "suite": { "type": "string" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "title": { "type": "string" },
+    "difficulty": {
+      "type": "integer", "minimum": 1, "maximum": 5,
+      "description": "Authored estimate, replaced by the observed value (1 - mean credited score) after each round."
+    },
+    "sealed": {
+      "type": "boolean", "default": false,
+      "description": "Sealed items are never exposed to prompt authors or agents. The gap between development and sealed scores is published as the generalization gap — a widening gap means the programme is fitting its own benchmark."
+    },
+    "tags": { "type": "array", "items": { "type": "string" } },
+
+    "prompt": {
+      "type": "object",
+      "description": "Authored once, compiled into the canonical IR. See schemas/prompt-ir.schema.json.",
+      "required": ["objective", "scope", "success_criteria"],
+      "properties": {
+        "persona": { "type": "string" },
+        "domain": { "type": "string" },
+        "objective": { "type": "string" },
+        "scope": { "type": "string" },
+        "success_criteria": { "type": "array", "items": { "type": "string" } },
+        "context": { "type": "object" },
+        "reference_material": { "type": "array", "items": { "type": "object" } },
+        "questions": {
+          "type": "array",
+          "description": "For question-style suites. Each question declares whether it is answerable from the corpus, so correct abstention can be rewarded.",
+          "items": {
+            "type": "object",
+            "required": ["id", "text", "answerable"],
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "answerable": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+
+    "oracle": {
+      "type": "object",
+      "required": ["provenance"],
+      "properties": {
+        "provenance": {
+          "enum": ["STATIC_ANALYSIS", "SEEDED_MUTATION", "HUMAN_CURATED", "TEST_DERIVED"],
+          "description": "How this ground truth was established. HUMAN_CURATED entries carry a curator and review date — an unchallengeable oracle is how a benchmark decays."
+        },
+        "curator": { "type": "string" },
+        "reviewed_on": { "type": "string" },
+        "mutation_id": { "type": ["string", "null"] },
+        "answerable": { "type": "boolean", "default": true },
+        "findings": {
+          "type": "array",
+          "description": "Known findings. Reported findings are matched one-to-one against these (Hungarian assignment) so one oracle finding cannot be claimed five times for five true positives.",
+          "items": {
+            "type": "object",
+            "required": ["oracle_id", "type", "entities"],
+            "properties": {
+              "oracle_id": { "type": "string" },
+              "type": { "type": "string" },
+              "category": { "type": "string" },
+              "severity": { "enum": ["critical", "high", "medium", "low", "info"] },
+              "entities": { "type": "array", "items": { "type": "string" } },
+              "evidence": { "type": "array", "items": { "type": "object" } },
+              "expected_root_cause": { "type": "array", "items": { "type": "string" } },
+              "compliance_status": { "enum": ["COMPLIANT", "NON_COMPLIANT", "NOT_APPLICABLE", "INSUFFICIENT_EVIDENCE"] }
+            }
+          }
+        },
+        "relations": {
+          "type": "array",
+          "description": "Graph assertions that must hold (or must NOT hold) for a correct answer. TRUE/FALSE pairs let the suite test both recall and hallucination on the same structure.",
+          "items": {
+            "type": "object",
+            "required": ["subject", "predicate", "object", "truth"],
+            "properties": {
+              "subject": { "type": "string" },
+              "predicate": { "type": "string" },
+              "object": { "type": "string" },
+              "modality": { "enum": ["synchronous", "asynchronous", "unknown"] },
+              "truth": { "type": "boolean" }
+            }
+          }
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["question_id"],
+            "properties": {
+              "question_id": { "type": "string" },
+              "expected_entities": { "type": "array", "items": { "type": "string" } },
+              "expected_abstention": { "type": "boolean", "default": false }
+            }
+          }
+        }
+      }
+    },
+
+    "budget": {
+      "type": "object",
+      "properties": {
+        "max_tool_calls": { "type": "integer" },
+        "max_graph_queries": { "type": "integer" },
+        "max_files_opened": { "type": "integer" },
+        "max_wall_clock_s": { "type": "integer" },
+        "max_input_tokens": { "type": "integer" },
+        "max_output_tokens": { "type": "integer" }
+      }
+    },
+
+    "item_stats": {
+      "type": "object",
+      "description": "Populated by `mb.py score`. Discrimination below ~0.15 means the item separates nothing; retire it to the regression set.",
+      "properties": {
+        "observed_difficulty": { "type": "number" },
+        "discrimination": { "type": "number" },
+        "rounds_observed": { "type": "integer" },
+        "status": { "enum": ["active", "regression", "retired"] }
+      }
+    }
+  }
+}

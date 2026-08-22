@@ -1,0 +1,94 @@
+# Architecture suite.
+#
+# Partially subjective: whether a dependency is a violation depends on the
+# intended architecture, so each item ships the intended layering as reference
+# material. Without it the task is a Rorschach test and the disagreement between
+# models measures our ambiguity rather than their judgment.
+#
+# This suite depends on the tribunal for root-cause and remediation scoring.
+# Until the human calibration set exists and its inter-rater reliability has
+# been measured, run it with `tribunal.enabled: false` and read only the
+# deterministic dimensions.
+
+suite: architecture-v1
+version: 1.0.0
+description: Seeded architecture violations with an explicit intended-architecture oracle.
+f_beta: 1.0
+corpus: fixtures/sample-repo
+
+tasks:
+
+  - id: ARC-0001
+    suite: architecture-v1
+    version: 1.0.0
+    title: "Bounded-context leakage in the reporting path"
+    difficulty: 3
+    sealed: false
+    tags: [java, architecture, bounded-context]
+
+    prompt:
+      persona: "an application architect reviewing service boundaries"
+      domain: "domain-driven design in enterprise systems"
+      objective: >
+        Identify where the implementation departs from the intended architecture
+        described in the reference material, and state the practical consequence
+        of each departure.
+      scope: >
+        The attached corpus, assessed against the intended architecture in
+        <spec>. Do not report stylistic preferences as architectural violations.
+      success_criteria:
+        - "Every departure from the intended architecture is reported."
+        - "Each finding names the offending component and the rule it breaks."
+        - "Each finding states a consequence, not only a rule citation."
+        - "A remediation is proposed that is achievable without a rewrite."
+      context:
+        why_this_matters: >
+          The reporting workload is about to be extracted into its own service.
+          Anything reaching across the boundary now becomes a distributed
+          coupling problem later.
+        audience: "the architecture review board"
+      reference_material:
+        - label: "payments package"
+          kind: code
+          path: "src/com/acme/payments"
+        - label: "intended architecture"
+          kind: spec
+          inline: |
+            Intended layering:
+              Controller -> Service -> Repository -> datastore
+            Rules:
+              1. Only the owning bounded context's Service layer may reach its Repository.
+              2. Reporting is a separate bounded context and must read through a
+                 published interface, never through another context's repository.
+              3. Controllers hold no domain logic.
+
+    oracle:
+      provenance: HUMAN_CURATED
+      curator: "engineering-intelligence"
+      reviewed_on: "2026-08-22"
+      answerable: true
+      findings:
+        - oracle_id: ARC-0001-F1
+          type: shared_datastore
+          category: architecture
+          severity: medium
+          entities: [ReportingService, PaymentRepository]
+          evidence:
+            - { file: "ReportingService.java", lines: "4-9" }
+          expected_root_cause: ["bounded_context_leakage", "cross_context_repository_access"]
+        - oracle_id: ARC-0001-F2
+          type: layer_violation
+          category: architecture
+          severity: medium
+          entities: [PaymentController.search, OrderRepository.findOrders]
+          evidence:
+            - { file: "PaymentController.java", lines: "17-21" }
+          expected_root_cause: ["controller_reaches_repository_directly"]
+
+    budget:
+      max_tool_calls: 25
+      max_graph_queries: 20
+      max_files_opened: 40
+      max_wall_clock_s: 900
+      max_input_tokens: 200000
+      max_output_tokens: 20000

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://skills.io/schema/skill-manifest/v1.json",
+  "name": "model-benchmark",
+  "version": "1.0.0",
+  "title": "Model Benchmark — Engineering Intelligence Evaluation Harness",
+  "summary": "Evidence-first benchmarking of frontier LLMs on enterprise software-engineering tasks: canonical prompt IR, per-model adapters, machine-enforced fairness contract, deterministic and code-graph grading, blinded judge tribunal, honest cost economics.",
+  "license": "Proprietary — internal use",
+  "entry": "SKILL.md",
+  "harnesses": {
+    "claude-code": { "install_path": ".claude/skills/model-benchmark", "entry": "SKILL.md" },
+    "github-copilot": { "install_path": ".github/skills/model-benchmark", "entry": "SKILL.md" },
+    "generic-agent": { "entry": "SKILL.md", "cli": "scripts/mb.py" }
+  },
+  "runtime": {
+    "python": ">=3.9",
+    "required_packages": ["pyyaml"],
+    "optional_packages": [],
+    "network": "outbound HTTPS to configured provider endpoints only",
+    "offline_modes": ["--dry-run", "--replay"]
+  },
+  "subskills": [
+    {
+      "id": "benchmark-planning",
+      "path": "skills/benchmark-planning/SKILL.md",
+      "when": "Scoping a study: which models, which lanes, how many trials, expected cost and statistical power."
+    },
+    {
+      "id": "adapter-authoring",
+      "path": "skills/adapter-authoring/SKILL.md",
+      "when": "Adding or revising a model adapter: a new model, a new provider, or a prompt-rendering change."
+    },
+    {
+      "id": "suite-authoring",
+      "path": "skills/suite-authoring/SKILL.md",
+      "when": "Writing eval tasks, oracles, seeded vulnerabilities, or mutation-generated ground truth."
+    },
+    {
+      "id": "run-execution",
+      "path": "skills/run-execution/SKILL.md",
+      "when": "Executing a benchmark: compile, validate fairness, invoke, disposition, store."
+    },
+    {
+      "id": "grading-and-scoring",
+      "path": "skills/grading-and-scoring/SKILL.md",
+      "when": "Turning raw responses into scores: normalize, resolve entities, verify claims, match findings, score, run statistics."
+    },
+    {
+      "id": "judge-tribunal",
+      "path": "skills/judge-tribunal/SKILL.md",
+      "when": "Standing up or operating the blinded judge panel, or calibrating judges against human ground truth."
+    },
+    {
+      "id": "reporting-and-routing",
+      "path": "skills/reporting-and-routing/SKILL.md",
+      "when": "Producing Pareto frontiers, leaderboards, code-graph uplift analysis, or a model-routing policy."
+    },
+    {
+      "id": "change-management",
+      "path": "skills/change-management/SKILL.md",
+      "when": "Versioning a component, migrating a schema, or deciding whether a change requires a backfill."
+    }
+  ],
+  "references": [
+    { "id": "fairness-contract", "path": "references/fairness-contract.md" },
+    { "id": "scoring-spec", "path": "references/scoring-spec.md" },
+    { "id": "statistics", "path": "references/statistics.md" },
+    { "id": "economics", "path": "references/economics.md" },
+    { "id": "security", "path": "references/security.md" },
+    { "id": "provider-notes", "path": "references/provider-notes.md" },
+    { "id": "troubleshooting", "path": "references/troubleshooting.md" }
+  ],
+  "schemas": {
+    "prompt_ir": { "path": "schemas/prompt-ir.schema.json", "version": "1.0.0" },
+    "task": { "path": "schemas/task.schema.json", "version": "1.0.0" },
+    "findings": { "path": "schemas/findings-v1.schema.json", "version": "1.0.0" },
+    "run_manifest": { "path": "schemas/run-manifest.schema.json", "version": "1.0.0" },
+    "grade": { "path": "schemas/grade.schema.json", "version": "1.0.0" }
+  },
+  "commands": [
+    { "name": "doctor", "usage": "mb.py doctor", "description": "Environment, registry, pricing staleness and credential-visibility check. Never prints secret values." },
+    { "name": "models", "usage": "mb.py models list|show <id>", "description": "Inspect the model registry and per-model capability facts." },
+    { "name": "compile", "usage": "mb.py compile --suite <f> --task <id> [--model <id>|--all-models] [--dry-run]", "description": "Build the canonical IR, render per-adapter prompts, run the fairness validator, emit hashes." },
+    { "name": "plan", "usage": "mb.py plan --benchmark <f> [--estimate]", "description": "Expand a study into its trial matrix and estimate cost and duration before spending." },
+    { "name": "run", "usage": "mb.py run --benchmark <f> [--live|--replay|--dry-run] [--include-retired]", "description": "Execute the trial matrix with retry, backoff and disposition handling." },
+    { "name": "grade", "usage": "mb.py grade --run-dir <d>", "description": "Normalize, resolve entities, verify claims, match findings against oracles." },
+    { "name": "score", "usage": "mb.py score --run-dir <d>", "description": "Compute quality, calibration, abstention, reliability, economics and statistics." },
+    { "name": "report", "usage": "mb.py report --run-dir <d> [--format md|json]", "description": "Render frontiers, iso-budget tables, exclusions and the comparability statement." },
+    { "name": "route", "usage": "mb.py route --run-dir <d>", "description": "Emit a routing policy derived from the measured frontiers." },
+    { "name": "test", "usage": "mb.py test", "description": "Replay the bundled cassettes end to end. Run after any scoring change." }
+  ],
+  "invariants": [
+    "A safety refusal is dispositioned, never scored as a wrong answer.",
+    "Vendor effort labels are not a common scale; models are compared at iso-cost / iso-latency budget points.",
+    "Cross-provider token counts are never used as a capability metric.",
+    "Credentials never enter prompts, manifests, transcripts, cassettes or logs.",
+    "The upstream model-prompt-templates library is read-only.",
+    "A change to scoring, matching, resolution or the response schema invalidates cross-version comparison until a backfill runs."
+  ]
+}

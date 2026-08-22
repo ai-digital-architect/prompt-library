@@ -1,0 +1,82 @@
+# Resiliency suite.
+#
+# Resiliency findings are frequently ABSENCE claims — "no timeout is
+# configured", "the retry policy is unbounded". The response schema supports
+# that directly via `relations[].negated`, and the evidence provider only
+# answers an absence claim for predicates it can actually decide. Answering
+# "false" from ignorance would convert a gap in our own graph into an apparent
+# model hallucination.
+
+suite: resiliency-v1
+version: 1.0.0
+description: Seeded resiliency defects — timeouts, retries, bulkheads, redundancy.
+f_beta: 1.2
+corpus: fixtures/sample-repo
+
+tasks:
+
+  - id: RES-0001
+    suite: resiliency-v1
+    version: 1.0.0
+    title: "External call resiliency on the charge path"
+    difficulty: 2
+    sealed: false
+    tags: [java, resiliency, timeouts, retries]
+
+    prompt:
+      persona: "a reliability engineer reviewing a service before a traffic peak"
+      domain: "resilient distributed systems"
+      objective: >
+        Assess how the charge path behaves when the external payment gateway is
+        slow or unavailable. Report every configuration that would let a gateway
+        problem propagate into the charge path.
+      scope: >
+        The attached corpus only. Treat missing configuration as a finding when
+        the code path makes an external call without it.
+      success_criteria:
+        - "Every external call site is identified."
+        - "Missing timeout and unbounded retry configuration are reported as SEPARATE findings, since they need different remediations."
+        - "Each finding states its failure-propagation consequence."
+        - "Absence claims are expressed as negated relations so they can be checked."
+      context:
+        why_this_matters: >
+          Last quarter a slow downstream dependency saturated the request pool and
+          took the checkout path down with it. This review is meant to catch the
+          same shape before the traffic peak.
+        audience: "the reliability review board"
+      reference_material:
+        - label: "payments package"
+          kind: code
+          path: "src/com/acme/payments"
+
+    oracle:
+      provenance: SEEDED_MUTATION
+      mutation_id: FIXTURE-002
+      answerable: true
+      findings:
+        - oracle_id: RES-0001-F1
+          type: missing_timeout
+          category: resiliency
+          severity: high
+          entities: [PaymentClient.callGateway]
+          evidence:
+            - { file: "PaymentClient.java", lines: "12-20" }
+          expected_root_cause: ["no_timeout_configured", "unbounded_external_call"]
+        - oracle_id: RES-0001-F2
+          type: unbounded_retry
+          category: resiliency
+          severity: high
+          entities: [PaymentClient.callGateway]
+          evidence:
+            - { file: "PaymentClient.java", lines: "15-18" }
+          expected_root_cause: ["retry_max_attempts_unbounded"]
+      relations:
+        - { subject: PaymentService, predicate: CALLS, object: PaymentClient.callGateway, modality: synchronous, truth: true }
+
+    budget:
+      max_tool_calls: 25
+      max_graph_queries: 15
+      max_files_opened: 30
+      max_wall_clock_s: 600
+      max_input_tokens: 150000
+      max_output_tokens: 16000
